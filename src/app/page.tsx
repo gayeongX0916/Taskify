@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <>
-      <div className="text-3xl">32/42</div>
+      <div className="bg-violet_5534DA text-3xl">32/42</div>
       <div className="text-2xl">24/32</div>
       <div className="text-xl">20/32</div>
       <div className="text-2lg">18/26</div>
