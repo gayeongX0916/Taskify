@@ -5,7 +5,7 @@ import exampleIcon from "@/assets/crown.svg";
 
 export default function DashboardHeader() {
   return (
-    <header className="flex items-center justify-between pl-[84px] pr-[8px] py-[15px] md:pl-[200px] md:pr-[80px] md:py-[19px] lg:pl-[340px] ">
+    <header className="flex items-center justify-between border-b border-[#d9d9d9] pl-[84px] pr-[8px] py-[15px] md:pl-[200px] md:pr-[80px] md:py-[19px] lg:pl-[340px] ">
       <h1 className="text-lg font-bold text-black_333236 md:text-xl">
         내 대시보드
       </h1>
