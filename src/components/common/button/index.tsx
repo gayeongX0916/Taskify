@@ -35,3 +35,23 @@ export function DashboardButton({ mode }: DashboardButtonProps) {
   );
 }
 
+type ModalButtonProps = {
+  mode: "any" | "cancel";
+  children: ReactNode;
+};
+
+export function ModalButton({ mode, children }: ModalButtonProps) {
+  const isCancel = mode === "cancel";
+
+  return (
+    <button
+      className={`rounded-[8px] px-[46px] py-[11px] text-lg font-semibold md:font-medium md:px-[56px] md:py-[9px] ${
+        isCancel
+          ? "text-gray_787486 border border-gray_D9D9D9"
+          : "bg-violet_5534DA text-white_FFFFFF"
+      }`}
+    >
+      {mode === "cancel" ? "취소" : children}
+    </button>
+  );
+}
