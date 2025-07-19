@@ -1,6 +1,6 @@
 export function AssigneeCard() {
   return (
-    <div className="flex md:flex-col md:gap-y-[16px] border border-gray_D9D9D9 rounded-[8px] px-[16px] py-[9px] justify-around md:py-[13px] md:pl-[16px] md:pr-[56px] w-full">
+    <div className="flex mb-[16px] md:flex-col md:gap-y-[16px] border border-gray_D9D9D9 rounded-[8px] px-[16px] py-[9px] justify-around md:py-[13px] md:pl-[16px] md:pr-[56px] w-full md:w-[200px] md:h-[155px]">
       <div className="flex flex-col md:gap-y-[6px]">
         <span className="text-xs font-semibold">담당자</span>
         <div className="flex gap-x-[8px] items-center">
