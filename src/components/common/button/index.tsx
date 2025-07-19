@@ -38,14 +38,16 @@ export function DashboardButton({ mode }: DashboardButtonProps) {
 type ModalButtonProps = {
   mode: "any" | "cancel";
   children: ReactNode;
+  onClick?: () => void;
 };
 
-export function ModalButton({ mode, children }: ModalButtonProps) {
+export function ModalButton({ mode, children, onClick }: ModalButtonProps) {
   const isCancel = mode === "cancel";
 
   return (
     <button
-      className={`rounded-[8px] px-[46px] py-[11px] text-lg font-semibold md:font-medium md:px-[56px] md:py-[9px] ${
+      onClick={onClick}
+      className={`rounded-[8px] px-[46px] py-[11px] text-lg md:font-semibold md:font-medium md:px-[56px] md:py-[9px] w-full ${
         isCancel
           ? "text-gray_787486 border border-gray_D9D9D9"
           : "bg-violet_5534DA text-white_FFFFFF"
