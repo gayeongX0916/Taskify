@@ -5,6 +5,7 @@ import { AssigneeDropdown } from "@/components/dropdown/assignee";
 import { ProgressDropdown } from "@/components/dropdown/progress";
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
+import editIcon from "@/assets/edit_icon.svg";
 
 export function ModalEditTodo() {
   const [isOpen, setIsOpen] = useState(false);

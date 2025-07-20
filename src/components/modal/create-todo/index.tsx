@@ -3,10 +3,17 @@
 import { ModalButton } from "@/components/common/button";
 import { AssigneeDropdown } from "@/components/dropdown/assignee";
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import Image from "next/image";
+import plusIcon from "@/assets/plus_icon.svg";
+import { useRef, useState } from "react";
 
 export function ModalCreateTodo() {
   const [isOpen, setIsOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInputClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <Dialog open={true} onClose={setIsOpen}>
@@ -52,7 +59,12 @@ export function ModalCreateTodo() {
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">이미지</span>
-                <input type="file" />
+                <div className="w-[76px] h-[76px] bg-[#F5F5F5] flex justify-center items-center">
+                  <button onClick={handleInputClick}>
+                    <Image src={plusIcon} alt="추가" />
+                  </button>
+                  <input type="file" ref={fileInputRef} className="hidden" />
+                </div>
               </div>
               <div className="flex gap-x-[11px]">
                 <ModalButton mode="cancel">취소</ModalButton>
