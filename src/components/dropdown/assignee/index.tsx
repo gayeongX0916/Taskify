@@ -24,9 +24,9 @@ export function AssigneeDropdown() {
           </button>
         )}
       </div>
-      <div className="rouned-[8px] px-[16px] py-[14px] flex flex-col gap-y-[11px]">
+      {/* <div className="rouned-[8px] px-[16px] py-[14px] flex flex-col gap-y-[11px]">
         {exampleList.map((list) => (
-          <div className="flex gap-x-[8px]">
+          <div key={list} className="flex gap-x-[8px]">
             <Image src={checkIcon} alt="체크" />
             <button className="flex gap-x-[6px]">
               <div className="rounded-full bg-violet_8P flex justify-center items-center w-[26px] h-[26px]">
@@ -36,7 +36,7 @@ export function AssigneeDropdown() {
             </button>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
