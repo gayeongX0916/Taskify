@@ -19,10 +19,10 @@ export function ModalCreateDashboard() {
   const [colorClick, setColorClick] = useState("green_7AC555");
 
   return (
-    <Dialog open={isOpen} onClose={setIsOpen}>
+    <Dialog open={true} onClose={setIsOpen}>
       <div className="fixed inset-0 bg-black bg-opacity-30">
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <div className="bg-white_FFFFFF px-[16px] py-[20px] rounded-[8px] w-full md:w-[584px] md:px-[32px] md:py-[32px]">
+          <div className="bg-white_FFFFFF px-[16px] py-[20px] rounded-[8px] w-full min-w-[327px] md:w-[584px] md:px-[32px] md:py-[32px]">
             <div className="mb-[32px] md:mb-[40px]">
               <h1 className="text-xl text-black_333236 mb-[24px] font-bold md:text-2xl">
                 새로운 대시보드
