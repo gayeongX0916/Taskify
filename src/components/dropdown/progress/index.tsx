@@ -15,7 +15,7 @@ export function ProgressDropdown() {
     <div>
       <div className="relative">
         <div
-          className={`rounded-[6px] hover:border hover:border-violet_5534DA px-[16px] py-[8px] ${
+          className={`rounded-[6px] border border-gray_D9D9D9 hover:border hover:border-violet_5534DA px-[16px] py-[8px] w-full ${
             isOpen ? "border border-violet_5534DA" : ""
           }`}
         >
