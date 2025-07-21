@@ -6,7 +6,15 @@ import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
 import Image from "next/image";
 
-export function ModalCreateDashboard() {
+type ModalCreateDashboardProps = {
+  mode: "create" | "edit";
+  name?: string;
+};
+
+export function ModalCreateDashboard({
+  mode,
+  name = "기존",
+}: ModalCreateDashboardProps) {
   const colorList = [
     "green_7AC555",
     "purple_760DDE",
@@ -17,6 +25,7 @@ export function ModalCreateDashboard() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [colorClick, setColorClick] = useState("green_7AC555");
+  const [value, setValue] = useState("기존");
 
   return (
     <Dialog open={true} onClose={setIsOpen}>
@@ -25,11 +34,14 @@ export function ModalCreateDashboard() {
           <div className="bg-white_FFFFFF px-[16px] py-[20px] rounded-[8px] w-full min-w-[327px] md:w-[584px] md:px-[32px] md:py-[32px]">
             <div className="mb-[32px] md:mb-[40px]">
               <h1 className="text-xl text-black_333236 mb-[24px] font-bold md:text-2xl">
-                새로운 대시보드
+                {mode === "create" ? "새로운 대시보드" : name}
               </h1>
               <div className="flex flex-col gap-y-[8px] mb-[16px]">
                 <span className="text-lg text-black_333236">대시보드 이름</span>
-                <input className="px-[16px] py-[15px] rounded-[8px] border border-gray_D9D9D9 w-full h-[50px]" />
+                <input
+                  className="px-[16px] py-[15px] rounded-[8px] border border-gray_D9D9D9 w-full h-[50px]"
+                  value={value}
+                />
               </div>
               <div className="flex gap-x-[8px]">
                 {colorList.map((list) => (
@@ -45,12 +57,16 @@ export function ModalCreateDashboard() {
                 ))}
               </div>
             </div>
-            <div className="flex gap-x-[7px]">
-              <ModalButton mode="cancel" onClick={() => setIsOpen(false)}>
-                취소
-              </ModalButton>
-              <ModalButton mode="any">생성</ModalButton>
-            </div>
+            {mode === "create" ? (
+              <div className="flex gap-x-[7px]">
+                <ModalButton mode="cancel" onClick={() => setIsOpen(false)}>
+                  취소
+                </ModalButton>
+                <ModalButton mode="any">생성</ModalButton>
+              </div>
+            ) : (
+              <ModalButton mode="any">변경</ModalButton>
+            )}
           </div>
         </div>
       </div>
