@@ -26,7 +26,7 @@ export function AddButton({ mode }: AddButtonProps) {
   const text = getText();
 
   return (
-    <div className="flex gap-x-[12px] justify-center items-center py-[20px] border border-D9D9D9 rouned-[10px]">
+    <div className="flex gap-x-[12px] justify-center items-center py-[20px] border border-D9D9D9 rounded-[10px]">
       {text && (
         <span className="text-lg text-black_333236 md:text-2lg font-bold">
           {text}
