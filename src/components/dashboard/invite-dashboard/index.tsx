@@ -1,4 +1,5 @@
 import searchIcon from "@/assets/search_icon.svg";
+import emptyDashboard from "@/assets/empty_dashboard.svg";
 import { DashboardButton } from "@/components/common/button";
 import Image from "next/image";
 
@@ -41,8 +42,8 @@ export function InviteDashboard() {
   ];
 
   return (
-    <div className="px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] md:px-[28px]">
-      <div className="flex flex-col gap-y-[16px] mb-[13px] md:mb-[24px] lg:gap-y-[32px]">
+    <div className="px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] md:px-[28px] flex flex-col gap-y-[13px] md:gap-y-[24px]">
+      <div className="flex flex-col gap-y-[16px] lg:gap-y-[32px]">
         <h1 className="text-xl text-black-333236 font-bold md:text-2xl">
           초대받은 대시보드
         </h1>
@@ -87,6 +88,13 @@ export function InviteDashboard() {
           ))}
         </div>
       </div>
+
+      {exampleList.length === 0 && (
+        <div className="flex flex-col ">
+          <Image src={emptyDashboard} alt="없어요" width={60} height={60} />
+          <span>아직 초대받은 대시보드가 없어요</span>
+        </div>
+      )}
     </div>
   );
 }
