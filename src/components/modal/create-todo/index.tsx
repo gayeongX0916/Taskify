@@ -59,12 +59,14 @@ export function ModalCreateTodo() {
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">이미지</span>
-                <div className="w-[76px] h-[76px] bg-[#F5F5F5] flex justify-center items-center">
-                  <button onClick={handleInputClick}>
-                    <Image src={plusIcon} alt="추가" />
-                  </button>
-                  <input type="file" ref={fileInputRef} className="hidden" />
-                </div>
+
+                <button
+                  className="w-[76px] h-[76px] bg-[#F5F5F5] flex justify-center items-center"
+                  onClick={handleInputClick}
+                >
+                  <Image src={plusIcon} alt="추가" />
+                </button>
+                <input type="file" ref={fileInputRef} className="hidden" />
               </div>
               <div className="flex gap-x-[11px]">
                 <ModalButton mode="cancel">취소</ModalButton>
