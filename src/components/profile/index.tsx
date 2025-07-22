@@ -16,7 +16,7 @@ export function Profile() {
   };
 
   return (
-    <div className="px-[16px] py-[16px] md:px-[24px] md:py-[24px]">
+    <div className="px-[16px] py-[16px] rounded-[8px] md:px-[24px] md:py-[24px] md:rounded-[16px]">
       <h1 className="text-2lg text-black_333236 font-bold mb-[40px] md:text-2xl md:mb-[24px]">
         프로필
       </h1>
