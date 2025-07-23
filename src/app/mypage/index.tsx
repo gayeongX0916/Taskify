@@ -1,0 +1,5 @@
+// 마이페이지
+
+const myPage = () => {
+  return <div></div>;
+};

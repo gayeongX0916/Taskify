@@ -1,11 +1,5 @@
-import DashboardHeader from "@/components/common/gnb/dashboard-header";
-import DefaultHeader from "@/components/common/gnb/default-header";
-import Image from "next/image";
+// 메인 랜딩페이지
 
-export default function Home() {
-  return (
-    <>
-      <DashboardHeader />
-    </>
-  );
-}
+const HomePage = () => {
+  return <div></div>;
+};
