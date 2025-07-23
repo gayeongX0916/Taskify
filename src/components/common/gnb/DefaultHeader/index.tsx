@@ -6,7 +6,7 @@ export default function DefaultHeader() {
   return (
     <header className="bg-black_000000 flex justify-between items-center px-[24px] py-[16px] md:px-[40px] md:py-[15px] lg:px-[80px]">
       <button className="flex md:hidden">
-        <Image src={logoWhite} alt="로고" width={24} height={28} />
+        <Image src={logoWhite} alt="로고" />
       </button>
       <button className="hidden md:flex">
         <Image src={logoTitleWhite} alt="로고" width={121} height={39} />
