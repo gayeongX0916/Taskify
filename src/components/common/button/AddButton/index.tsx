@@ -4,10 +4,10 @@ import { ReactNode } from "react";
 
 type AddButtonProps = {
   mode: "column" | "dashboard" | "todo" | "delete";
-  children?: ReactNode;
+  className?:string;
 };
 
-export function AddButton({ mode }: AddButtonProps) {
+export function AddButton({ mode,className }: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
@@ -26,7 +26,7 @@ export function AddButton({ mode }: AddButtonProps) {
   const text = getText();
 
   return (
-    <div className="flex gap-x-[12px] justify-center items-center py-[20px] border border-D9D9D9 rounded-[10px]">
+    <button className={`flex gap-x-[12px] justify-center items-center py-[20px] border border-D9D9D9 rounded-[10px] ${className ?? ""}`}>
       {text && (
         <span className="text-lg text-black_333236 md:text-2lg font-bold">
           {text}
@@ -35,6 +35,6 @@ export function AddButton({ mode }: AddButtonProps) {
       {showImage && (
         <Image src={addBoxIcon} alt="추가하기" width={22} height={22} />
       )}
-    </div>
+    </button>
   );
 }

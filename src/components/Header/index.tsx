@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import DefaultHeader from "../common/gnb/DefaultHeader";
-import DashboardHeader from "../common/gnb/DashboardHeader";
+import DefaultHeader from "../common/GNB/DefaultHeader";
+import DashboardHeader from "../common/GNB/DashboardHeader";
 
 export function Header() {
   const pathname = usePathname();
