@@ -1,7 +1,7 @@
 import searchIcon from "@/assets/search_icon.svg";
 import emptyDashboard from "@/assets/empty_dashboard.svg";
-import { DashboardButton } from "@/components/common/button";
 import Image from "next/image";
+import { DashboardButton } from "@/components/common/Button/DashboardButton";
 
 type MobileInviteListProps = {
   name: string;

@@ -1,11 +1,12 @@
 "use client";
 
-import { ModalButton } from "@/components/common/button";
+
 import { AssigneeDropdown } from "@/components/dropdown/assignee";
 import { Dialog } from "@headlessui/react";
 import Image from "next/image";
 import plusIcon from "@/assets/plus_icon.svg";
 import { useRef, useState } from "react";
+import { ModalButton } from "@/components/common/Button/ModalButton";
 
 export function ModalCreateTodo() {
   const [isOpen, setIsOpen] = useState(false);
