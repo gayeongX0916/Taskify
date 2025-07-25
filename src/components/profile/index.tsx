@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { DefaultInput } from "../common/input";
+import { DefaultInput } from "../common/Input";
 import Image from "next/image";
 import plusIcon from "@/assets/plus_icon.svg";
 import { ModalButton } from "../common/button";

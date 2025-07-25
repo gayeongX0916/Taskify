@@ -9,7 +9,7 @@ type DefaultInputProps = {
   onChange?: (value: string) => void;
 };
 
-export function DefaultInput({
+export function BaseInput({
   label,
   placeholder,
   value,
@@ -21,11 +21,12 @@ export function DefaultInput({
     setIsTyping(true);
     onChange?.(e.target.value);
   };
+  
   return (
     <div className="flex flex-col gap-y-[8px]">
       <span className="text-md text-black_333236 md:text-lg">{label}</span>
       <input
-        className={`px-[16px] py-[15px] rounded-[8px] border border-gray_D9D9D9 text-lg w-full ${
+        className={`px-[16px] py-[12px] rounded-[8px] border border-gray_D9D9D9 text-lg w-full ${
           !isTyping && value ? "text-gray_9FA6B2" : "text-black_333236"
         }`}
         placeholder={placeholder}

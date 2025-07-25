@@ -2,6 +2,7 @@ import arrowLeftNone from "@/assets/arrow_left_none.svg";
 import arrowRightNone from "@/assets/arrow_right_none.svg";
 import addBoxWhiteIcon from "@/assets/add_box_white.svg";
 import Image from "next/image";
+import { ActionButton } from "@/components/common/Button/ActionButton";
 
 type MemberTableProps = {
   mode: "member" | "invite";
@@ -76,9 +77,7 @@ export function MemberTable({ mode }: MemberTableProps) {
                     {list}
                   </span>
                 </div>
-                <button className="rounded-[4px] px-[15px] py-[7px] border border-gray_D9D9D9 text-xs text-violet_5534DA md:px-[29px]">
-                  삭제
-                </button>
+                <ActionButton>삭제</ActionButton>
               </div>
             ))
           : inviteList.map((list) => (
@@ -86,9 +85,7 @@ export function MemberTable({ mode }: MemberTableProps) {
                 <span className="text-md text-black_333236 md:text-lg">
                   {list}
                 </span>
-                <button className="rounded-[4px] px-[15px] py-[7px] border border-gray_D9D9D9 text-xs text-violet_5534DA md:px-[29px]">
-                  취소
-                </button>
+                <ActionButton>취소</ActionButton>
               </div>
             ))}
       </div>

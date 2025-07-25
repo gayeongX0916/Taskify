@@ -6,7 +6,7 @@ import moreIcon from "@/assets/more_icon.svg";
 import closeIcon from "@/assets/close_icon.svg";
 import Image from "next/image";
 import { Chip } from "@/components/chip";
-import { CommentTextarea } from "@/components/common/input/CommentTextarea";
+import { CommentTextarea } from "@/components/common/Input/CommentTextarea";
 import { Comment } from "@/components/comment";
 import { AssigneeCard } from "@/components/dashboard/assignee-card";
 import { Dropdown } from "@/components/dropdown";
