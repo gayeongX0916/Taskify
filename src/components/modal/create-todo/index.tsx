@@ -1,20 +1,17 @@
 "use client";
 
-
 import { AssigneeDropdown } from "@/components/dropdown/assignee";
 import { Dialog } from "@headlessui/react";
-import Image from "next/image";
-import plusIcon from "@/assets/plus_icon.svg";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ModalButton } from "@/components/common/Button/ModalButton";
+import { BaseInput } from "@/components/common/Input/BaseInput";
+import { TextareaInput } from "@/components/common/Input/ModalInput/TextareaInput";
+import { DateInput } from "@/components/common/Input/ModalInput/dateInput";
+import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
+import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 
 export function ModalCreateTodo() {
   const [isOpen, setIsOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleInputClick = () => {
-    fileInputRef.current?.click();
-  };
 
   return (
     <Dialog open={true} onClose={setIsOpen}>
@@ -29,46 +26,15 @@ export function ModalCreateTodo() {
                 <span className="text-lg text-black_333236">담당자</span>
                 <AssigneeDropdown />
               </div>
-              <div className="flex flex-col gap-y-[8px]">
-                <span className="text-lg text-black_333236">제목 *</span>
-                <input
-                  className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9"
-                  placeholder="제목을 입력해 주세요"
-                />
-              </div>
-              <div className="flex flex-col gap-y-[8px]">
-                <span className="text-lg text-black_333236">설명 *</span>
-                <textarea
-                  placeholder="설명을 입력해 주세요"
-                  className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9 resize-none"
-                />
-              </div>
-              <div className="flex flex-col gap-y-[8px]">
-                <span className="text-lg text-black_333236">마감일</span>
-                <input
-                  type="date"
-                  className="px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9"
-                  placeholder="날짜를 입력해 주세요"
-                />
-              </div>
-              <div className="flex flex-col gap-y-[8px]">
-                <span className="text-lg text-black_333236">태그</span>
-                <input
-                  className="px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9"
-                  placeholder="입력 후 Enter"
-                />
-              </div>
-              <div className="flex flex-col gap-y-[8px]">
-                <span className="text-lg text-black_333236">이미지</span>
+              <BaseInput label="제목 *" placeholder="제목을 입력해 주세요" />
+              <TextareaInput
+                label="설명 *"
+                placeholder="설명을 입력해 주세요"
+              />
+              <DateInput label="마감일 *" />
+              <TagInput label="태그" placeholder="입력 후 Enter" />
+              <ImageInput label="이미지" />
 
-                <button
-                  className="w-[76px] h-[76px] bg-[#F5F5F5] flex justify-center items-center"
-                  onClick={handleInputClick}
-                >
-                  <Image src={plusIcon} alt="추가" />
-                </button>
-                <input type="file" ref={fileInputRef} className="hidden" />
-              </div>
               <div className="flex gap-x-[11px]">
                 <ModalButton mode="cancel">취소</ModalButton>
                 <ModalButton mode="any">생성</ModalButton>
