@@ -10,7 +10,10 @@ export function Avatar({ username }: AvatarProps) {
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center text-white text-md md:text-lg bg-[${bgColor}] w-[34px] h-[34px] font-semibold border-2 border-white_FFFFFF md:w-[38px] md:h-[38px]`}
+      className={
+        "rounded-full flex items-center justify-center text-white text-md md:text-lg w-[34px] h-[34px] font-semibold border-2 border-white_FFFFFF md:w-[38px] md:h-[38px]"
+      }
+      style={{ backgroundColor: bgColor }}
     >
       {initial}
     </div>
