@@ -18,7 +18,7 @@ export default function DashboardHeader({
 
   return (
     <header
-      className={`flex items-center border-b border-[#d9d9d9] pl-[84px] pr-[8px] py-[13px] md:pl-[200px] md:pr-[32px] md:py-[15px] lg:pl-[340px] ${
+      className={`flex items-center border-b border-[#d9d9d9] pl-[16px] pr-[8px] py-[13px] md:pl-[40px] md:pr-[32px] md:py-[15px] ${
         users.length > 0 && !isMyDashboardPage
           ? "justify-end lg:justify-between"
           : "justify-between"
