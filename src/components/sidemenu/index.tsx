@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import logoTitlePurple from "@/assets/logo_title_purple.svg";
 import logoPurple from "@/assets/logo_purple.svg";
 import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
-import { PaginationButton } from "../common/button/PaginationButton";
+import { PaginationButton } from "../common/Button/PaginationButton";
+import { usePathname } from "next/navigation";
 
 const colorMap: Record<string, string> = {
   green: "bg-green_7AC555",
@@ -24,8 +27,14 @@ const exampleList = [
 // md:min-w-[160px] md:w-full
 
 export function SideMenu() {
+  const pathname = usePathname();
+
+  if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
+    return null;
+  }
+
   return (
-    <nav className="md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px]">
+    <nav className="fixed top-0 left-0 z-50 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
       <header className="mb-[38px] flex justify-center md:mb-[56px] lg:justify-start">
         <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
         <Image src={logoPurple} alt="모바일 로고" className="flex md:hidden" />
