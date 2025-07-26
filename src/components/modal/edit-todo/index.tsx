@@ -1,8 +1,8 @@
 "use client";
 
 import { ModalButton } from "@/components/common/button";
-import { AssigneeDropdown } from "@/components/dropdown/assignee";
-import { ProgressDropdown } from "@/components/dropdown/progress";
+import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
+import { ProgressDropdown } from "@/components/Dropdown/ProgressDropdown";
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import editIcon from "@/assets/edit_icon.svg";
@@ -31,15 +31,11 @@ export function ModalEditTodo() {
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">제목 *</span>
-                <input
-                  className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9"
-                />
+                <input className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9" />
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">설명 *</span>
-                <textarea
-                  className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9 resize-none"
-                />
+                <textarea className="px-[16px] py-[11px] rounded-[8px] border border-gray_D9D9D9 resize-none" />
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">마감일</span>
@@ -50,9 +46,7 @@ export function ModalEditTodo() {
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">태그</span>
-                <input
-                  className="px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9"
-                />
+                <input className="px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9" />
               </div>
               <div className="flex flex-col gap-y-[8px]">
                 <span className="text-lg text-black_333236">이미지</span>

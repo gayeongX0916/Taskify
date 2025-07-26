@@ -9,7 +9,7 @@ import { Chip } from "@/components/chip";
 import { CommentTextarea } from "@/components/common/Input/CommentTextarea";
 import { Comment } from "@/components/comment";
 import { AssigneeCard } from "@/components/dashboard/assignee-card";
-import { Dropdown } from "@/components/dropdown";
+import { Dropdown } from "@/components/Dropdown/ActionDropdown";
 
 export function ModalDashBoard() {
   const [isOpen, setIsOpen] = useState(false);

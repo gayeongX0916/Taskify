@@ -1,15 +1,18 @@
 import { useEffect, useRef } from "react";
 
-type DropdownProps = {
+type ActionDropdownProps = {
   setShowDropdown: (showDropdown: boolean) => void;
 };
 
-export function Dropdown({ setShowDropdown }: DropdownProps) {
+export function ActionDropdown({ setShowDropdown }: ActionDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownList = ["수정하기", "삭제하기"];
 
   const handleClickOutSide = (e: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(e.target as Node)
+    ) {
       setShowDropdown(false);
     }
   };

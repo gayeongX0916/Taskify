@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { SideMenu } from "@/components/sidemenu";
+import { PaddingWrapper } from "@/components/common/PaddingWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SideMenu />
-        <div className="pl-[67px] md:pl-[160px] lg:pl-[300px]">
+        <PaddingWrapper>
           <Header />
           <main>{children}</main>
-        </div>
+        </PaddingWrapper>
       </body>
     </html>
   );

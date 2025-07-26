@@ -1,6 +1,6 @@
 "use client";
 
-import { AssigneeDropdown } from "@/components/dropdown/assignee";
+import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { ModalButton } from "@/components/common/Button/ModalButton";
