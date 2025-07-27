@@ -4,10 +4,14 @@ import arrowDropdown from "@/assets/arrow_drop_down.svg";
 import checkIcon from "@/assets/check_icon.svg";
 import { Avatar } from "@/components/common/Avatar";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export function AssigneeDropdown() {
-  const [value, setValue] = useState("");
+type AssigneeDropdownProps = {
+  initialValue?: string;
+};
+
+export function AssigneeDropdown({ initialValue }: AssigneeDropdownProps) {
+  const [value, setValue] = useState(initialValue || "");
   const [isOpen, setIsOpen] = useState(false);
   const exampleList = [
     "배유철",
@@ -18,6 +22,12 @@ export function AssigneeDropdown() {
     "박나네나",
   ];
   const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialValue && exampleList.includes(initialValue)) {
+      setSelected(initialValue);
+    }
+  }, [initialValue]);
 
   const filteredList = (input: string) =>
     exampleList.filter((name) => name.includes(input));
@@ -42,15 +52,17 @@ export function AssigneeDropdown() {
   return (
     <div className="relative">
       <div className="flex items-center gap-x-[8px] px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9 w-full">
-        {selected && <Avatar username={selected} />}
+        {selected && (
+          <Avatar username={selected} className="w-[32px] h-[32px] text-md" />
+        )}
         <input
           value={value}
           onChange={handleInputChange}
           placeholder="이름을 입력해 주세요"
-          className="text-lg text-black_333236 flex-1 outline-none"
+          className="text-lg text-black_333236 flex-1 min-w-0 outline-none"
         />
-        <button onClick={handleOpenClick}>
-          <Image src={arrowDropdown} alt="드롭다운" />
+        <button onClick={handleOpenClick} className="flex-shrink-0">
+          <Image src={arrowDropdown} alt="드롭다운" width={26} height={26} />
         </button>
       </div>
 
