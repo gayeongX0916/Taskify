@@ -5,7 +5,6 @@ export const pastelColors = [
   "#FFB3B3",
   "#FFCC99",
   "#AED581",
-  "#81D4FA",
   "#B39DDB",
 ];
 
