@@ -16,7 +16,7 @@ export function TextareaInput({
       <span className="text-md text-black_333236 md:text-lg">{label}</span>
       <textarea
         placeholder={placeholder}
-        className="px-[16px] py-[12px] rounded-[8px] border border-gray_D9D9D9 text-lg resize-none"
+        className="px-[16px] py-[12px] rounded-[8px] border border-gray_D9D9D9 text-lg resize-none text-black_333236"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

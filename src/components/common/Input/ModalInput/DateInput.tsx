@@ -22,7 +22,7 @@ export function DateInput({
       <div className="relative w-full [&_.react-datepicker-wrapper]:w-full">
         <DatePicker
           placeholderText={placeholder}
-          className="pl-[40px] pr-[16px] py-[12px] rounded-[8px] border border-gray_D9D9D9 w-full"
+          className="pl-[40px] pr-[16px] py-[12px] rounded-[8px] border border-gray_D9D9D9 w-full text-black_333236"
           dateFormat="yyyy-MM-dd HH:mm"
           showTimeSelect
           selected={value}
