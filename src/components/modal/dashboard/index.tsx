@@ -13,7 +13,7 @@ import { ActionDropdown } from "@/components/Dropdown/ActionDropdown";
 import { ModalProps } from "@/types/ModalProps";
 import { getTagColor } from "@/utils/getTagColor";
 
-export function ModalDashBoard({ isOpen, onClose }: ModalProps) {
+export function DashBoardModal({ isOpen, onClose }: ModalProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const exampleList = ["백엔드", "프론트엔드", "디자인"];
   const commentList = [

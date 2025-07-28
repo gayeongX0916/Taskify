@@ -5,7 +5,7 @@ import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 
-export function ModalCreateColumn({ isOpen, onClose }: ModalProps) {
+export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const [existed, setExisted] = useState(false);
 
   return (

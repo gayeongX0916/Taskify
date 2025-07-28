@@ -14,7 +14,7 @@ import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
 import { ModalValues } from "@/types/ModalValues";
 
-export function ModalEditTodo({ isOpen, onClose }: ModalProps) {
+export function EditTodoModal({ isOpen, onClose }: ModalProps) {
   const [values, setValues] = useState<ModalValues>({
     progress: "To Do",
     assignee: "배유철",

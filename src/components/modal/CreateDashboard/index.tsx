@@ -15,7 +15,7 @@ type ModalCreateDashboardProps = {
   onClose: () => void;
 };
 
-export function ModalCreateDashboard({
+export function CreateDashboardModal({
   mode,
   defaultColor,
   defaultValue,

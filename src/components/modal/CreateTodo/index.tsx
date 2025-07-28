@@ -20,7 +20,7 @@ type ModalValues = {
   img: string;
 };
 
-export function ModalCreateTodo({ isOpen, onClose }: ModalProps) {
+export function CreateTodoModal({ isOpen, onClose }: ModalProps) {
   const [values, setValues] = useState<ModalValues>({
     assignee: "",
     title: "",

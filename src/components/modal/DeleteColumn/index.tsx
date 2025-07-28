@@ -2,7 +2,7 @@ import { ModalButton } from "@/components/common/Button/ModalButton";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 
-export function ModalDeleteColumn({ isOpen, onClose }: ModalProps) {
+export function DeleteColumnModal({ isOpen, onClose }: ModalProps) {
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
