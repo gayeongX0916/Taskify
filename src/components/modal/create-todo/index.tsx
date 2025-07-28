@@ -1,6 +1,5 @@
 "use client";
 
-import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { ModalButton } from "@/components/common/Button/ModalButton";
@@ -9,6 +8,7 @@ import { TextareaInput } from "@/components/common/Input/ModalInput/TextareaInpu
 import { DateInput } from "@/components/common/Input/ModalInput/DateInput";
 import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
+import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 
 type ModalValues = {
   assignee: string;
@@ -34,7 +34,7 @@ export function ModalCreateTodo() {
     <Dialog open={true} onClose={setIsOpen}>
       <div className="fixed inset-0 bg-black bg-opacity-30">
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <div className="bg-white_FFFFFF min-w-[327px] w-full pt-[28px] px-[20px] pb-[20px] rounded-[16px] md:w-[584px]">
+          <div className="max-h-[90vh] overflow-y-auto bg-white_FFFFFF min-w-[327px] w-full pt-[28px] px-[20px] pb-[20px] rounded-[16px] md:w-[584px]">
             <h1 className="text-lg text-black_333236 mb-[32px] font-bold md:text-2xl">
               할 일 생성
             </h1>
@@ -48,6 +48,7 @@ export function ModalCreateTodo() {
                 placeholder="제목을 입력해 주세요"
                 value={values.title}
                 onChange={(value) => setValues({ ...values, title: value })}
+                mode="any"
               />
               <TextareaInput
                 label="설명 *"
