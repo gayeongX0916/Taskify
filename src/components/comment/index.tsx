@@ -1,20 +1,56 @@
-export function Comment() {
+import { Avatar } from "../common/Avatar";
+
+type CommentProps = {
+  name: string;
+  date: string;
+  des: string;
+};
+
+export function Comment({ name, date, des }: CommentProps) {
+  const handleonEdit = () => {};
+  const handleonDelete = () => {};
+
+  const buttonList = [
+    {
+      label: "수정",
+      onClick: handleonEdit,
+    },
+    { label: "삭제", onClick: handleonDelete },
+  ];
+
   return (
     <div className="flex gap-x-[10px]">
-      <div className="w-[34px] h-[34px] rounded-full flex justify-center items-center">
-        C
-      </div>
-      <div className="flex flex-col gap-y-[6px]">
+      <Avatar
+        username={name}
+        className="w-[26px] h-[26px] md:w-[34px] md:h-[34px] text-xs md:text-lg"
+      />
+
+      <div className="flex flex-col gap-y-[6px] w-full">
         <div className="flex gap-x-[8px] items-center">
-          <span className="text-md font-semibold text-black_333236">
-            정만철
+          <span className="text-xs md:text-md font-semibold text-black_333236">
+            {name}
           </span>
-          <span className="text-xs text-gray_9FA6B2">2022.12.27 14:00</span>
+
+          <time
+            className="text-xs text-gray_9FA6B2"
+            dateTime={new Date(date).toISOString()}
+          >
+            {date}
+          </time>
         </div>
-        <span className="text-md text-black_333236">오늘 안에 가능?</span>
+
+        <p className="text-xs md:text-md text-black_333236">{des}</p>
+
         <div className="flex gap-x-[14px]">
-          <button className="text-xs text-gray_9FA6B2 underline">수정</button>
-          <button className="text-xs text-gray_9FA6B2 underline">삭제</button>
+          {buttonList.map(({ label, onClick }) => (
+            <button
+              key={label}
+              className="text-xxs md:text-xs text-gray_9FA6B2 underline"
+              onClick={onClick}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
