@@ -18,9 +18,9 @@ export function ActionDropdown({ setShowDropdown }: ActionDropdownProps) {
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutSide);
+    document.addEventListener("click", handleClickOutSide);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutSide);
+      document.removeEventListener("click", handleClickOutSide);
     };
   }, []);
 
