@@ -4,9 +4,15 @@ type ModalButtonProps = {
   mode: "any" | "cancel";
   children: ReactNode;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
-export function ModalButton({ mode, children, onClick }: ModalButtonProps) {
+export function ModalButton({
+  mode,
+  children,
+  onClick,
+  disabled,
+}: ModalButtonProps) {
   const isCancel = mode === "cancel";
 
   return (
@@ -17,6 +23,7 @@ export function ModalButton({ mode, children, onClick }: ModalButtonProps) {
           ? "text-gray_787486 border border-gray_D9D9D9"
           : "bg-violet_5534DA text-white_FFFFFF"
       }`}
+      disabled={disabled}
     >
       {mode === "cancel" ? "취소" : children}
     </button>

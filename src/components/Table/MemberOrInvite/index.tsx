@@ -1,8 +1,8 @@
-import arrowLeftNone from "@/assets/arrow_left_none.svg";
-import arrowRightNone from "@/assets/arrow_right_none.svg";
 import addBoxWhiteIcon from "@/assets/add_box_white.svg";
 import Image from "next/image";
 import { ActionButton } from "@/components/common/Button/ActionButton";
+import { PaginationButton } from "@/components/common/Button/PaginationButton";
+import { Avatar } from "@/components/common/Avatar";
 
 type MemberTableProps = {
   mode: "member" | "invite";
@@ -19,7 +19,7 @@ function InviteButton({ className }: { className?: string }) {
   );
 }
 
-export function MemberTable({ mode }: MemberTableProps) {
+export function MemberOrInviteTable({ mode }: MemberTableProps) {
   const inviteList = [
     "abc@naver.com",
     "bdc@naver.com",
@@ -31,53 +31,45 @@ export function MemberTable({ mode }: MemberTableProps) {
 
   return (
     <div className="pt-[24px] px-[20px] pb-[12px] rounded-[8px]">
-      <div className="flex justify-between md:mb-[32px] mb-[18px] md:mb-[27px]">
+      <header className="flex justify-between mb-[18px] md:mb-[27px]">
         <h1 className="text-xl text-black_333236 font-bold md:text-2xl">
           {mode === "member" ? "구성원" : "초대 내역"}
         </h1>
 
-        <div className="flex items-center gap-x-[16px]">
+        <div className="flex items-center gap-x-[12px] md:gap-x-[16px]">
           <span className="text-xs text-black_333236 md:text-md">
             1 페이지 중 1
           </span>
-          <div className="flex">
-            <button className="border border_gray_D9D9D9 rounded-l-[4px] px-[10px] py-[10px]">
-              <Image src={arrowLeftNone} alt="이전" />
-            </button>
-            <button className="border border_gray_D9D9D9 rounded-r-[4px] px-[10px] py-[10px]">
-              <Image src={arrowRightNone} alt="다음" />
-            </button>
-          </div>
+          <PaginationButton />
           {mode === "invite" && (
             <InviteButton className="hidden md:flex md:h-full md:w-[105px]" />
           )}
         </div>
-      </div>
+      </header>
 
       <div
         className={`flex items-center justify-between ${
           mode === "member" ? "mb-[13px]" : "mb-[26px]"
         }`}
       >
-        <span className="text-md text-gray_9FA6B2">
+        <span className="text-md md:text-lg text-gray_9FA6B2">
           {mode === "member" ? "이름" : "이메일"}
         </span>
         {mode === "invite" && <InviteButton className="flex md:hidden" />}
       </div>
 
-      <div>
+      <div className="flex flex-col">
         {mode === "member"
           ? memberList.map((list) => (
               <div className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE">
                 <div className="flex gap-x-[8px] items-center">
-                  <div className="w-[34px] h-[34px] rounded-full bg-[#C4B1A2] flex justify-center items-center">
-                    B
-                  </div>
+                  <Avatar username={list} />
                   <span className="text-md text-black_333236 md:text-lg">
                     {list}
                   </span>
                 </div>
-                <ActionButton>삭제</ActionButton>
+
+                <ActionButton className="md:text-md">삭제</ActionButton>
               </div>
             ))
           : inviteList.map((list) => (
@@ -85,7 +77,7 @@ export function MemberTable({ mode }: MemberTableProps) {
                 <span className="text-md text-black_333236 md:text-lg">
                   {list}
                 </span>
-                <ActionButton>취소</ActionButton>
+                <ActionButton className="md:text-md">취소</ActionButton>
               </div>
             ))}
       </div>
