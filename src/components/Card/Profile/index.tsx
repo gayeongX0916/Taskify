@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { DefaultInput } from "../common/Input";
 import Image from "next/image";
 import plusIcon from "@/assets/plus_icon.svg";
-import { ModalButton } from "../common/button";
+import { BaseInput } from "@/components/common/Input/BaseInput";
+import { ModalButton } from "@/components/common/Button/ModalButton";
 
-export function Profile() {
+export function ProfileCard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [emailValue, setEmailValue] = useState("kim@naver.com");
   const [nicknameValue, setNicknameValue] = useState("배김김");
@@ -21,7 +21,7 @@ export function Profile() {
         프로필
       </h1>
 
-      <div className="flex flex-col gap-y-[40px] md:flex-row md:gap-x-[42px]">
+      <form className="flex flex-col gap-y-[40px] md:flex-row md:gap-x-[42px]">
         <button
           className="w-[100px] h-[100px] flex justify-center items-center bg-[#F5F5F5] rounded-[6px] md:w-[182px] md:h-[182px]"
           onClick={handleInputClick}
@@ -39,21 +39,23 @@ export function Profile() {
 
         <div className="flex flex-col gap-y-[24px] flex-[9]">
           <div className="flex flex-col gap-y-[16px]">
-            <DefaultInput
+            <BaseInput
               label="이메일"
               value={emailValue}
               onChange={setEmailValue}
+              mode="profile"
             />
-            <DefaultInput
+            <BaseInput
               label="닉네임"
               value={nicknameValue}
               onChange={setNicknameValue}
+              mode="profile"
             />
           </div>
 
           <ModalButton mode="any">저장</ModalButton>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
