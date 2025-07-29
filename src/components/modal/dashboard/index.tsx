@@ -8,7 +8,7 @@ import Image from "next/image";
 import { Chip } from "@/components/common/Chip";
 import { CommentTextarea } from "@/components/common/Input/CommentTextarea";
 import { Comment } from "@/components/Comment";
-import { AssigneeCard } from "@/components/dashboard/AssigneeCard";
+import { AssigneeCard } from "@/components/Card/Assignee";
 import { ActionDropdown } from "@/components/Dropdown/ActionDropdown";
 import { ModalProps } from "@/types/ModalProps";
 import { getTagColor } from "@/utils/getTagColor";
