@@ -1,8 +1,8 @@
 import { Children, ReactNode } from "react";
 
 type LoginButtonPros = {
-  disabled: boolean;
-  children: ReactNode;
+  disabled?: boolean;
+  children?: ReactNode;
   onClick?: () => void;
 };
 

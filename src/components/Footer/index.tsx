@@ -12,7 +12,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-black_000000 text-gray_9FA6B2 text-xs md:text-lg">
+    <footer className="bg-black_000000 text-gray_9FA6B2 text-xs md:text-lg pb-[90px] md:pb-[0]">
       <div className="flex flex-col items-center md:flex-row md:justify-between md:px-[40px] md:py-[40px] lg:px-[140px]">
         <p className="mb-[12px] md:mb-[0]">&copy; codeit - 2023</p>
         <div className="mb-[68px] md:mb-[0] flex gap-x-[20px] md:gap-x-[32px]">
