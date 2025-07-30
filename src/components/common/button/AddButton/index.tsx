@@ -1,13 +1,12 @@
 import addBoxIcon from "@/assets/add_box_purple.svg";
 import Image from "next/image";
-import { ReactNode } from "react";
 
 type AddButtonProps = {
   mode: "column" | "dashboard" | "todo" | "delete";
-  className?:string;
+  className?: string;
 };
 
-export function AddButton({ mode,className }: AddButtonProps) {
+export function AddButton({ mode, className }: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
@@ -26,7 +25,11 @@ export function AddButton({ mode,className }: AddButtonProps) {
   const text = getText();
 
   return (
-    <button className={`flex gap-x-[12px] justify-center items-center py-[20px] border border-D9D9D9 rounded-[10px] ${className ?? ""}`}>
+    <button
+      className={`flex gap-x-[12px] justify-center items-center border border-D9D9D9 rounded-[10px] ${
+        className ?? "py-[20px]"
+      }`}
+    >
       {text && (
         <span className="text-lg text-black_333236 md:text-2lg font-bold">
           {text}
