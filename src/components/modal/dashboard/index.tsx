@@ -11,7 +11,7 @@ import { Comment } from "@/components/Comment";
 import { AssigneeCard } from "@/components/Card/Assignee";
 import { ActionDropdown } from "@/components/Dropdown/ActionDropdown";
 import { ModalProps } from "@/types/ModalProps";
-import { getTagColor } from "@/utils/getTagColor";
+import { TagList } from "@/components/common/TagList";
 
 export function DashBoardModal({ isOpen, onClose }: ModalProps) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,7 +26,6 @@ export function DashBoardModal({ isOpen, onClose }: ModalProps) {
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
         <section className="bg-white_FFFFFF w-full md:w-[730px] px-[16px] py-[16px] md:pt-[30px] md:pr-[38px] md:pb-[33px] md:pl-[18px] rounded-[8px]">
-          
           <header className="flex justify-end md:justify-between items-center mb-[16px] md:mb-[24px]">
             <h2 className="hidden md:block md:text-2xl md:text-black_333236 md:font-bold">
               대시보드 타이틀
@@ -62,7 +61,6 @@ export function DashBoardModal({ isOpen, onClose }: ModalProps) {
                 </div>
               )}
             </div>
-
           </header>
 
           <h2 className="text-xl text-black_333236 font-bold flex justify-start mb-[8px] md:hidden">
@@ -72,24 +70,12 @@ export function DashBoardModal({ isOpen, onClose }: ModalProps) {
           <main className="flex flex-col-reverse md:flex-row md:justify-between max-h-[70vh] overflow-y-auto pr-[20px]">
             <article className="flex flex-col">
               <div className="flex gap-x-[12px] items-center md:gap-x-[20px]">
-                <Chip name="To Do" className="text-xs"/>
+                <Chip name="To Do" className="text-xs" />
                 <span className="border-l border-gray_D9D9D9 h-[20px]" />
-                <div className="flex items-center gap-x-[8px] md:gap-x-[6px]">
-                  {exampleList.map((item) => {
-                    const color = getTagColor(item);
-                    return (
-                      <span
-                        key={item}
-                        className={
-                          "rounded-[4px] px-[6px] py-[4px] md:px-[9px] md:py-[5px] text-xs"
-                        }
-                        style={{ backgroundColor: color.bg, color: color.text }}
-                      >
-                        {item}
-                      </span>
-                    );
-                  })}
-                </div>
+                <TagList
+                  tags={exampleList}
+                  className="gap-x-[8px] md:gap-x-[6px]"
+                />
               </div>
 
               <p className="text-md mt-[16px] lg:mt-[26px]">내용들</p>

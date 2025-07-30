@@ -1,5 +1,6 @@
 import { getTagColor } from "@/utils/getTagColor";
 import { useState } from "react";
+import { TagList } from "../../TagList";
 
 type TagInputProps = {
   label: string;
@@ -41,21 +42,12 @@ export function TagInput({
         onKeyDown={handleKeyDown}
         value={inputValue}
       />
-      <div className="flex gap-x-[10px] items-center flex-wrap gap-y-[10px]">
-        {value.map((item) => {
-          const color = getTagColor(item);
-          return (
-            <button
-              key={item}
-              onClick={() => handleDeleteClick(item)}
-              className={"rounded-[4px] px-[6px] py-[2px] text-md"}
-              style={{ backgroundColor: color.bg, color: color.text }}
-            >
-              {item}
-            </button>
-          );
-        })}
-      </div>
+      <TagList
+        tags={value}
+        isButton={true}
+        onClickTag={handleDeleteClick}
+        className="gap-x-[10px] gap-y-[10px]"
+      />
     </div>
   );
 }
