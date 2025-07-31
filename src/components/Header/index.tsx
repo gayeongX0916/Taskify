@@ -7,7 +7,7 @@ import DashboardHeader from "../common/GNB/DashboardHeader";
 export function Header() {
   const pathname = usePathname();
 
-  const isAuthPage = pathname === "/login" || pathname === "signup";
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
   const isMainPage = pathname === "/";
 
   if (isAuthPage) return null;

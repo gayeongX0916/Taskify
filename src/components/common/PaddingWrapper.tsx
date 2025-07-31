@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 export function PaddingWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const isAuthPage = pathname === "/login" || pathname === "signup";
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
   const isMainPage = pathname === "/";
 
   return (
