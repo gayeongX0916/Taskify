@@ -7,14 +7,9 @@ import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
 import { PaginationButton } from "../common/Button/PaginationButton";
 import { usePathname } from "next/navigation";
-
-const colorMap: Record<string, string> = {
-  green: "bg-green_7AC555",
-  purple: "bg-purple_760DDE",
-  orange: "bg-orange_FFA500",
-  blue: "bg-blue_76A5EA",
-  pink: "bg-pink_E876EA",
-};
+import { dashboardColoMap } from "@/utils/dashboardColorMap";
+import { CreateDashboardModal } from "../Modal/CreateDashboard";
+import { useState } from "react";
 
 const exampleList = [
   { color: "green", name: "비브리지", isOwner: true },
@@ -24,27 +19,31 @@ const exampleList = [
   { color: "pink", name: "중요 문서함", isOwner: false },
 ];
 
-// md:min-w-[160px] md:w-full
-
 export function SideMenu() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
     return null;
   }
 
   return (
-    <nav className="fixed top-0 left-0 z-50 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
+    <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
+      <CreateDashboardModal
+        mode="create"
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
       <header className="mb-[38px] flex justify-center md:mb-[56px] lg:justify-start">
         <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
         <Image src={logoPurple} alt="모바일 로고" className="flex md:hidden" />
       </header>
-      <section className="flex flex-col gap-y-[22px] md:gap-y-[16px]">
+      <section className="flex flex-col gap-y-[22px] md:gap-y-[16px] mb-[32px]">
         <div className="flex justify-center md:justify-between md:items-center">
           <span className="hidden md:block md:text-xs md:text-gray_787486 md:font-semibold">
             Dash Boards
           </span>
-          <button>
+          <button onClick={() => setIsOpen(true)}>
             <Image src={addBoxIcon} alt="추가" width={20} height={20} />
           </button>
         </div>
@@ -54,7 +53,7 @@ export function SideMenu() {
               <button className="flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px]  md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px]">
                 <div
                   className={`${
-                    colorMap[item.color]
+                    dashboardColoMap[item.color]
                   } rounded-full w-[8px] h-[8px]`}
                 ></div>
                 <div className="hidden md:flex md:gap-x-[6px]">
@@ -68,7 +67,9 @@ export function SideMenu() {
           ))}
         </ul>
       </section>
-      <PaginationButton />
+      <div className="hidden md:flex">
+        <PaginationButton />
+      </div>
     </nav>
   );
 }
