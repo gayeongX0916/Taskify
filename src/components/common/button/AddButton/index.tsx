@@ -4,15 +4,16 @@ import Image from "next/image";
 type AddButtonProps = {
   mode: "column" | "dashboard" | "todo" | "delete";
   className?: string;
+  onClick?: () => void;
 };
 
-export function AddButton({ mode, className }: AddButtonProps) {
+export function AddButton({ mode, className, onClick }: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
         return "새로운 칼럼 추가하기";
       case "dashboard":
-        return "새로운 대시보드 추가하기";
+        return "새로운 대시보드";
       case "delete":
         return "대시보드 삭제하기";
       case "todo":
@@ -26,14 +27,13 @@ export function AddButton({ mode, className }: AddButtonProps) {
 
   return (
     <button
-      className={`flex gap-x-[12px] justify-center items-center border border-D9D9D9 rounded-[10px] ${
+      onClick={onClick}
+      className={`flex gap-x-[12px] justify-center items-center border border-D9D9D9 rounded-[10px] bg-white_FFFFFF ${
         className ?? "py-[20px]"
       }`}
     >
       {text && (
-        <span className="text-lg text-black_333236 md:text-2lg font-bold">
-          {text}
-        </span>
+        <span className="text-md text-black_333236 md:text-lg">{text}</span>
       )}
       {showImage && (
         <Image src={addBoxIcon} alt="추가하기" width={22} height={22} />
