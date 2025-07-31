@@ -29,7 +29,7 @@ const HomePage = () => {
 
   return (
     <div className="bg-black_000000 px-[16px] md:px-[40px] lg:px-0">
-      <div className="mx-auto max-w-[1200px]">
+      <main className="mx-auto max-w-[1200px]">
         <section className="flex flex-col items-center pt-[35px]">
           <Image
             src={landingMain}
@@ -125,7 +125,7 @@ const HomePage = () => {
         </div>
 
         <Footer />
-      </div>
+      </main>
     </div>
   );
 };

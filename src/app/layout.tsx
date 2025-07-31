@@ -33,7 +33,7 @@ export default function RootLayout({
         <SideMenu />
         <PaddingWrapper>
           <Header />
-          <main>{children}</main>
+          <div>{children}</div>
         </PaddingWrapper>
       </body>
     </html>
