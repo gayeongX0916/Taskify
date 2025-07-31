@@ -1,3 +1,5 @@
+"use client";
+
 import landingMain from "@/assets/landing_main.svg";
 import landing1 from "@/assets/landing_1.svg";
 import landing2 from "@/assets/landing_2.svg";
@@ -6,8 +8,11 @@ import landing4 from "@/assets/landing_4.svg";
 import landing5 from "@/assets/landing_5.svg";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
+  const router = useRouter();
+
   const featureList = [
     {
       img: landing3,
@@ -24,7 +29,7 @@ const HomePage = () => {
 
   return (
     <div className="bg-black_000000 px-[16px] md:px-[40px] lg:px-0">
-      <div className="mx-auto max-w-[1200px]">
+      <main className="mx-auto max-w-[1200px]">
         <section className="flex flex-col items-center pt-[35px]">
           <Image
             src={landingMain}
@@ -43,7 +48,10 @@ const HomePage = () => {
             </h1>
           </div>
 
-          <button className="bg-violet_5534DA px-[87px] py-[11px] rounded-[8px] text-md text-white_FFFFFF md:text-2lg md:py-[14px]">
+          <button
+            className="bg-violet_5534DA px-[87px] py-[11px] rounded-[8px] text-md text-white_FFFFFF md:text-2lg md:py-[14px]"
+            onClick={() => router.push("/login")}
+          >
             로그인하기
           </button>
         </section>
@@ -117,7 +125,7 @@ const HomePage = () => {
         </div>
 
         <Footer />
-      </div>
+      </main>
     </div>
   );
 };
