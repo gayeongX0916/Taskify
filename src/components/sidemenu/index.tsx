@@ -55,6 +55,7 @@ export function SideMenu() {
                   className={`${
                     dashboardColoMap[item.color]
                   } rounded-full w-[8px] h-[8px]`}
+                  
                 ></div>
                 <div className="hidden md:flex md:gap-x-[6px]">
                   <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
