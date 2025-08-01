@@ -3,7 +3,9 @@ import settingIcon from "@/assets/setting_icon.svg";
 import addBoxIcon from "@/assets/add_box.svg";
 import { Avatar } from "../../Avatar";
 import { InvitedUserList } from "./InvitedUserList";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { InviteModal } from "@/components/Modal/Base/InviteModal";
+import { useState } from "react";
 
 type DashboardHeaderProps = {
   dashboardName: string;
@@ -12,9 +14,11 @@ type DashboardHeaderProps = {
 export default function DashboardHeader({
   dashboardName,
 }: DashboardHeaderProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const isMyDashboardPage = pathname === "/mydashboard";
   const users = ["김가영", "이가병", "김나희", "rld", "김가ㅏ", "김나나"];
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <header
@@ -24,6 +28,7 @@ export default function DashboardHeader({
           : "justify-between"
       }`}
     >
+      <InviteModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <h1
         className={`text-lg font-bold text-black_333236 md:text-2lg ${
           !isMyDashboardPage && "hidden lg:flex"
@@ -33,7 +38,10 @@ export default function DashboardHeader({
       </h1>
       <div className="flex items-center gap-x-[16px] md:gap-x-[32px] lg:gap-x-[40px]">
         <div className="flex gap-x-[6px] md:gap-x-[16px]">
-          <button className="px-[12px] py-[3px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]">
+          <button
+            onClick={() => router.push("/dashboard/1/edit")}
+            className="px-[12px] py-[3px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
+          >
             <Image
               src={settingIcon}
               alt="관리"
@@ -43,7 +51,10 @@ export default function DashboardHeader({
             />
             관리
           </button>
-          <button className="px-[12px] py-[6px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="px-[12px] py-[6px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
+          >
             <Image
               src={addBoxIcon}
               alt="초대하기"
@@ -60,12 +71,15 @@ export default function DashboardHeader({
 
           <div className="h-[34px] border-l border-gray_D9D9D9"></div>
 
-          <div className="flex items-center gap-x-[12px]">
+          <button
+            className="flex items-center gap-x-[12px]"
+            onClick={() => router.push("/mypage")}
+          >
             <Avatar username="김가영" />
             <span className="hidden md:flex md:text-lg md:text-black_333236">
               배유철
             </span>
-          </div>
+          </button>
         </div>
       </div>
     </header>
