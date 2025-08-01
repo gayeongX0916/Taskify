@@ -1,36 +1,23 @@
 "use client";
 
 import { Dialog } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
 import Image from "next/image";
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { colorList } from "@/utils/dashboardColor";
+import { ModalProps } from "@/types/ModalProps";
 
-type ModalCreateDashboardProps = {
-  mode: "create" | "edit";
-  defaultValue?: string;
-  defaultColor?: string;
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-export function CreateDashboardModal({
-  mode,
-  defaultColor,
-  defaultValue,
-  isOpen,
-  onClose,
-}: ModalCreateDashboardProps) {
-  const [color, setColor] = useState(defaultColor);
-  const [name, setName] = useState(defaultValue);
+export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
+  const [color, setColor] = useState("");
+  const [name, setName] = useState("");
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
         <section className="bg-white_FFFFFF px-[16px] py-[20px] rounded-[8px] w-full min-w-[327px] md:w-[584px] md:px-[32px] md:py-[32px]">
           <h1 className="text-xl text-black_333236 mb-[24px] font-bold md:text-2xl">
-            {mode === "create" ? "새로운 대시보드" : name}
+            새로운 대시보드
           </h1>
 
           <form>
@@ -66,9 +53,7 @@ export function CreateDashboardModal({
               <ModalButton mode="cancel" onClick={onClose}>
                 취소
               </ModalButton>
-              <ModalButton mode="any">
-                {mode === "create" ? "생성" : "변경"}
-              </ModalButton>
+              <ModalButton mode="any">생성</ModalButton>
             </footer>
           </form>
         </section>
