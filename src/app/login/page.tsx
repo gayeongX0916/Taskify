@@ -6,7 +6,7 @@ import authLogo from "@/assets/auth_logo.svg";
 import Link from "next/link";
 import Image from "next/image";
 import { LoginInput } from "@/components/common/Input/LoginInput";
-import { validateFields } from "@/utils/validateFields";
+import { validateFields } from "@/lib/utils/validateFields";
 import { LoginButton } from "@/components/common/Button/LoginButton";
 
 const loginPage = () => {

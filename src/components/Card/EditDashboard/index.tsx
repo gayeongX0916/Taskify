@@ -1,4 +1,4 @@
-import { colorList } from "@/utils/dashboardColor";
+import { colorList } from "@/lib/utils/dashboardColor";
 import Image from "next/image";
 import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";

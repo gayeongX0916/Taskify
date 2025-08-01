@@ -1,4 +1,4 @@
-import { getTagColor } from "@/utils/getTagColor";
+import { getTagColor } from "@/lib/utils/getTagColor";
 
 type TagListProps = {
   tags: string[];

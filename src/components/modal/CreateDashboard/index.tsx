@@ -5,7 +5,7 @@ import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
 import Image from "next/image";
 import { ModalButton } from "@/components/common/Button/ModalButton";
-import { colorList } from "@/utils/dashboardColor";
+import { colorList } from "@/lib/utils/dashboardColor";
 import { ModalProps } from "@/types/ModalProps";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {

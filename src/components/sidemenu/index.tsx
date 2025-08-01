@@ -7,7 +7,7 @@ import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
 import { PaginationButton } from "../common/Button/PaginationButton";
 import { usePathname } from "next/navigation";
-import { dashboardColoMap } from "@/utils/dashboardColorMap";
+import { dashboardColoMap } from "@/lib/utils/dashboardColorMap";
 import { CreateDashboardModal } from "../Modal/CreateDashboard";
 import { useState } from "react";
 
@@ -29,10 +29,7 @@ export function SideMenu() {
 
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
-      <CreateDashboardModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
+      <CreateDashboardModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <header className="mb-[38px] flex justify-center md:mb-[56px] lg:justify-start">
         <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
         <Image src={logoPurple} alt="모바일 로고" className="flex md:hidden" />
@@ -54,7 +51,6 @@ export function SideMenu() {
                   className={`${
                     dashboardColoMap[item.color]
                   } rounded-full w-[8px] h-[8px]`}
-                  
                 ></div>
                 <div className="hidden md:flex md:gap-x-[6px]">
                   <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
