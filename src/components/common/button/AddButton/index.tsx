@@ -11,7 +11,7 @@ export function AddButton({ mode, className, onClick }: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
-        return "새로운 칼럼 추가하기";
+        return "새로운 컬럼 추가하기";
       case "dashboard":
         return "새로운 대시보드";
       case "delete":
