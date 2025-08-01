@@ -13,7 +13,6 @@ const mydashboardPage = () => {
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
       <CreateDashboardModal
-        mode="create"
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       />

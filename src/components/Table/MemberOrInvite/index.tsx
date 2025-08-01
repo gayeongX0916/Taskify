@@ -30,7 +30,7 @@ export function MemberOrInviteTable({ mode }: MemberTableProps) {
   const memberList = ["정만철", "김태순", "최주협", "윤지현"];
 
   return (
-    <div className="pt-[24px] px-[20px] pb-[12px] rounded-[8px]">
+    <div className="bg-white_FFFFFF pt-[24px] px-[20px] pb-[12px] rounded-[8px] md:px-[26px] md:pt-[28px] md:pb-[20px]">
       <header className="flex justify-between mb-[18px] md:mb-[27px]">
         <h1 className="text-xl text-black_333236 font-bold md:text-2xl">
           {mode === "member" ? "구성원" : "초대 내역"}
@@ -61,7 +61,10 @@ export function MemberOrInviteTable({ mode }: MemberTableProps) {
       <div className="flex flex-col">
         {mode === "member"
           ? memberList.map((list) => (
-              <div className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE">
+              <div
+                key={list}
+                className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE"
+              >
                 <div className="flex gap-x-[8px] items-center">
                   <Avatar username={list} />
                   <span className="text-md text-black_333236 md:text-lg">
@@ -73,7 +76,10 @@ export function MemberOrInviteTable({ mode }: MemberTableProps) {
               </div>
             ))
           : inviteList.map((list) => (
-              <div className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE">
+              <div
+                key={list}
+                className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE"
+              >
                 <span className="text-md text-black_333236 md:text-lg">
                   {list}
                 </span>
