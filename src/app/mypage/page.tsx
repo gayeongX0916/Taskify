@@ -19,8 +19,10 @@ const myPage = () => {
           <Image src={arrowLeft} alt="돌아가기" />
           <span className="text-lg text-black_333236">돌아가기</span>
         </button>
-        <ProfileCard />
-        <PasswordCard />
+        <div className="flex flex-col gap-y-[16px] md:gap-y-[24px]">
+          <ProfileCard />
+          <PasswordCard />
+        </div>
       </div>
     </main>
   );

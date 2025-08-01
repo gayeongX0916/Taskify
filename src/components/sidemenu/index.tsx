@@ -30,7 +30,6 @@ export function SideMenu() {
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
       <CreateDashboardModal
-        mode="create"
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       />

@@ -16,7 +16,7 @@ export function ProfileCard() {
   };
 
   return (
-    <div className="bg-white_FFFFFF px-[16px] py-[16px] rounded-[8px] md:px-[24px] md:py-[24px] md:rounded-[16px]">
+    <section className="bg-white_FFFFFF px-[16px] py-[16px] rounded-[8px] md:px-[24px] md:py-[24px] md:rounded-[16px]">
       <h1 className="text-2lg text-black_333236 font-bold mb-[40px] md:text-xl md:mb-[24px]">
         프로필
       </h1>
@@ -56,6 +56,6 @@ export function ProfileCard() {
           <ModalButton mode="any">저장</ModalButton>
         </div>
       </form>
-    </div>
+    </section>
   );
 }
