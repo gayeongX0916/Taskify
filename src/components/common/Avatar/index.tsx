@@ -1,4 +1,7 @@
-import { getInitialFromUserName, getRandomColor } from "@/utils/randomColor";
+import {
+  getInitialFromUserName,
+  getRandomColor,
+} from "@/lib/utils/randomColor";
 
 type AvatarProps = {
   username: string;

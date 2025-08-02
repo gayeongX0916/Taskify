@@ -1,7 +1,7 @@
 import crownIcon from "@/assets/crown.svg";
 import arrowRightIcon from "@/assets/arrow_right.svg";
 import Image from "next/image";
-import { dashboardColoMap } from "@/utils/dashboardColorMap";
+import { dashboardColoMap } from "@/lib/utils/dashboardColorMap";
 
 type DashboardNameCardProps = {
   name: string;
