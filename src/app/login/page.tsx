@@ -8,6 +8,8 @@ import Image from "next/image";
 import { LoginInput } from "@/components/common/Input/LoginInput";
 import { validateFields } from "@/lib/utils/validateFields";
 import { LoginButton } from "@/components/common/Button/LoginButton";
+import { LoginType } from "@/types/users";
+import { postLogin } from "@/lib/api/auth";
 
 const loginPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,6 +52,22 @@ const loginPage = () => {
     },
   ];
 
+  const handleClickLogin = async (data: LoginType) => {
+    try {
+      const response = await postLogin(data);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setIsOpen(true);
+        setModalMessage(error.response.data.message);
+      } else {
+        setIsOpen(true);
+        setModalMessage(
+          error.response?.data?.message || "비밀번호가 일치하지 않습니다."
+        );
+      }
+    }
+  };
+
   return (
     <main className="bg-gray_FAFAFA">
       <AuthModal isOpen={isOpen} onClose={() => setIsOpen(false)}>
@@ -65,7 +83,13 @@ const loginPage = () => {
           </span>
         </div>
 
-        <form className="mb-[24px] flex flex-col gap-y-[8px] w-full md:gap-y-[16px]">
+        <form
+          className="mb-[24px] flex flex-col gap-y-[8px] w-full md:gap-y-[16px]"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleClickLogin(values);
+          }}
+        >
           {formFields.map(({ key, label, placeholder, mode }) => (
             <LoginInput
               key={key}
