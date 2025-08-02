@@ -11,6 +11,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { AuthModal } from "@/components/Modal/Auth";
 import { useRouter } from "next/navigation";
+import { SignupType } from "@/types/users";
+import { postSignUp } from "@/lib/api/users";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -39,6 +41,25 @@ const SignUpPage = () => {
       values,
     });
     setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
+  const handleClickSignUp = async (data: SignupType) => {
+    try {
+      const { email, nickname, password } = data;
+      await postSignUp({ email, nickname, password });
+      setIsOpen(true);
+      setModalMessage("가입이 완료되었습니다.");
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        setIsOpen(true);
+        setModalMessage(error.response.data.message);
+      } else {
+        setIsOpen(true);
+        setModalMessage(
+          error.response?.data?.message || "가입에 실패했습니다."
+        );
+      }
+    }
   };
 
   const formFields: {
@@ -73,8 +94,6 @@ const SignUpPage = () => {
     },
   ];
 
-  const handleClickSignUp = () => {};
-
   return (
     <main className="bg-gray_FAFAFA">
       <AuthModal
@@ -98,7 +117,13 @@ const SignUpPage = () => {
           </span>
         </div>
 
-        <form className="mb-[24px] flex flex-col gap-y-[8px] w-full md:gap-y-[16px]">
+        <form
+          className="mb-[24px] flex flex-col gap-y-[8px] w-full md:gap-y-[16px]"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleClickSignUp(values);
+          }}
+        >
           {formFields.map(({ key, label, placeholder, mode }) => (
             <LoginInput
               key={key}
@@ -127,7 +152,6 @@ const SignUpPage = () => {
             </span>
           </div>
           <LoginButton
-            onClick={handleClickSignUp}
             disabled={
               !agree || Object.values(errors).some((error) => error !== "")
             }
