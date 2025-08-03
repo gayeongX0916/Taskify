@@ -13,7 +13,7 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       console.warn("인증 만료 -> 로그인 페이지로 이동");
