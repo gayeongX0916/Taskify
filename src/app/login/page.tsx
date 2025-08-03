@@ -8,8 +8,9 @@ import Image from "next/image";
 import { LoginInput } from "@/components/common/Input/LoginInput";
 import { validateFields } from "@/lib/utils/validateFields";
 import { LoginButton } from "@/components/common/Button/LoginButton";
-import { LoginType } from "@/types/users";
 import { postLogin } from "@/lib/api/auth";
+import { useAuthStore } from "@/lib/stores/auth";
+import { LoginType } from "@/types/auth";
 
 const loginPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,8 +54,12 @@ const loginPage = () => {
   ];
 
   const handleClickLogin = async (data: LoginType) => {
+    const setAuth = useAuthStore.getState().setAuth;
     try {
       const response = await postLogin(data);
+      const token = response.data.accessToken;
+      const userId = response.data.user.id;
+      setAuth(token, userId);
     } catch (error: any) {
       if (error.response?.status === 404) {
         setIsOpen(true);
