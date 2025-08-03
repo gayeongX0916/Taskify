@@ -11,8 +11,10 @@ import { LoginButton } from "@/components/common/Button/LoginButton";
 import { postLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/stores/auth";
 import { LoginType } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
 const loginPage = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [values, setValues] = useState({
@@ -71,6 +73,7 @@ const loginPage = () => {
         );
       }
     }
+    router.push("/mydashboard");
   };
 
   return (

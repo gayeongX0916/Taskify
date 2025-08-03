@@ -10,8 +10,8 @@ export const postDashboard = (data: postDashboardType) =>
   api.post("/dashboards", data);
 
 // 대시보드 목록 조회
-export const getDashboardList = ({ size }: { size: number }) =>
-  api.get(`/dashboards?navigationMethod=pagination&page=1&size=${size}`);
+export const getDashboardList = () =>
+  api.get(`/dashboards?navigationMethod=pagination&page=1&size=6`);
 
 // 대시보드 상세 조회
 export const getDashboardDetail = ({ dashboardId }: { dashboardId: number }) =>
