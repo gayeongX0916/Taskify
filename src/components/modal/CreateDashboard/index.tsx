@@ -7,10 +7,21 @@ import Image from "next/image";
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { colorList } from "@/lib/utils/dashboardColor";
 import { ModalProps } from "@/types/ModalProps";
+import { postDashboard } from "@/lib/api/dashboards";
+import { postDashboardType } from "@/types/dashboards";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const [color, setColor] = useState("");
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState("");
+
+  const handleCreateDashboard = async (data: postDashboardType) => {
+    try {
+      await postDashboard(data);
+    } catch (error) {
+      setError("대시보드 생성에 실패했습니다.");
+    }
+  };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -31,8 +42,8 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
               <input
                 id="dashboard-name"
                 className="px-[16px] py-[15px] rounded-[8px] border border-gray_D9D9D9 w-full h-[50px]"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
@@ -42,7 +53,8 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
                   key={list}
                   type="button"
                   onClick={() => setColor(list)}
-                  className={`bg-${list} w-[30px] h-[30px] rounded-full flex justify-center items-center`}
+                  style={{ backgroundColor: list }}
+                  className="w-[30px] h-[30px] rounded-full flex justify-center items-center"
                 >
                   {color === list && <Image src={checkIcon} alt="체크" />}
                 </button>
@@ -53,7 +65,12 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
               <ModalButton mode="cancel" onClick={onClose}>
                 취소
               </ModalButton>
-              <ModalButton mode="any">생성</ModalButton>
+              <ModalButton
+                mode="any"
+                onClick={() => handleCreateDashboard({ title, color })}
+              >
+                생성
+              </ModalButton>
             </footer>
           </form>
         </section>
