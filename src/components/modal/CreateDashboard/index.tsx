@@ -9,17 +9,18 @@ import { colorList } from "@/lib/utils/dashboardColor";
 import { ModalProps } from "@/types/ModalProps";
 import { postDashboard } from "@/lib/api/dashboards";
 import { postDashboardType } from "@/types/dashboards";
+import { useToastStore } from "@/lib/stores/toast";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const [color, setColor] = useState("");
   const [title, setTitle] = useState("");
-  const [error, setError] = useState("");
+  const addToast = useToastStore.getState().addToast;
 
   const handleCreateDashboard = async (data: postDashboardType) => {
     try {
       await postDashboard(data);
     } catch (error) {
-      setError("대시보드 생성에 실패했습니다.");
+      addToast("대시보드 생성에 실패했습니다.");
     }
   };
 
