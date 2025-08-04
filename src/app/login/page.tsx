@@ -62,6 +62,7 @@ const loginPage = () => {
       const token = response.data.accessToken;
       const userId = response.data.user.id;
       setAuth(token, userId);
+      router.push("/mydashboard");
     } catch (error: any) {
       if (error.response?.status === 404) {
         setIsOpen(true);
@@ -73,7 +74,6 @@ const loginPage = () => {
         );
       }
     }
-    router.push("/mydashboard");
   };
 
   return (
