@@ -7,25 +7,35 @@ import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
 import { PaginationButton } from "../common/Button/PaginationButton";
 import { usePathname } from "next/navigation";
-import { dashboardColoMap } from "@/lib/utils/dashboardColorMap";
 import { CreateDashboardModal } from "../Modal/CreateDashboard";
-import { useState } from "react";
-
-const exampleList = [
-  { color: "green", name: "비브리지", isOwner: true },
-  { color: "purple", name: "코드잇", isOwner: true },
-  { color: "orange", name: "3분기 계획", isOwner: false },
-  { color: "blue", name: "회의록", isOwner: false },
-  { color: "pink", name: "중요 문서함", isOwner: false },
-];
+import { useEffect, useState } from "react";
+import { getDashboardList } from "@/lib/api/dashboards";
+import { dashboardColoMap } from "@/lib/utils/dashboardColor";
+import { getDashboardListType } from "@/types/dashboards";
 
 export function SideMenu() {
+  const [dashboardList, setDashboardList] = useState<getDashboardListType[]>(
+    []
+  );
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("");
 
   if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
     return null;
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getDashboardList();
+        setDashboardList(res.data.dashboards);
+      } catch (error: any) {
+        setError("대시보드를 불러오는 중 오류가 발생했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
@@ -44,19 +54,17 @@ export function SideMenu() {
           </button>
         </div>
         <ul className="flex flex-col items-center md:gap-y-[8px] md:items-start gap-y-[6px] md:w-full">
-          {exampleList.map((item) => (
-            <li key={item.name} className="md:w-full">
+          {dashboardList.map(({ title, color, createdByMe }) => (
+            <li key={title} className="md:w-full">
               <button className="flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px]  md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px]">
                 <div
-                  className={`${
-                    dashboardColoMap[item.color]
-                  } rounded-full w-[8px] h-[8px]`}
+                  className={`${dashboardColoMap[color]} rounded-full w-[8px] h-[8px]`}
                 ></div>
                 <div className="hidden md:flex md:gap-x-[6px]">
                   <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
-                    {item.name}
+                    {title}
                   </span>
-                  {item.isOwner && <Image src={crownIcon} alt="주인" />}
+                  {createdByMe && <Image src={crownIcon} alt="주인" />}
                 </div>
               </button>
             </li>
