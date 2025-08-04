@@ -6,18 +6,23 @@ import { PaginationButton } from "@/components/common/Button/PaginationButton";
 import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
+import { getDashboardListType } from "@/types/dashboards";
 import { useEffect, useState } from "react";
 
 const mydashboardPage = () => {
-  const [dashboardList, setDashboardLit] = useState([]);
+  const [dashboardList, setDashboardList] = useState<getDashboardListType[]>(
+    []
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await getDashboardList();
-        setDashboardLit(res.data.dashboards);
+        setDashboardList(res.data.dashboards);
+        setIsOwner(res.data.createdByMe);
       } catch (error: any) {
         setError("대시보드를 불러오는 중 오류가 발생했습니다.");
       }
@@ -37,17 +42,13 @@ const mydashboardPage = () => {
               onClick={() => setIsOpen(true)}
             />
             {dashboardList.length > 0 &&
-              dashboardList.map((dashboard) => (
+              dashboardList.map(({ title, color }) => (
                 <DashboardNameCard
-                  name="비브리지"
-                  isOwner={true}
-                  bgColor="green"
+                  name={title}
+                  isOwner={isOwner}
+                  bgColor={color}
                 />
               ))}
-            {/* <DashboardNameCard name="비브리지" isOwner={true} bgColor="green" />
-            <DashboardNameCard name="비브리지" isOwner={false} bgColor="pink" />
-            <DashboardNameCard name="비브리지" isOwner={true} bgColor="blue" />
-            <DashboardNameCard name="ds" isOwner={false} bgColor="blue" /> */}
           </div>
           {dashboardList.length > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
