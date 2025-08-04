@@ -39,6 +39,15 @@ module.exports = {
         xs: ["12px", "18px"],
         xxs: ["10px", "16px"],
       },
+      keyframes: {
+        fadeOut: {
+          "0%": { opacity: "1", visibility: "visible" },
+          "100%": { opacity: "0", visibility: "hidden" },
+        },
+      },
+      animation: {
+        fadeOut: "fadeOut 3s ease-in-out forwards",
+      },
     },
   },
   plugins: [],

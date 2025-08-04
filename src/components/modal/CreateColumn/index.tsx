@@ -2,6 +2,7 @@
 
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { postColumn } from "@/lib/api/columns";
+import { useToastStore } from "@/lib/stores/toast";
 import { postColumnType } from "@/types/columns";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
@@ -12,13 +13,13 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const [existed, setExisted] = useState(false);
   const [value, setValue] = useState("");
   const { dashboardId } = useParams();
-  const [error, setError] = useState("");
+  const addToast = useToastStore.getState().addToast;
 
   const handleCreateColumn = async (data: postColumnType) => {
     try {
       await postColumn(data);
     } catch (error) {
-      setError("컬럼 생성에 실패했습니다.");
+      addToast("컬럼 생성에 실패했습니다.");
     }
   };
 

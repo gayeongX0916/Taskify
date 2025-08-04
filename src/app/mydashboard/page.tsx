@@ -6,6 +6,7 @@ import { PaginationButton } from "@/components/common/Button/PaginationButton";
 import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
+import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardListType } from "@/types/dashboards";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ const mydashboardPage = () => {
     []
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [error, setError] = useState("");
+  const addToast = useToastStore.getState().addToast;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +25,7 @@ const mydashboardPage = () => {
         const res = await getDashboardList();
         setDashboardList(res.data.dashboards);
       } catch (error: any) {
-        setError("대시보드를 불러오는 중 오류가 발생했습니다.");
+        addToast("대시보드를 불러오는 중 오류가 발생했습니다.");
       }
     };
     fetchData();

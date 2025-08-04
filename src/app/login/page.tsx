@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthModal } from "@/components/Modal/Auth";
 import { useState } from "react";
 import authLogo from "@/assets/auth_logo.svg";
 import Link from "next/link";
@@ -12,11 +11,10 @@ import { postLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/stores/auth";
 import { LoginType } from "@/types/auth";
 import { useRouter } from "next/navigation";
+import { useToastStore } from "@/lib/stores/toast";
 
 const loginPage = () => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -57,20 +55,21 @@ const loginPage = () => {
 
   const handleClickLogin = async (data: LoginType) => {
     const setAuth = useAuthStore.getState().setAuth;
+    const addToast = useToastStore.getState().addToast;
     try {
       const response = await postLogin(data);
       const token = response.data.accessToken;
       const userId = response.data.user.id;
       setAuth(token, userId);
       router.push("/mydashboard");
+      addToast("로그인 성공!", "success");
     } catch (error: any) {
       if (error.response?.status === 404) {
-        setIsOpen(true);
-        setModalMessage(error.response.data.message);
+        addToast(error.response.data.message, "error");
       } else {
-        setIsOpen(true);
-        setModalMessage(
-          error.response?.data?.message || "비밀번호가 일치하지 않습니다."
+        addToast(
+          error.response.data.message || "비밀번호가 일치하지 않습니다.",
+          "error"
         );
       }
     }
@@ -78,9 +77,6 @@ const loginPage = () => {
 
   return (
     <main className="bg-gray_FAFAFA">
-      <AuthModal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        {modalMessage}
-      </AuthModal>
       <div className="px-[12px] py-[70px] md:px-[110px] lg:px-0 flex flex-col items-center lg:max-w-[520px] lg:mx-auto">
         <div className="flex flex-col gap-y-[8px]">
           <Link href="/">

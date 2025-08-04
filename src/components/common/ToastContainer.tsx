@@ -14,11 +14,11 @@ export function ToastContainer() {
   }, [toasts, removeToast]);
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-[9999]">
+    <div className="fixed top-[20px] left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[9999]">
       {toasts.map((toast) => (
-        <div
+        <button
           key={toast.id}
-          className={`px-4 py-2 rounded shadow-lg text-white transition
+          className={`px-[12px] py-[8px] text-sm md:text-lg md:px-[20px] md:py-[13px] rounded-[8px] text-white animate-fadeOut whitespace-nowrap
             ${
               toast.type === "error"
                 ? "bg-red-500"
@@ -30,7 +30,7 @@ export function ToastContainer() {
           onClick={() => removeToast(toast.id)}
         >
           {toast.message}
-        </div>
+        </button>
       ))}
     </div>
   );

@@ -9,10 +9,10 @@ import checkboxDefault from "@/assets/checkbox_default.svg";
 import checkboxActive from "@/assets/checkbox_active.svg";
 import { useState } from "react";
 import Link from "next/link";
-import { AuthModal } from "@/components/Modal/Auth";
 import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
+import { useToastStore } from "@/lib/stores/toast";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -29,8 +29,6 @@ const SignUpPage = () => {
     checkPassword: "",
   });
   const [agree, setAgree] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
 
   const toggleAgree = () => setAgree((prev) => !prev);
 
@@ -44,19 +42,19 @@ const SignUpPage = () => {
   };
 
   const handleClickSignUp = async (data: SignupType) => {
+    const addToast = useToastStore.getState().addToast;
     try {
       const { email, nickname, password } = data;
       await postSignUp({ email, nickname, password });
-      setIsOpen(true);
-      setModalMessage("가입이 완료되었습니다.");
+      addToast("가입 완료!", "success");
+      router.push("/login");
     } catch (error: any) {
       if (error.response?.status === 409) {
-        setIsOpen(true);
-        setModalMessage(error.response.data.message);
+        addToast(error.response.data.message, "error");
       } else {
-        setIsOpen(true);
-        setModalMessage(
-          error.response?.data?.message || "가입에 실패했습니다."
+        addToast(
+          error.response.data.message || "가입에 실패했습니다.",
+          "error"
         );
       }
     }
@@ -96,17 +94,6 @@ const SignUpPage = () => {
 
   return (
     <main className="bg-gray_FAFAFA">
-      <AuthModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={() => {
-          if (modalMessage === "가입이 완료되었습니다.") {
-            router.push("/login");
-          }
-        }}
-      >
-        {modalMessage}
-      </AuthModal>
       <div className="px-[12px] py-[70px] md:px-[110px] lg:px-0 flex flex-col items-center lg:max-w-[520px] lg:mx-auto">
         <div className="flex flex-col gap-y-[8px]">
           <Link href="/">

@@ -4,14 +4,15 @@ import { ColumnCard } from "@/components/Card/Column";
 import { AddButton } from "@/components/common/Button/AddButton";
 import { CreateColumnModal } from "@/components/Modal/CreateColumn";
 import { getColumnList } from "@/lib/api/columns";
+import { useToastStore } from "@/lib/stores/toast";
 import { getColumnListType } from "@/types/columns";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const dashboardPage = () => {
+  const addToast = useToastStore.getState().addToast;
   const [isOpen, setIsOpen] = useState(false);
   const { dashboardId } = useParams();
-  const [error, setError] = useState("");
   const [columnList, setColumnList] = useState<getColumnListType[]>([]);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ const dashboardPage = () => {
         const res = await getColumnList({ dashboardId: Number(dashboardId) });
         setColumnList(res.data.data);
       } catch (error) {
-        setError("컬럼 목록 조회에 실패했습니다.");
+        addToast("컬럼 목록 조회에 실패했습니다.");
       }
     };
     fetchData();
