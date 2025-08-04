@@ -9,9 +9,11 @@ import landing5 from "@/assets/landing_5.svg";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/auth";
 
 const HomePage = () => {
   const router = useRouter();
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   const featureList = [
     {
@@ -26,6 +28,14 @@ const HomePage = () => {
       des: "구성원을 초대하고 내보낼 수 있어요",
     },
   ];
+
+  const handleClickRouter = () => {
+    if (accessToken) {
+      router.push("/mydashboard");
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
     <div className="bg-black_000000 px-[16px] md:px-[40px] lg:px-0">
@@ -50,9 +60,9 @@ const HomePage = () => {
 
           <button
             className="bg-violet_5534DA px-[87px] py-[11px] rounded-[8px] text-md text-white_FFFFFF md:text-2lg md:py-[14px]"
-            onClick={() => router.push("/login")}
+            onClick={handleClickRouter}
           >
-            로그인하기
+            {accessToken ? "내 대시보드로" : "로그인하기"}
           </button>
         </section>
 
