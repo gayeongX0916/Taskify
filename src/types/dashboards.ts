@@ -12,7 +12,7 @@ export interface deleteInviteDashboardType {
   invitationId: number;
 }
 
-export interface getDashboardListTYpe {
+export interface getDashboardListType {
   id: number;
   title: string;
   color: string;
