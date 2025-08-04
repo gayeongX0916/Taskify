@@ -6,6 +6,7 @@ type ModalButtonProps = {
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
+  type?: "button" | "submit";
 };
 
 export function ModalButton({
@@ -14,6 +15,7 @@ export function ModalButton({
   onClick,
   disabled,
   className,
+  type,
 }: ModalButtonProps) {
   const isCancel = mode === "cancel";
 
@@ -26,6 +28,7 @@ export function ModalButton({
           : "bg-violet_5534DA text-white_FFFFFF"
       } ${className ?? "px-[46px] py-[14px]"}`}
       disabled={disabled}
+      type={type}
     >
       {mode === "cancel" ? "취소" : children}
     </button>

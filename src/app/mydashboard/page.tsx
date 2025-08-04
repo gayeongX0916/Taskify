@@ -7,22 +7,22 @@ import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { getDashboardListType } from "@/types/dashboards";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const mydashboardPage = () => {
+  const router = useRouter();
   const [dashboardList, setDashboardList] = useState<getDashboardListType[]>(
     []
   );
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
-  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await getDashboardList();
         setDashboardList(res.data.dashboards);
-        setIsOwner(res.data.createdByMe);
       } catch (error: any) {
         setError("대시보드를 불러오는 중 오류가 발생했습니다.");
       }
@@ -42,12 +42,14 @@ const mydashboardPage = () => {
               onClick={() => setIsOpen(true)}
             />
             {dashboardList.length > 0 &&
-              dashboardList.map(({ title, color }) => (
-                <DashboardNameCard
-                  name={title}
-                  isOwner={isOwner}
-                  bgColor={color}
-                />
+              dashboardList.map(({ title, color, createdByMe, id }) => (
+                <button onClick={() => router.push(`/dashboard/${id}`)}>
+                  <DashboardNameCard
+                    name={title}
+                    isOwner={createdByMe}
+                    bgColor={color}
+                  />
+                </button>
               ))}
           </div>
           {dashboardList.length > 0 && (

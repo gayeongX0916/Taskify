@@ -62,12 +62,13 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
             </div>
 
             <footer className="flex gap-x-[7px] mt-[32px] md:mt-[40px]">
-              <ModalButton mode="cancel" onClick={onClose}>
+              <ModalButton mode="cancel" type="button" onClick={onClose}>
                 취소
               </ModalButton>
               <ModalButton
                 mode="any"
                 onClick={() => handleCreateDashboard({ title, color })}
+                type="submit"
               >
                 생성
               </ModalButton>
