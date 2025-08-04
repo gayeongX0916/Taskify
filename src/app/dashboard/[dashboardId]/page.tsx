@@ -3,28 +3,36 @@
 import { ColumnCard } from "@/components/Card/Column";
 import { AddButton } from "@/components/common/Button/AddButton";
 import { CreateColumnModal } from "@/components/Modal/CreateColumn";
-import { useState } from "react";
+import { getColumnList } from "@/lib/api/columns";
+import { getColumnListType } from "@/types/columns";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const dashboardPage = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { dashboardId } = useParams();
+  const [error, setError] = useState("");
+  const [columnList, setColumnList] = useState<getColumnListType[]>([]);
 
-  const exampleList = [
-    {
-      count: 3,
-      name: "To Do",
-    },
-    { count: 2, name: "On Progress" },
-    { count: 3, name: "Done" },
-    { count: 3, name: "HI" },
-    { count: 3, name: "Bye" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getColumnList({ dashboardId: Number(dashboardId) });
+        setColumnList(res.data.data);
+      } catch (error) {
+        setError("컬럼 목록 조회에 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
       <CreateColumnModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <div className="flex flex-col pb-[20px] lg:flex-row lg:overflow-x-auto">
         <div className="flex flex-col lg:flex-row">
-          {exampleList.map(({ count, name }) => (
-            <ColumnCard key={name} count={count} columnName={name} />
+          {columnList.map(({ id, title }) => (
+            <ColumnCard key={id} count={1} columnName={title} />
           ))}
         </div>
         <div className="px-[12px] pt-[16px] pb-[49px] md:py-[20px] md:px-[20px] lg:pt-[68px] lg:pb[0] lg:pl-[20px] lg:pr-[100px]">
