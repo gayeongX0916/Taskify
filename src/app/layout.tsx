@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { SideMenu } from "@/components/SideMenu";
 import { PaddingWrapper } from "@/components/common/PaddingWrapper";
+import { ToastContainer } from "@/components/common/ToastContainer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ToastContainer />
         <SideMenu />
         <PaddingWrapper>
           <Header />
