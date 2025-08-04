@@ -10,7 +10,7 @@ export const postColumn = (data: postColumnType) => api.post("/columns", data);
 
 // 컬럼 목록 조회
 export const getColumnList = ({ dashboardId }: { dashboardId: number }) =>
-  api.get(`/columns?dashboard=${dashboardId}`);
+  api.get(`/columns?dashboardId=${dashboardId}`);
 
 // 컬럼 수정
 export const putColumn = ({ columnId, title }: putColumnType) =>

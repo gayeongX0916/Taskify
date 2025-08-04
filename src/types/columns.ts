@@ -12,3 +12,9 @@ export interface postCardImgType {
   columnId: number;
   file: File;
 }
+
+export interface getColumnListType {
+  id: number;
+  title: string;
+  dashboardId: number;
+}

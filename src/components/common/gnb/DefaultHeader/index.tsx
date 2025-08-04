@@ -4,11 +4,18 @@ import Image from "next/image";
 import logoWhite from "@/assets/logo_white.svg";
 import logoTitleWhite from "@/assets/logo_title_white.svg";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/auth";
 
 export default function DefaultHeader() {
   const router = useRouter();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const handleGotoHome = () => router.push("/");
+  const handleLogout = () => {
+    clearAuth();
+    router.push("/login");
+  };
 
   return (
     <header className="bg-black_000000 flex justify-between items-center px-[24px] py-[16px] md:px-[40px] md:py-[15px] lg:px-[80px]">
@@ -20,8 +27,14 @@ export default function DefaultHeader() {
       </button>
 
       <div className="flex gap-x-[24px] text-white_FFFFFF text-md md:text-lg md:gap-x-[36px]">
-        <button onClick={() => router.push("/login")}>로그인</button>
-        <button onClick={() => router.push("/signup")}>회원가입</button>
+        {accessToken ? (
+          <button onClick={handleLogout}>로그아웃</button>
+        ) : (
+          <>
+            <button onClick={() => router.push("/login")}>로그인</button>
+            <button onClick={() => router.push("/signup")}>회원가입</button>
+          </>
+        )}
       </div>
     </header>
   );
