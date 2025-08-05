@@ -10,15 +10,21 @@ import { ModalProps } from "@/types/ModalProps";
 import { postDashboard } from "@/lib/api/dashboards";
 import { postDashboardType } from "@/types/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
+import { useDashboardStore } from "@/lib/stores/dashboard";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const [color, setColor] = useState("");
   const [title, setTitle] = useState("");
   const addToast = useToastStore.getState().addToast;
+  const addDashboard = useDashboardStore((state) => state.addDashboard);
 
   const handleCreateDashboard = async (data: postDashboardType) => {
     try {
-      await postDashboard(data);
+      const res = await postDashboard(data);
+      addDashboard(res.data);
+      onClose();
+      setTitle("");
+      setColor("");
     } catch (error) {
       addToast("대시보드 생성에 실패했습니다.");
     }
@@ -32,7 +38,12 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
             새로운 대시보드
           </h1>
 
-          <form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleCreateDashboard({ title, color });
+            }}
+          >
             <div className="flex flex-col gap-y-[8px] mb-[16px]">
               <label
                 htmlFor="dashboard-name"
@@ -69,7 +80,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
               <ModalButton
                 mode="any"
                 onClick={() => handleCreateDashboard({ title, color })}
-                type="submit"
+                type="button"
               >
                 생성
               </ModalButton>
