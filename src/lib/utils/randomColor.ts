@@ -15,6 +15,7 @@ export function getRandomColor(char: string) {
 }
 
 export function getInitialFromUserName(username: string) {
+   if (!username) return ""; 
   const trimmed = username.trim();
   const firstChar = trimmed[0];
   return firstChar;
