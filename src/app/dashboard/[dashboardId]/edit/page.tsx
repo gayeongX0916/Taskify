@@ -2,13 +2,28 @@
 
 import Image from "next/image";
 import arrowLeft from "@/assets/arrow_left.svg";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { EditDashboardCard } from "@/components/Card/EditDashboard";
 import { MemberOrInviteTable } from "@/components/Table/MemberOrInvite";
 import { AddButton } from "@/components/common/Button/AddButton";
+import { useDashboardStore } from "@/lib/stores/dashboard";
+import { deleteDashboard } from "@/lib/api/dashboards";
+import { useToastStore } from "@/lib/stores/toast";
 
 const editDashboardPage = () => {
+  const { dashboardId } = useParams();
   const router = useRouter();
+  const removeDashboard = useDashboardStore((state) => state.removeDashboard);
+  const addToast = useToastStore.getState().addToast;
+
+  const handleDeleteDashboard = async (dashboardId: number) => {
+    try {
+      await deleteDashboard({ dashboardId });
+      removeDashboard(dashboardId);
+    } catch (error) {
+      addToast("대시보드 삭제에 실패했습니다.");
+    }
+  };
 
   return (
     <main className="bg-gray_FAFAFA pt-[16px] px-[12px] pb-[60px] md:px-[20px] md:pt-[20px]">
@@ -22,7 +37,7 @@ const editDashboardPage = () => {
         </button>
 
         <div className="flex flex-col gap-y-[16px]">
-          <EditDashboardCard title="비브리지" />
+          <EditDashboardCard dashboardId={Number(dashboardId)} />
           <MemberOrInviteTable mode="member" />
           <MemberOrInviteTable mode="invite" />
         </div>
@@ -31,6 +46,7 @@ const editDashboardPage = () => {
         <AddButton
           mode="delete"
           className="w-full py-[13px] md:w-[320px] md:py-[18px]"
+          onClick={() => handleDeleteDashboard(Number(dashboardId))}
         />
       </div>
     </main>

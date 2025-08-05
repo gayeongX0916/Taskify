@@ -6,16 +6,15 @@ import { PaginationButton } from "@/components/common/Button/PaginationButton";
 import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
+import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useToastStore } from "@/lib/stores/toast";
-import { getDashboardListType } from "@/types/dashboards";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const mydashboardPage = () => {
   const router = useRouter();
-  const [dashboardList, setDashboardList] = useState<getDashboardListType[]>(
-    []
-  );
+  const dashboardList = useDashboardStore((state) => state.dashboardList);
+  const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const [isOpen, setIsOpen] = useState(false);
   const addToast = useToastStore.getState().addToast;
 
@@ -42,16 +41,11 @@ const mydashboardPage = () => {
               className="w-full py-[15px]"
               onClick={() => setIsOpen(true)}
             />
-            {dashboardList.length > 0 &&
-              dashboardList.map(({ title, color, createdByMe, id }) => (
-                <button onClick={() => router.push(`/dashboard/${id}`)}>
-                  <DashboardNameCard
-                    name={title}
-                    isOwner={createdByMe}
-                    bgColor={color}
-                  />
-                </button>
-              ))}
+            {dashboardList.map(({ id }) => (
+              <button key={id} onClick={() => router.push(`/dashboard/${id}`)}>
+                <DashboardNameCard dashboardId={id} />
+              </button>
+            ))}
           </div>
           {dashboardList.length > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">

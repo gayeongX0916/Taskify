@@ -3,18 +3,23 @@ import Image from "next/image";
 import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
 import { ModalButton } from "@/components/common/Button/ModalButton";
+import { useDashboardStore } from "@/lib/stores/dashboard";
 
 type EditDashboardCardProps = {
-  title: string;
+  dashboardId: number;
 };
 
-export function EditDashboardCard({ title }: EditDashboardCardProps) {
-  const [color, setColor] = useState("");
-  const [name, setName] = useState("");
+export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
+  const dashboard = useDashboardStore((state) =>
+    state.dashboardList.find((d) => d.id === dashboardId)
+  );
+  const [color, setColor] = useState(dashboard?.color ?? "");
+  const [title, setTitle] = useState(dashboard?.title ?? "");
+
   return (
     <section className="bg-white_FFFFFF px-[16px] py-[20px] rounded-[8px] md:px-[28px] md:py-[32px] md:rounded-[16px]">
       <h1 className="text-xl text-black_333236 mb-[24px] font-bold md:text-2xl">
-        {title}
+        {dashboard?.title}
       </h1>
       <form className="flex flex-col">
         <div className="flex flex-col gap-y-[8px] mb-[16px]">
@@ -24,8 +29,8 @@ export function EditDashboardCard({ title }: EditDashboardCardProps) {
           <input
             id="dashboard-name"
             className="px-[16px] py-[15px] rounded-[8px] border border-gray_D9D9D9 w-full h-[40px] md:h-[50px]"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
@@ -35,7 +40,8 @@ export function EditDashboardCard({ title }: EditDashboardCardProps) {
               key={list}
               type="button"
               onClick={() => setColor(list)}
-              className={`bg-${list} w-[30px] h-[30px] rounded-full flex justify-center items-center`}
+              style={{ backgroundColor: list }}
+              className="w-[30px] h-[30px] rounded-full flex justify-center items-center"
             >
               {color === list && <Image src={checkIcon} alt="체크" />}
             </button>
