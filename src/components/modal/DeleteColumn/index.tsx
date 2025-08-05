@@ -1,8 +1,34 @@
 import { ModalButton } from "@/components/common/Button/ModalButton";
+import { deleteColumn } from "@/lib/api/columns";
+import { useToastStore } from "@/lib/stores/toast";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
-export function DeleteColumnModal({ isOpen, onClose }: ModalProps) {
+interface DeleteColumnModalProps extends ModalProps {
+  columnId: number;
+  onDelete: (columnId: number) => void;
+}
+
+export function DeleteColumnModal({
+  isOpen,
+  onClose,
+  columnId,
+  onDelete,
+}: DeleteColumnModalProps) {
+  const router = useRouter();
+  const addToast = useToastStore.getState().addToast;
+
+  const handleDeleteColumn = async () => {
+    try {
+      await deleteColumn({ columnId });
+      onClose();
+      onDelete(columnId);
+    } catch (error) {
+      addToast("컬럼 삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
@@ -14,7 +40,9 @@ export function DeleteColumnModal({ isOpen, onClose }: ModalProps) {
             <ModalButton mode="cancel" onClick={onClose}>
               취소
             </ModalButton>
-            <ModalButton mode="any">삭제</ModalButton>
+            <ModalButton mode="any" onClick={handleDeleteColumn}>
+              삭제
+            </ModalButton>
           </div>
         </div>
       </div>
