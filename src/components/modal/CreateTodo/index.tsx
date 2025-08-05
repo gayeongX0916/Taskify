@@ -10,25 +10,38 @@ import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 import { ModalProps } from "@/types/ModalProps";
+import { postCardType } from "@/types/cards";
+import { postCard } from "@/lib/api/cards";
+import { useToastStore } from "@/lib/stores/toast";
 
-type ModalValues = {
-  assignee: string;
-  title: string;
-  des: string;
-  date: Date | null;
-  tag: string[];
-  img: string;
-};
+interface CreateTodoModalProps extends ModalProps {
+  columnId: number;
+}
 
-export function CreateTodoModal({ isOpen, onClose }: ModalProps) {
-  const [values, setValues] = useState<ModalValues>({
-    assignee: "",
+export function CreateTodoModal({
+  isOpen,
+  onClose,
+  columnId,
+}: CreateTodoModalProps) {
+  const addToast = useToastStore.getState().addToast;
+  const [values, setValues] = useState<postCardType>({
+    assigneeUserId: 0,
+    columnId: columnId,
+    dashboardId: 0,
     title: "",
-    des: "",
-    date: null,
-    tag: [],
-    img: "",
+    description: "",
+    dueDate: "",
+    tags: [],
+    imageUrl: "",
   });
+
+  const handlePostCard = async (data: postCardType) => {
+    try {
+      await postCard(data);
+    } catch (error) {
+      addToast("카드 생성에 실패했습니다.");
+    }
+  };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -54,20 +67,26 @@ export function CreateTodoModal({ isOpen, onClose }: ModalProps) {
             <TextareaInput
               label="설명 *"
               placeholder="설명을 입력해 주세요"
-              value={values.des}
-              onChange={(value) => setValues({ ...values, des: value })}
+              value={values.description}
+              onChange={(value) => setValues({ ...values, description: value })}
             />
             <DateInput
               label="마감일 *"
               placeholder="날짜를 입력해 주세요"
-              value={values.date}
-              onChange={(value) => setValues({ ...values, date: value })}
+              value={values.dueDate ? new Date(values.dueDate) : null} // string → Date
+              onChange={(date) =>
+                setValues({
+                  ...values,
+                  // Date → string (ISO나 원하는 포맷으로)
+                  dueDate: date ? date.toISOString() : "",
+                })
+              }
             />
             <TagInput
               label="태그"
               placeholder="입력 후 Enter"
-              value={values.tag}
-              onChange={(value) => setValues({ ...values, tag: value })}
+              value={values.tags}
+              onChange={(value) => setValues({ ...values, tags: value })}
             />
             <ImageInput label="이미지" />
           </main>
@@ -76,7 +95,9 @@ export function CreateTodoModal({ isOpen, onClose }: ModalProps) {
             <ModalButton mode="cancel" onClick={onClose}>
               취소
             </ModalButton>
-            <ModalButton mode="any">생성</ModalButton>
+            <ModalButton mode="any" onClick={() => handlePostCard(values)}>
+              생성
+            </ModalButton>
           </footer>
         </section>
       </div>

@@ -30,7 +30,7 @@ export function ModalButton({
       disabled={disabled}
       type={type}
     >
-      {mode === "cancel" ? "취소" : children}
+      {children}
     </button>
   );
 }
