@@ -2,6 +2,7 @@
 
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { postColumn } from "@/lib/api/columns";
+import { useColumnStore } from "@/lib/stores/column";
 import { useToastStore } from "@/lib/stores/toast";
 import { postColumnType } from "@/types/columns";
 import { ModalProps } from "@/types/ModalProps";
@@ -14,16 +15,24 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const [value, setValue] = useState("");
   const { dashboardId } = useParams();
   const addToast = useToastStore.getState().addToast;
+  const addColumn = useColumnStore((state) => state.addColumn);
+  const columnList = useColumnStore((state) => state.columnList);
 
   const handleCreateColumn = async (data: postColumnType) => {
     try {
-      await postColumn(data);
+      const res = await postColumn(data);
+      addColumn(res.data);
+      onClose();
+      setValue("");
     } catch (error) {
       addToast("컬럼 생성에 실패했습니다.");
     }
   };
 
-  useEffect(() => {});
+  useEffect(() => {
+    const isExisted = columnList.some((col) => col.title === value);
+    setExisted(isExisted);
+  }, [value, columnList]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -33,7 +42,16 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
             새 컬럼 생성
           </h1>
 
-          <form className="flex flex-col">
+          <form
+            className="flex flex-col"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleCreateColumn({
+                title: value,
+                dashboardId: Number(dashboardId),
+              });
+            }}
+          >
             <div className="flex flex-col gap-y-[8px] mb-[24px]">
               <label
                 htmlFor="column-name"
@@ -61,7 +79,7 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
               </ModalButton>
               <ModalButton
                 mode="any"
-                type="submit"
+                type="button"
                 onClick={() =>
                   handleCreateColumn({
                     title: value,

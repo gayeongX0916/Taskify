@@ -1,29 +1,27 @@
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { deleteColumn } from "@/lib/api/columns";
+import { useColumnStore } from "@/lib/stores/column";
 import { useToastStore } from "@/lib/stores/toast";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
-import { useRouter } from "next/navigation";
 
 interface DeleteColumnModalProps extends ModalProps {
   columnId: number;
-  onDelete: (columnId: number) => void;
 }
 
 export function DeleteColumnModal({
   isOpen,
   onClose,
   columnId,
-  onDelete,
 }: DeleteColumnModalProps) {
-  const router = useRouter();
   const addToast = useToastStore.getState().addToast;
+  const removeColumn = useColumnStore((state) => state.removeColumn);
 
   const handleDeleteColumn = async () => {
     try {
       await deleteColumn({ columnId });
+      removeColumn(columnId);
       onClose();
-      onDelete(columnId);
     } catch (error) {
       addToast("컬럼 삭제에 실패했습니다.");
     }
