@@ -10,20 +10,16 @@ import { getCardList } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { getCardType } from "@/types/cards";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
+import { useColumnStore } from "@/lib/stores/column";
 
 type ColumnCardProps = {
   columnId: number;
-  columnName: string;
-  onDelete: (columnId: number) => void;
+  title:string;
 };
 
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
-export function ColumnCard({
-  columnId,
-  columnName,
-  onDelete,
-}: ColumnCardProps) {
+export function ColumnCard({ columnId,title }: ColumnCardProps) {
   const addToast = useToastStore.getState().addToast;
   const [cardList, setCardList] = useState<getCardType[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -62,9 +58,9 @@ export function ColumnCard({
         columnId={columnId}
         isOpen={modalState.deleteColumn}
         onClose={() => handleClickClose("deleteColumn")}
-        onDelete={onDelete}
       />
       <EditColumnModal
+      columnId={columnId}
         isOpen={modalState.editColumn}
         onClose={() => handleClickClose("editColumn")}
         onDelete={() => {
@@ -79,7 +75,7 @@ export function ColumnCard({
       />
       {selectedId !== null && (
         <DashBoardModal
-          columnName={columnName}
+          columnName={title}
           cardId={selectedId}
           isOpen={modalState.dashboard}
           onClose={() => handleClickClose("dashboard")}
@@ -89,7 +85,7 @@ export function ColumnCard({
         <div className="flex items-center gap-x-[8px]">
           <div className="w-[8px] h-[8px] bg-violet_5534DA rounded-full"></div>
           <div className="flex items-center gap-x-[12px]">
-            <h1 className="text-lg font-bold md:text-2lg">{columnName}</h1>
+            <h1 className="text-lg font-bold md:text-2lg">{title}</h1>
             <span className="bg-gray_EEEEEE rounded-[4px] px-[6px] py-[3px] text-xs text-gray_787486">
               {count}
             </span>
