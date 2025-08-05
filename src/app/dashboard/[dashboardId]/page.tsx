@@ -27,13 +27,17 @@ const dashboardPage = () => {
     fetchData();
   }, []);
 
+  const handleDeleteColumn = (columnId: number) => {
+    setColumnList((prev) => prev.filter((col) => col.id !== columnId));
+  };
+
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
       <CreateColumnModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <div className="flex flex-col pb-[20px] lg:flex-row lg:overflow-x-auto">
         <div className="flex flex-col lg:flex-row">
           {columnList.map(({ id, title }) => (
-            <ColumnCard key={id} count={1} columnName={title} />
+            <ColumnCard key={id} columnId={id} columnName={title} onDelete={handleDeleteColumn}/>
           ))}
         </div>
         <div className="px-[12px] pt-[16px] pb-[49px] md:py-[20px] md:px-[20px] lg:pt-[68px] lg:pb[0] lg:pl-[20px] lg:pr-[100px]">
