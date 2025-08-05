@@ -20,3 +20,19 @@ export interface getCardListType {
 export interface putCardType extends BaseCardType {
   cardId: number;
 }
+
+export interface getCardType {
+  id: number; // cardId
+  columnId: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  tags: string[];
+  imageUrl: string;
+  createdAt:string;
+  assignee: {
+    profileImageUrl: string;
+    nickname: string;
+    id: number;
+  };
+}
