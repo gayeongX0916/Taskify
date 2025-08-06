@@ -5,25 +5,27 @@ import { ColumnDetailCard } from "../ColumnDetail";
 import { EditColumnModal } from "@/components/Modal/Base/EditColumnModal";
 import { CreateTodoModal } from "@/components/Modal/CreateTodo";
 import { DashBoardModal } from "@/components/Modal/Dashboard";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCardList } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { getCardType } from "@/types/cards";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
-import { useColumnStore } from "@/lib/stores/column";
+import { useCardStore } from "@/lib/stores/card";
 
 type ColumnCardProps = {
   columnId: number;
-  title:string;
+  title: string;
 };
 
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
-export function ColumnCard({ columnId,title }: ColumnCardProps) {
+export function ColumnCard({ columnId, title }: ColumnCardProps) {
   const addToast = useToastStore.getState().addToast;
-  const [cardList, setCardList] = useState<getCardType[]>([]);
+ const rawCardList = useCardStore((state) => state.cardsByColumn[columnId]);
+ const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
+  const setCardList = useCardStore((state) => state.setCardList);
+  const count = useCardStore((state) => state.countsByColumn[columnId] || 0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [count, setCount] = useState();
   const [modalState, setModalState] = useState({
     editColumn: false,
     createTodo: false,
@@ -39,18 +41,19 @@ export function ColumnCard({ columnId,title }: ColumnCardProps) {
     setModalState((prev) => ({ ...prev, [modalName]: false }));
   };
 
+  // ssr로 미리 5개 받아오기?
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getCardList({ size: 10, columnId: columnId });
-        setCardList(res.data.cards);
-        setCount(res.data.totalCount);
+        const res = await getCardList({ size: 10, columnId });
+        setCardList(columnId, res.data.cards, res.data.totalCount);
       } catch (error) {
         addToast("카드 목록을 조회하는데 실패했습니다.");
+        console.error(error);
       }
     };
     fetchData();
-  }, []);
+  }, [columnId, setCardList, addToast]);
 
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
@@ -60,7 +63,7 @@ export function ColumnCard({ columnId,title }: ColumnCardProps) {
         onClose={() => handleClickClose("deleteColumn")}
       />
       <EditColumnModal
-      columnId={columnId}
+        columnId={columnId}
         isOpen={modalState.editColumn}
         onClose={() => handleClickClose("editColumn")}
         onDelete={() => {
@@ -75,6 +78,7 @@ export function ColumnCard({ columnId,title }: ColumnCardProps) {
       />
       {selectedId !== null && (
         <DashBoardModal
+          columnId={columnId}
           columnName={title}
           cardId={selectedId}
           isOpen={modalState.dashboard}
