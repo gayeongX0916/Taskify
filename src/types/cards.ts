@@ -30,9 +30,11 @@ export interface getCardType {
   tags: string[];
   imageUrl: string;
   createdAt:string;
+  updatedAt:string;
   assignee: {
     profileImageUrl: string;
     nickname: string;
     id: number;
   };
+  dashboardId:number;
 }
