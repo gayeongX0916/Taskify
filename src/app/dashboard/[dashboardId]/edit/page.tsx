@@ -20,6 +20,7 @@ const editDashboardPage = () => {
     try {
       await deleteDashboard({ dashboardId });
       removeDashboard(dashboardId);
+      router.push("/mydashboard");
     } catch (error) {
       addToast("대시보드 삭제에 실패했습니다.");
     }

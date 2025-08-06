@@ -7,6 +7,7 @@ import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { useDashboardStore } from "@/lib/stores/dashboard";
+import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ const mydashboardPage = () => {
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const [isOpen, setIsOpen] = useState(false);
   const addToast = useToastStore.getState().addToast;
+  // const {isLoading,startLoading,stopLoading}=useLoadingStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +32,8 @@ const mydashboardPage = () => {
     fetchData();
   }, []);
 
+  if (dashboardList.length === 0) return <div>로딩 중</div>;
+
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
       <CreateDashboardModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
@@ -41,10 +45,19 @@ const mydashboardPage = () => {
               className="w-full py-[15px]"
               onClick={() => setIsOpen(true)}
             />
+            {/* {isLoading ? (
+          <div className="py-10 text-center">로딩 중...</div>
+        ) : dashboardList.length === 0 ? (
+          <div className="py-10 text-center">대시보드가 없습니다.</div>
+        ) : (
+          dashboardList.map((d) => (
+            <DashboardNameCard key={d.id} dashboardId={d.id} />
+          ))
+        )} */}
             {dashboardList.map(({ id }) => (
-              <button key={id} onClick={() => router.push(`/dashboard/${id}`)}>
+              <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>
                 <DashboardNameCard dashboardId={id} />
-              </button>
+              </div>
             ))}
           </div>
           {dashboardList.length > 0 && (
