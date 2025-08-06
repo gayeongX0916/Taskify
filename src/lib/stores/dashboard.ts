@@ -6,6 +6,7 @@ interface DashboardState {
   setDashboardList: (list: getDashboardListType[]) => void;
   addDashboard: (dashboard: getDashboardListType) => void;
   removeDashboard: (id: number) => void;
+  updateDashboard: (id: number, title: string, color: string) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -16,5 +17,11 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   removeDashboard: (id) =>
     set((state) => ({
       dashboardList: state.dashboardList.filter((d) => d.id !== id),
+    })),
+  updateDashboard: (id, title, color) =>
+    set((state) => ({
+      dashboardList: state.dashboardList.map((d) =>
+        d.id === id ? { ...d, title, color } : d
+      ),
     })),
 }));
