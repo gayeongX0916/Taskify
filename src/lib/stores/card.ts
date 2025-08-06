@@ -43,15 +43,27 @@ export const useCardStore = create<CardState>((set) => ({
         },
       };
     }),
-  updateCard: (columnId, card) =>
+  updateCard: (oldColumnId, card) =>
     set((state) => {
-      const prev = state.cardsByColumn[columnId] || [];
+      const newColumnId = card.columnId;
+      const newCardsByColumn = { ...state.cardsByColumn };
+      const newCountsByColumn = { ...state.countsByColumn };
+
+      const oldCards = newCardsByColumn[oldColumnId] || [];
+      newCardsByColumn[oldColumnId] = oldCards.filter((c) => c.id !== card.id);
+      newCountsByColumn[oldColumnId] = Math.max(
+        (newCountsByColumn[oldColumnId] || 1) - 1,
+        0
+      );
+
+      const newCards = newCardsByColumn[newColumnId] || [];
+      newCardsByColumn[newColumnId] = [card, ...newCards];
+      newCountsByColumn[newColumnId] =
+        (newCountsByColumn[newColumnId] || 0) + 1;
+
       return {
-        cardsByColumn: {
-          ...state.cardsByColumn,
-          [columnId]: prev.map((c) => (c.id === card.id ? card : c)),
-        },
-        countsByColumn: state.countsByColumn,
+        cardsByColumn: newCardsByColumn,
+        countsByColumn: newCountsByColumn,
       };
     }),
 }));
