@@ -14,7 +14,7 @@ import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
 import { getCardDetail, putCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { BaseCardType, getCardType, putCardType } from "@/types/cards";
+import { BaseCardType } from "@/types/cards";
 import { getColumnList } from "@/lib/api/columns";
 import { useParams } from "next/navigation";
 import { getColumnListType } from "@/types/columns";
@@ -84,8 +84,13 @@ export function EditTodoModal({
   const handleEditTodo = async (data: BaseCardType) => {
     if (!values) return;
     try {
-      const res = await putCard({ cardId, ...data });
+      const payload = { ...data };
+      if (!payload.imageUrl || payload.imageUrl.trim() === "") {
+        delete payload.imageUrl;
+      }
+      const res = await putCard({ cardId, ...payload });
       updateCard(columnId, res.data);
+      onClose();
     } catch (error) {
       addToast("컬럼 수정에 실패했습니다.");
     }

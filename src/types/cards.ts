@@ -5,7 +5,7 @@ export interface BaseCardType {
   description: string;
   dueDate: string;
   tags: string[];
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 export interface postCardType extends BaseCardType {

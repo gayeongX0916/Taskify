@@ -128,7 +128,7 @@ export function DashBoardModal({
             </h2>
 
             <main className="flex flex-col-reverse md:flex-row md:justify-between max-h-[70vh] overflow-y-auto pr-[20px] md:gap-x-[20px]">
-              <article className="flex flex-col">
+              <article className="flex flex-col min-w-[440px]">
                 <div className="flex gap-x-[12px] items-center md:gap-x-[20px]">
                   <Chip name={columnName} className="text-xs" />
                   <span className="border-l border-gray_D9D9D9 h-[20px]" />
@@ -142,13 +142,17 @@ export function DashBoardModal({
                   {detail.description}
                 </p>
 
-                <Image
-                  src={detail.imageUrl}
-                  alt="예시"
-                  width={290}
-                  height={168}
-                  className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
-                />
+                {detail.imageUrl === null ? (
+                  <div className="hidden"></div>
+                ) : (
+                  <Image
+                    src={detail.imageUrl}
+                    alt="예시"
+                    width={290}
+                    height={168}
+                    className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
+                  />
+                )}
 
                 <div className="mt-[24px] lg:mt-[16px]">
                   <CommentTextarea />
