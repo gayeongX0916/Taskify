@@ -3,7 +3,7 @@
 import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 import { ProgressDropdown } from "@/components/Dropdown/ProgressDropdown";
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import editIcon from "@/assets/edit_icon.svg";
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
@@ -12,18 +12,84 @@ import { DateInput } from "@/components/common/Input/ModalInput/DateInput";
 import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
-import { ModalValues } from "@/types/ModalValues";
+import { getCardDetail, putCard } from "@/lib/api/cards";
+import { useToastStore } from "@/lib/stores/toast";
+import { BaseCardType, getCardType, putCardType } from "@/types/cards";
+import { getColumnList } from "@/lib/api/columns";
+import { useParams } from "next/navigation";
+import { getColumnListType } from "@/types/columns";
+import { formatDate } from "@/lib/utils/formatDate";
+import { useCardStore } from "@/lib/stores/card";
 
-export function EditTodoModal({ isOpen, onClose }: ModalProps) {
-  const [values, setValues] = useState<ModalValues>({
-    progress: "To Do",
-    assignee: "배유철",
-    title: "제목",
-    des: "내용입니다",
-    date: new Date("2025-05-04T11:15:00"),
-    tag: ["안녕", "하이루"],
-    img: "",
+interface EditTodoModalProps extends ModalProps {
+  cardId: number;
+  columnId: number;
+}
+
+export function EditTodoModal({
+  isOpen,
+  onClose,
+  cardId,
+  columnId,
+}: EditTodoModalProps) {
+  const { dashboardId } = useParams();
+  const addToast = useToastStore.getState().addToast;
+  const [values, setValues] = useState<BaseCardType>({
+    assigneeUserId: 0,
+    columnId: 0,
+    title: "",
+    description: "",
+    dueDate: "",
+    tags: [],
+    imageUrl: "",
   });
+  const [columnList, setColumnList] = useState<getColumnListType[]>([]);
+  const updateCard = useCardStore((state) => state.updateCard);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getCardDetail({ cardId });
+        const card = res.data;
+        setValues({
+          assigneeUserId: card.assignee?.id ?? 0,
+          columnId: card.columnId,
+          title: card.title,
+          description: card.description,
+          dueDate: card.dueDate,
+          tags: card.tags,
+          imageUrl: card.imageUrl,
+        });
+      } catch (error) {
+        addToast("");
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchColumnList = async () => {
+      try {
+        const res = await getColumnList({ dashboardId: Number(dashboardId) });
+        setColumnList(res.data.data);
+      } catch (error) {
+        addToast("컬럼 목록 조회에 실패했습니다.");
+      }
+    };
+    fetchColumnList();
+  }, []);
+
+  if (!values) return null;
+
+  const handleEditTodo = async (data: BaseCardType) => {
+    if (!values) return;
+    try {
+      const res = await putCard({ cardId, ...data });
+      updateCard(columnId, res.data);
+    } catch (error) {
+      addToast("컬럼 수정에 실패했습니다.");
+    }
+  };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -37,11 +103,25 @@ export function EditTodoModal({ isOpen, onClose }: ModalProps) {
             <div className="flex flex-col items-center gap-y-[32px] md:flex-row md:gap-x-[32px]">
               <div className="flex flex-col gap-y-[8px] w-full md:w-[256px]">
                 <span className="text-lg text-black_333236">상태</span>
-                <ProgressDropdown initialValue={values.progress} />
+                <ProgressDropdown
+                  columnId={columnId}
+                  columnList={columnList}
+                  onSelect={(columnId) =>
+                    setValues({ ...values, columnId: columnId })
+                  }
+                />
               </div>
               <div className="flex flex-col gap-y-[8px] w-full md:w-[256px]">
                 <span className="text-lg text-black_333236">담당자</span>
-                <AssigneeDropdown initialValue={values.assignee} />
+                <AssigneeDropdown
+                  initialUserId={values.assigneeUserId}
+                  onSelect={(userId) =>
+                    setValues({
+                      ...values,
+                      assigneeUserId: userId, // BaseCardType 유지
+                    })
+                  }
+                />
               </div>
             </div>
 
@@ -55,29 +135,41 @@ export function EditTodoModal({ isOpen, onClose }: ModalProps) {
             <TextareaInput
               label="설명 *"
               placeholder="설명을 입력해 주세요"
-              value={values.des}
-              onChange={(value) => setValues({ ...values, des: value })}
+              value={values.description}
+              onChange={(value) => setValues({ ...values, description: value })}
             />
             <DateInput
               label="마감일 *"
               placeholder="날짜를 입력해 주세요"
-              value={values.date}
-              onChange={(value) => setValues({ ...values, date: value })}
+              value={values.dueDate ? new Date(values.dueDate) : null}
+              onChange={(date) =>
+                setValues({
+                  ...values,
+                  dueDate: formatDate(date),
+                })
+              }
             />
             <TagInput
               label="태그"
               placeholder="입력 후 Enter"
-              value={values.tag}
-              onChange={(value) => setValues({ ...values, tag: value })}
+              value={values.tags}
+              onChange={(value) => setValues({ ...values, tags: value })}
             />
-            <ImageInput label="이미지" />
+            <ImageInput
+              label="이미지"
+              columnId={columnId}
+              onChange={(url) => setValues({ ...values, imageUrl: url })}
+              initialUrl={values.imageUrl}
+            />
           </main>
 
           <footer className="flex gap-x-[11px] mt-[24px]">
             <ModalButton mode="cancel" onClick={onClose}>
               취소
             </ModalButton>
-            <ModalButton mode="any">수정</ModalButton>
+            <ModalButton mode="any" onClick={() => handleEditTodo(values)}>
+              수정
+            </ModalButton>
           </footer>
         </section>
       </div>

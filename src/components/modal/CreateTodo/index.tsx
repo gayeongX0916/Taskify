@@ -13,6 +13,9 @@ import { ModalProps } from "@/types/ModalProps";
 import { postCardType } from "@/types/cards";
 import { postCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
+import { useCardStore } from "@/lib/stores/card";
+import { useParams } from "next/navigation";
+import { formatDate } from "@/lib/utils/formatDate";
 
 interface CreateTodoModalProps extends ModalProps {
   columnId: number;
@@ -23,11 +26,13 @@ export function CreateTodoModal({
   onClose,
   columnId,
 }: CreateTodoModalProps) {
+  const { dashboardId } = useParams();
   const addToast = useToastStore.getState().addToast;
+  const addCard = useCardStore((state) => state.addCard);
   const [values, setValues] = useState<postCardType>({
     assigneeUserId: 0,
     columnId: columnId,
-    dashboardId: 0,
+    dashboardId: Number(dashboardId),
     title: "",
     description: "",
     dueDate: "",
@@ -37,7 +42,9 @@ export function CreateTodoModal({
 
   const handlePostCard = async (data: postCardType) => {
     try {
-      await postCard(data);
+      const res = await postCard(data);
+      addCard(columnId, res.data);
+      onClose();
     } catch (error) {
       addToast("카드 생성에 실패했습니다.");
     }
@@ -54,7 +61,11 @@ export function CreateTodoModal({
           <main className="flex flex-col gap-y-[24px] overflow-y-auto pr-[20px]">
             <div className="flex flex-col gap-y-[8px]">
               <span className="text-lg text-black_333236">담당자</span>
-              <AssigneeDropdown />
+              <AssigneeDropdown
+                onSelect={(userId) =>
+                  setValues({ ...values, assigneeUserId: userId })
+                }
+              />
             </div>
 
             <BaseInput
@@ -73,12 +84,11 @@ export function CreateTodoModal({
             <DateInput
               label="마감일 *"
               placeholder="날짜를 입력해 주세요"
-              value={values.dueDate ? new Date(values.dueDate) : null} // string → Date
+              value={values.dueDate ? new Date(values.dueDate) : null}
               onChange={(date) =>
                 setValues({
                   ...values,
-                  // Date → string (ISO나 원하는 포맷으로)
-                  dueDate: date ? date.toISOString() : "",
+                  dueDate: formatDate(date),
                 })
               }
             />
@@ -88,7 +98,11 @@ export function CreateTodoModal({
               value={values.tags}
               onChange={(value) => setValues({ ...values, tags: value })}
             />
-            <ImageInput label="이미지" />
+            <ImageInput
+              label="이미지"
+              columnId={columnId}
+              onChange={(url) => setValues({ ...values, imageUrl: url })}
+            />
           </main>
 
           <footer className="flex gap-x-[11px] mt-[24px]">
