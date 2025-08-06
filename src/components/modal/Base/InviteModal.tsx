@@ -17,6 +17,8 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
   const handleInviteDashboard = async (data: postInviteDashboardType) => {
     try {
       await postInviteDashboard(data);
+      onClose();
+      setValue("");
     } catch {
       addToast("대시보드 초대에 실패했습니다.");
     }
@@ -39,7 +41,10 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
         <ModalButton
           mode="any"
           onClick={() =>
-            handleInviteDashboard({ dashboardId: dashboardId, email: value })
+            handleInviteDashboard({
+              dashboardId,
+              email: value.trim(),
+            })
           }
         >
           생성

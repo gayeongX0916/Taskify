@@ -32,7 +32,7 @@ const mydashboardPage = () => {
     fetchData();
   }, []);
 
-  if (dashboardList.length === 0) return <div>로딩 중</div>;
+  // if (dashboardList.length === 0) return <div>로딩 중</div>;
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
