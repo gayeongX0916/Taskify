@@ -31,7 +31,7 @@ export const postInviteDashboard = ({
   dashboardId,
   email,
 }: postInviteDashboardType) =>
-  api.post(`/dashboards/${dashboardId}/invitations`, email);
+  api.post(`/dashboards/${dashboardId}/invitations`, {email});
 
 // 대시보드 초대 불러오기
 export const getInviteDashboard = ({

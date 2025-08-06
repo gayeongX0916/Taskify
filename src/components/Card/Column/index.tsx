@@ -21,8 +21,8 @@ type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
 export function ColumnCard({ columnId, title }: ColumnCardProps) {
   const addToast = useToastStore.getState().addToast;
- const rawCardList = useCardStore((state) => state.cardsByColumn[columnId]);
- const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
+  const rawCardList = useCardStore((state) => state.cardsByColumn[columnId]);
+  const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
   const setCardList = useCardStore((state) => state.setCardList);
   const count = useCardStore((state) => state.countsByColumn[columnId] || 0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -54,6 +54,14 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
     };
     fetchData();
   }, [columnId, setCardList, addToast]);
+
+  const sortedCardList = useMemo(() => {
+    if (!cardList) return [];
+    return [...cardList].sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  }, [cardList]);
 
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
@@ -115,7 +123,7 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
         />
       </div>
       <div className="flex flex-col md:gap-y-[16px]">
-        {cardList.map(({ id }, idx) => (
+        {sortedCardList.map(({ id }, idx) => (
           <div
             role="button"
             key={idx}

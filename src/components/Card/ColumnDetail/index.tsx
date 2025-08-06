@@ -9,6 +9,7 @@ import { getCardType } from "@/types/cards";
 import { getCardDetail } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
+import { formatDate } from "@/lib/utils/formatDate";
 
 type ColumnDetailCardProps = {
   cardId: number;
@@ -22,11 +23,14 @@ function CalendarDate({
   date?: string;
 }) {
   if (!date) return null;
+  const formattedDate = new Date(date);
 
   return (
     <time className={`flex gap-x-[4px] items-center ${className}`}>
       <Image src={calendarIcon} alt="달력" />
-      <span className="text-xs text-gray_787486">{date}</span>
+      <span className="text-xs text-gray_787486">
+        {formatDate(formattedDate)}
+      </span>
     </time>
   );
 }
@@ -57,7 +61,9 @@ export function ColumnDetailCard({ cardId }: ColumnDetailCardProps) {
           : "pt-[5px] md:py-[14px] lg:py-[16px]"
       } `}
     >
-      {cardDetail.imageUrl && (
+      {cardDetail.imageUrl === null ? (
+        <div className="hidden"></div>
+      ) : (
         <div className="flex justify-center items-center">
           <Image
             src={cardDetail.imageUrl}

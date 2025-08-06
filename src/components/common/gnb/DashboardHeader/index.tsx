@@ -9,6 +9,10 @@ import { useEffect, useState } from "react";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardDetail } from "@/lib/api/dashboards";
 import crownIcon from "@/assets/crown.svg";
+import { UserChangeType } from "@/types/users";
+import { getMyInfo } from "@/lib/api/users";
+import { useToastStore } from "@/lib/stores/toast";
+import { getDashboardMemberList } from "@/lib/api/members";
 
 export default function DashboardHeader() {
   const { dashboardId } = useParams();
@@ -17,6 +21,8 @@ export default function DashboardHeader() {
   const isMyDashboardPage = pathname === "/mydashboard";
   const users = ["김가영", "이가병", "김나희", "rld", "김가ㅏ", "김나나"];
   const [isOpen, setIsOpen] = useState(false);
+  const [myInfo, setMyInfo] = useState<UserChangeType>();
+  const addToast = useToastStore.getState().addToast;
 
   const dashboard = useDashboardStore((state) =>
     state.dashboardList.find((d) => d.id === Number(dashboardId))
@@ -39,6 +45,32 @@ export default function DashboardHeader() {
       fetchDashboard();
     }
   }, [dashboardId, dashboard, isMyDashboardPage, addDashboard]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getMyInfo();
+        setMyInfo(res.data);
+      } catch (error) {
+        addToast("내 정보를 가져오는데 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       await getDashboardMemberList({
+  //         size: 10,
+  //         dashboardId: Number(dashboardId),
+  //       });
+  //     } catch (error) {
+  //       addToast("멤버 목록 조회에 실패했습니다.");
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   if (!isMyDashboardPage && !dashboard) {
     return (
@@ -82,34 +114,36 @@ export default function DashboardHeader() {
         )}
       </div>
       <div className="flex items-center gap-x-[16px] md:gap-x-[32px] lg:gap-x-[40px]">
-        <div className="flex gap-x-[6px] md:gap-x-[16px]">
-          <button
-            onClick={() => router.push(`/dashboard/${dashboardId}/edit`)}
-            className="px-[12px] py-[3px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
-          >
-            <Image
-              src={settingIcon}
-              alt="관리"
-              width={20}
-              height={20}
-              className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
-            />
-            관리
-          </button>
-          <button
-            onClick={() => setIsOpen(true)}
-            className="px-[12px] py-[6px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
-          >
-            <Image
-              src={addBoxIcon}
-              alt="초대하기"
-              width={20}
-              height={20}
-              className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
-            />
-            초대하기
-          </button>
-        </div>
+        {!isMyDashboardPage && (
+          <div className="flex gap-x-[6px] md:gap-x-[16px]">
+            <button
+              onClick={() => router.push(`/dashboard/${dashboardId}/edit`)}
+              className="px-[12px] py-[3px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
+            >
+              <Image
+                src={settingIcon}
+                alt="관리"
+                width={20}
+                height={20}
+                className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
+              />
+              관리
+            </button>
+            <button
+              onClick={() => setIsOpen(true)}
+              className="px-[12px] py-[6px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
+            >
+              <Image
+                src={addBoxIcon}
+                alt="초대하기"
+                width={20}
+                height={20}
+                className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
+              />
+              초대하기
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center gap-x-[16px] md:gap-x-[24px] lg:gap-x-[36px]">
           {users && !isMyDashboardPage && <InvitedUserList users={users} />}
@@ -120,10 +154,14 @@ export default function DashboardHeader() {
             className="flex items-center gap-x-[12px]"
             onClick={() => router.push("/mypage")}
           >
-            <Avatar username="김가영" />
-            <span className="hidden md:flex md:text-lg md:text-black_333236">
-              배유철
-            </span>
+            {myInfo?.nickname && (
+              <>
+                <Avatar username={myInfo.nickname} />
+                <span className="hidden md:flex md:text-lg md:text-black_333236">
+                  {myInfo.nickname}
+                </span>
+              </>
+            )}
           </button>
         </div>
       </div>

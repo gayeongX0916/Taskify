@@ -7,8 +7,9 @@ import { EditDashboardCard } from "@/components/Card/EditDashboard";
 import { MemberOrInviteTable } from "@/components/Table/MemberOrInvite";
 import { AddButton } from "@/components/common/Button/AddButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
-import { deleteDashboard } from "@/lib/api/dashboards";
+import { deleteDashboard, getInviteDashboard } from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
+import { useEffect, useState } from "react";
 
 const editDashboardPage = () => {
   const { dashboardId } = useParams();
@@ -39,8 +40,8 @@ const editDashboardPage = () => {
 
         <div className="flex flex-col gap-y-[16px]">
           <EditDashboardCard dashboardId={Number(dashboardId)} />
-          <MemberOrInviteTable mode="member" />
-          <MemberOrInviteTable mode="invite" />
+          <MemberOrInviteTable mode="member" dashboardId={Number(dashboardId)}/>
+          <MemberOrInviteTable mode="invite" dashboardId={Number(dashboardId)}/>
         </div>
       </div>
       <div className="mt-[24px] md:flex md:justify-start">

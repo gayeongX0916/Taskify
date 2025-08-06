@@ -4,14 +4,24 @@ import searchIcon from "@/assets/search_icon.svg";
 import emptyDashboard from "@/assets/empty_dashboard.svg";
 import Image from "next/image";
 import { DashboardButton } from "@/components/common/Button/DashboardButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getInvitationList, putInvitationAnswer } from "@/lib/api/invitations";
+import { useToastStore } from "@/lib/stores/toast";
+import { getInvitationType, putInvitationAnswerType } from "@/types/invitation";
 
 type MobileInviteListProps = {
   name: string;
   invite: string;
+  id: number;
+  onRespond: (invitationId: number, accepted: boolean) => void;
 };
 
-function MobileInviteList({ name, invite }: MobileInviteListProps) {
+function MobileInviteList({
+  name,
+  invite,
+  id,
+  onRespond,
+}: MobileInviteListProps) {
   return (
     <li className="px-[16px] py-[14px] border-b border-gray_EEEEEE">
       <dl className="flex flex-col gap-y-[3px]">
@@ -30,8 +40,8 @@ function MobileInviteList({ name, invite }: MobileInviteListProps) {
       </dl>
 
       <div className="flex gap-x-[10px] mt-[14px]">
-        <DashboardButton mode="accept" />
-        <DashboardButton mode="deny" />
+        <DashboardButton mode="accept" onClick={() => onRespond(id, true)} />
+        <DashboardButton mode="deny" onClick={() => onRespond(id, false)} />
       </div>
     </li>
   );
@@ -39,20 +49,41 @@ function MobileInviteList({ name, invite }: MobileInviteListProps) {
 
 export function ReceivedInviteTable() {
   const [value, setValue] = useState("");
+  const addToast = useToastStore.getState().addToast;
+  const [invitedList, setInvitedList] = useState<getInvitationType[]>([]);
 
-  const exampleList = [
-    { name: "프로덕트 디자인", invite: "손동희" },
-    { name: "dff 디자인", invite: "ds" },
-    { name: "zzzz 디자인", invite: "cx" },
-    { name: "프로덕ddss트 디자인", invite: "ds" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getInvitationList({ size: 6 });
+        setInvitedList(res.data.invitations);
+      } catch (error) {
+        addToast("초대받은 목록을 불러오는데 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
 
-  const filteredList = exampleList.filter((item) => item.name.includes(value));
+  const filteredList = invitedList.filter((item) =>
+    item.inviter.nickname.includes(value)
+  );
+
+  const handlePutInvitation = async (
+    invitationId: number,
+    inviteAccepted: boolean
+  ) => {
+    try {
+      await putInvitationAnswer({ invitationId, inviteAccepted });
+      setInvitedList((prev) => prev.filter((item) => item.id !== invitationId));
+    } catch (error) {
+      addToast("초대 응답에 실패했습니다.");
+    }
+  };
 
   return (
     <section
       className={`flex flex-col bg-white_FFFFFF rounded-[16px] ${
-        exampleList.length === 0
+        invitedList.length === 0
           ? "gap-y-[100px] md:gap-y-[60px] px-[20px] pt-[24px] pb-[80px] md:px-[40px]"
           : "px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] md:px-[28px] gap-y-[13px] md:gap-y-[24px]"
       }`}
@@ -61,7 +92,7 @@ export function ReceivedInviteTable() {
         <h1 className="text-lg text-black-333236 font-bold md:text-xl">
           초대받은 대시보드
         </h1>
-        {exampleList.length > 0 && (
+        {invitedList.length > 0 && (
           <form className="relative" role="search">
             <input
               type="search"
@@ -79,7 +110,7 @@ export function ReceivedInviteTable() {
         )}
       </header>
 
-      {exampleList.length === 0 ? (
+      {invitedList.length === 0 ? (
         <div className="flex flex-col items-center gap-y-[16px] md:gap-y-[24px]">
           <Image
             src={emptyDashboard}
@@ -94,8 +125,14 @@ export function ReceivedInviteTable() {
       ) : (
         <>
           <ul className="flex flex-col md:hidden">
-            {filteredList.map(({ name, invite }) => (
-              <MobileInviteList key={name} name={name} invite={invite} />
+            {filteredList.map(({ dashboard, inviter, id }) => (
+              <MobileInviteList
+                key={id}
+                name={dashboard.title}
+                invite={inviter.nickname}
+                id={id}
+                onRespond={handlePutInvitation}
+              />
             ))}
           </ul>
 
@@ -106,18 +143,26 @@ export function ReceivedInviteTable() {
               <span className="text-lg text-gray_9FA6B2">수락 여부</span>
             </div>
             <ul className="flex flex-col">
-              {filteredList.map(({ name, invite }) => (
+              {filteredList.map(({ dashboard, inviter, id }) => (
                 <li
-                  key={name}
+                  key={id}
                   className="grid grid-cols-[2fr_2fr_3fr] items-center justify-items-center border-b border-gray_EEEEEE py-[22px] lg:py-[20px]"
                 >
                   <span className="text-lg text-black_333236 whitespace-nowrap">
-                    {name}
+                    {dashboard.title}
                   </span>
-                  <span className="text-lg text-black_333236">{invite}</span>
+                  <span className="text-lg text-black_333236">
+                    {inviter.nickname}
+                  </span>
                   <div className="flex gap-x-[10px]">
-                    <DashboardButton mode="accept" />
-                    <DashboardButton mode="deny" />
+                    <DashboardButton
+                      mode="accept"
+                      onClick={() => handlePutInvitation(id, true)}
+                    />
+                    <DashboardButton
+                      mode="deny"
+                      onClick={() => handlePutInvitation(id, false)}
+                    />
                   </div>
                 </li>
               ))}

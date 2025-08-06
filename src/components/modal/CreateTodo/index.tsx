@@ -42,7 +42,12 @@ export function CreateTodoModal({
 
   const handlePostCard = async (data: postCardType) => {
     try {
-      const res = await postCard(data);
+      const payload = { ...data };
+
+      if (!payload.imageUrl || payload.imageUrl.trim() === "") {
+        delete payload.imageUrl;
+      }
+      const res = await postCard(payload);
       addCard(columnId, res.data);
       onClose();
     } catch (error) {
