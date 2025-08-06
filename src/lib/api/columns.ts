@@ -21,9 +21,9 @@ export const deleteColumn = ({ columnId }: { columnId: number }) =>
   api.delete(`/columns/${columnId}`);
 
 // 카드 이미지 업로드
-export const postCardImg = ({ columnId, file }: postCardImgType) => {
+export const postCardImg = ({ columnId, image }: postCardImgType) => {
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append("image", image);
 
   return api.post(`/columns/${columnId}/card-image`, formData, {
     headers: {

@@ -7,19 +7,27 @@ import { Chip } from "@/components/common/Chip";
 import checkIcon from "@/assets/check_icon.svg";
 
 type ProgressDropdownProps = {
-  initialValue?: string;
+  columnId: number;
+  columnList: { id: number; title: string }[];
+  onSelect?: (columnId: number) => void;
 };
 
-export function ProgressDropdown({ initialValue }: ProgressDropdownProps) {
+export function ProgressDropdown({
+  columnId,
+  columnList,
+  onSelect,
+}: ProgressDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const exampleList = ["To Do", "On Progress", "Done"];
-  const [selected, setSelected] = useState<string | null>(initialValue || null);
+  const initialTitle =
+    columnList.find((col) => col.id === columnId)?.title || "";
+  const [selected, setSelected] = useState<string>(initialTitle);
 
   const onToggleDropdown = () => setIsOpen((prev) => !prev);
 
-  const handleSelectClick = (name: string) => {
-    setSelected(name);
+  const handleSelectClick = (columnId: number, title: string) => {
+    setSelected(title);
     setIsOpen(false);
+    onSelect?.(columnId);
   };
 
   return (
@@ -33,17 +41,18 @@ export function ProgressDropdown({ initialValue }: ProgressDropdownProps) {
 
       {isOpen && (
         <div className="absolute bg-white_FFFFFF w-full px-[16px] py-[14px] flex flex-col gap-y-[11px] border border-gray_D9D9D9 rounded-[6px] mt-[2px] overflow-y-auto max-h-[300px] z-[10]">
-          {exampleList.map((list) => (
+          {columnList.map((col) => (
             <button
+              key={col.title}
               className="flex gap-x-[8px]"
-              onClick={() => handleSelectClick(list)}
+              onClick={() => handleSelectClick(col.id, col.title)}
             >
-              {list === selected ? (
+              {col.title === selected ? (
                 <Image src={checkIcon} alt="체크" />
               ) : (
                 <Image src={checkIcon} alt="빈 체크" className="invisible" />
               )}
-              <Chip name={list} key={list} />
+              <Chip name={col.title} key={col.title} />
             </button>
           ))}
         </div>

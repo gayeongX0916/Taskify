@@ -10,7 +10,7 @@ export interface putColumnType {
 
 export interface postCardImgType {
   columnId: number;
-  file: File;
+  image: File;
 }
 
 export interface getColumnListType {

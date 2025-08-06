@@ -15,6 +15,6 @@ export function Header() {
   return isMainPage ? (
     <DefaultHeader />
   ) : (
-    <DashboardHeader dashboardName="비브리지" />
+    <DashboardHeader />
   );
 }

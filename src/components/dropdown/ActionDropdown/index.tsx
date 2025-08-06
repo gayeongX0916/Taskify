@@ -2,11 +2,20 @@ import { useEffect, useRef } from "react";
 
 type ActionDropdownProps = {
   setShowDropdown: (showDropdown: boolean) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
-export function ActionDropdown({ setShowDropdown }: ActionDropdownProps) {
+export function ActionDropdown({
+  setShowDropdown,
+  onEdit,
+  onDelete,
+}: ActionDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownList = ["수정하기", "삭제하기"];
+  const dropdownList = [
+    { label: "수정하기", onClick: onEdit },
+    { label: "삭제하기", onClick: onDelete },
+  ];
 
   const handleClickOutSide = (e: MouseEvent) => {
     if (
@@ -29,12 +38,13 @@ export function ActionDropdown({ setShowDropdown }: ActionDropdownProps) {
       ref={dropdownRef}
       className="rounded-[6px] bg-white_FFFFFF px-[6px] py-[6px] border border-gray_D9D9D9 flex flex-col w-[93px]"
     >
-      {dropdownList.map((list) => (
+      {dropdownList.map(({ label, onClick }) => (
         <button
-          key={list}
+          key={label}
+          onClick={onClick}
           className="text-md text-black_333236 hover:bg-violet_8P hover:text-violet_5534DA hover:rounded-[4px]"
         >
-          {list}
+          {label}
         </button>
       ))}
     </div>
