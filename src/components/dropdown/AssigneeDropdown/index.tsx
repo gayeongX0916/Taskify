@@ -3,85 +3,125 @@
 import arrowDropdown from "@/assets/arrow_drop_down.svg";
 import checkIcon from "@/assets/check_icon.svg";
 import { Avatar } from "@/components/common/Avatar";
+import { getDashboardMemberList } from "@/lib/api/members";
+import { useToastStore } from "@/lib/stores/toast";
+import { getDashboardMemberListType } from "@/types/members";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type AssigneeDropdownProps = {
-  initialValue?: string;
+  initialUserId?: number;
+  onSelect?: (userId: number) => void;
 };
 
-export function AssigneeDropdown({ initialValue }: AssigneeDropdownProps) {
-  const [value, setValue] = useState(initialValue || "");
+export function AssigneeDropdown({
+  initialUserId,
+  onSelect,
+}: AssigneeDropdownProps) {
+  const { dashboardId } = useParams();
+  const addToast = useToastStore.getState().addToast;
+  const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const exampleList = [
-    "배유철",
-    "배동석",
-    "김나ㅏㄴ",
-    "김나나나",
-    "김떙떙",
-    "박나네나",
-  ];
-  const [selected, setSelected] = useState<string | null>(null);
+  const [memberList, setMemberList] = useState<getDashboardMemberListType[]>(
+    []
+  );
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (initialValue && exampleList.includes(initialValue)) {
-      setSelected(initialValue);
+    const fetchData = async () => {
+      try {
+        const res = await getDashboardMemberList({
+          size: 10,
+          dashboardId: Number(dashboardId),
+        });
+        setMemberList(res.data.members);
+      } catch {
+        addToast("담당자 목록 조회에 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, [dashboardId]);
+
+  useEffect(() => {
+    if (initialUserId && memberList.length > 0) {
+      const initialNickname =
+        memberList.find((member) => member.userId === initialUserId)
+          ?.nickname || "";
+      setValue(initialNickname);
+      setIsEditing(false);
     }
-  }, [initialValue]);
+  }, [initialUserId, memberList]);
 
   const filteredList = (input: string) =>
-    exampleList.filter((name) => name.includes(input));
+    memberList.filter((member) => member.nickname.includes(input));
 
   const handleOpenClick = () => {
     setIsOpen((prev) => !prev);
   };
 
-  const handleSelectClick = (name: string) => {
-    setSelected(name);
+  const handleSelectClick = (userId: number, name: string) => {
     setValue(name);
     setIsOpen(false);
+    setIsEditing(false);
+    onSelect?.(userId);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    setSelected(null);
     setIsOpen(e.target.value.length > 0 && filteredList(newValue).length > 0);
   };
+
+  const isSelected = memberList.find((member) => member.nickname === value);
 
   return (
     <div className="relative">
       <div className="flex items-center gap-x-[8px] px-[16px] py-[11px] rounded-[6px] border border-gray_D9D9D9 w-full">
-        {selected && (
-          <Avatar username={selected} className="w-[32px] h-[32px] text-md" />
+        {isSelected && !isEditing ? (
+          <button
+            className="flex items-center gap-x-[8px]"
+            onClick={() => setIsEditing(true)}
+          >
+            <Avatar username={value} className="w-[32px] h-[32px] text-md" />
+            <span>{value}</span>
+          </button>
+        ) : (
+          <>
+            <input
+              value={value}
+              onChange={handleInputChange}
+              placeholder="이름을 입력해 주세요"
+              className="text-lg text-black_333236 flex-1 min-w-0 outline-none"
+            />
+            <button onClick={handleOpenClick} className="flex-shrink-0">
+              <Image
+                src={arrowDropdown}
+                alt="드롭다운"
+                width={26}
+                height={26}
+              />
+            </button>
+          </>
         )}
-        <input
-          value={value}
-          onChange={handleInputChange}
-          placeholder="이름을 입력해 주세요"
-          className="text-lg text-black_333236 flex-1 min-w-0 outline-none"
-        />
-        <button onClick={handleOpenClick} className="flex-shrink-0">
-          <Image src={arrowDropdown} alt="드롭다운" width={26} height={26} />
-        </button>
       </div>
 
       {isOpen && filteredList(value).length > 0 && (
         <div className="absolute bg-white_FFFFFF w-full px-[16px] py-[14px] flex flex-col gap-y-[11px] border border-gray_D9D9D9 rounded-[6px] mt-[2px] overflow-y-auto max-h-[300px]">
-          {filteredList(value).map((name) => (
+          {filteredList(value).map(({ userId, nickname }) => (
             <button
-              key={name}
+              key={nickname}
               className="flex gap-x-[8px]"
-              onClick={() => handleSelectClick(name)}
+              onClick={() => handleSelectClick(userId, nickname)}
             >
-              {name === selected ? (
+              {nickname === value ? (
                 <Image src={checkIcon} alt="체크" />
               ) : (
                 <Image src={checkIcon} alt="빈 체크" className="invisible" />
               )}
               <div className="flex gap-x-[6px] items-center">
-                <Avatar username={name} />
-                <span className="text-lg text-black_333236">{name}</span>
+                <Avatar username={nickname} />
+                <span className="text-lg text-black_333236">{nickname}</span>
               </div>
             </button>
           ))}
