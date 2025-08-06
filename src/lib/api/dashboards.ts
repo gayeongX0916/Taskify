@@ -1,6 +1,7 @@
 import {
   deleteInviteDashboardType,
   postDashboardType,
+  postInviteDashboardType,
   putDashboardType,
 } from "@/types/dashboards";
 import { api } from "./axios";
@@ -29,10 +30,8 @@ export const deleteDashboard = ({ dashboardId }: { dashboardId: number }) =>
 export const postInviteDashboard = ({
   dashboardId,
   email,
-}: {
-  dashboardId: number;
-  email: string;
-}) => api.post(`/dashboards/${dashboardId}/invitations`, email);
+}: postInviteDashboardType) =>
+  api.post(`/dashboards/${dashboardId}/invitations`, email);
 
 // 대시보드 초대 불러오기
 export const getInviteDashboard = ({
