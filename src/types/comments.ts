@@ -6,8 +6,16 @@ export interface postCommentType{
 }
 
 export interface getCommentType{
-  size:number;
+  id:number;
+  content:string;
+  createdAt:string;
+  updatedAt:string;
   cardId:number;
+  author:{
+    profileImageUrl:string;
+    nickname:string;
+    id:number;
+  }
 }
 
 export interface putCommentType{
