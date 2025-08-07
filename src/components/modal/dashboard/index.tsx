@@ -17,6 +17,8 @@ import { useToastStore } from "@/lib/stores/toast";
 import { deleteCardDetail, getCardDetail } from "@/lib/api/cards";
 import { EditTodoModal } from "../EditTodo";
 import { useCardStore } from "@/lib/stores/card";
+import { getComment } from "@/lib/api/comments";
+import { useCommentStore } from "@/lib/stores/comment";
 
 interface DashBoardModalProps extends ModalProps {
   cardId: number;
@@ -36,11 +38,9 @@ export function DashBoardModal({
   const [showEditModal, setShowEditModal] = useState(false);
   const addToast = useToastStore.getState().addToast;
   const [detail, setDetail] = useState<getCardType>();
-  const commentList = [
-    { name: "정만철", date: "2025-11-23 14:00", des: "언제까지?" },
-    { name: "정만철", date: "2025-11-23 14:00", des: "언제까지?" },
-    { name: "정만철", date: "2025-11-23 14:00", des: "언제까지?" },
-  ];
+  const commentByCard = useCommentStore((state) => state.commentsByCard);
+  const commentList = commentByCard[cardId] || [];
+  const setCommentList = useCommentStore((state) => state.setCommentList);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +53,18 @@ export function DashBoardModal({
     };
     fetchData();
   }, [cardId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getComment({ size: 6, cardId });
+        setCommentList(cardId, res.data.comments);
+      } catch (error) {
+        addToast("댓글 조회에 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
 
   if (!detail) return <div>디테일 로딩 중</div>;
 
@@ -155,12 +167,19 @@ export function DashBoardModal({
                 )}
 
                 <div className="mt-[24px] lg:mt-[16px]">
-                  <CommentTextarea />
+                  <CommentTextarea cardId={cardId} columnId={columnId} />
                 </div>
 
                 <div className="mt-[16px] md:mt-[24px] flex flex-col gap-y-[8px]">
-                  {commentList.map(({ name, date, des }, idx) => (
-                    <Comment key={idx} name={name} date={date} des={des} />
+                  {commentList.map(({ id, author, createdAt, content,cardId }) => (
+                    <Comment
+                      key={id}
+                      name={author.nickname}
+                      date={createdAt}
+                      content={content}
+                      cardId={cardId}
+                      commentId={id}
+                    />
                   ))}
                 </div>
               </article>
