@@ -1,19 +1,58 @@
+import { formatDate } from "@/lib/utils/formatDate";
 import { Avatar } from "../common/Avatar";
+import { useCommentStore } from "@/lib/stores/comment";
+import { useToastStore } from "@/lib/stores/toast";
+import { deleteComment, putComment } from "@/lib/api/comments";
+import { useState } from "react";
 
 type CommentProps = {
   name: string;
   date: string;
-  des: string;
+  content: string;
+  cardId: number;
+  commentId: number;
 };
 
-export function Comment({ name, date, des }: CommentProps) {
-  const handleonEdit = () => {};
-  const handleonDelete = () => {};
+export function Comment({
+  name,
+  date,
+  content,
+  cardId,
+  commentId,
+}: CommentProps) {
+  const [value, setValue] = useState(content);
+  const removeComment = useCommentStore((state) => state.removeComment);
+  const updateComment = useCommentStore((state) => state.updateComment);
+  const addToast = useToastStore.getState().addToast;
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleonEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleonEditCompleted = async () => {
+    try {
+      await putComment({ commentId, content: value });
+      updateComment(cardId, commentId, value);
+      setIsEditing(false);
+    } catch (error) {
+      addToast("댓글 수정에 실패했습니다.");
+    }
+  };
+
+  const handleonDelete = async () => {
+    try {
+      await deleteComment({ commentId });
+      removeComment(cardId, commentId);
+    } catch (error) {
+      addToast("댓글 삭제에 실패했습니다.");
+    }
+  };
 
   const buttonList = [
     {
-      label: "수정",
-      onClick: handleonEdit,
+      label: isEditing ? "완료" : "수정",
+      onClick: isEditing ? handleonEditCompleted : handleonEdit,
     },
     { label: "삭제", onClick: handleonDelete },
   ];
@@ -31,15 +70,21 @@ export function Comment({ name, date, des }: CommentProps) {
             {name}
           </span>
 
-          <time
-            className="text-xs text-gray_9FA6B2"
-            dateTime={new Date(date).toISOString()}
-          >
-            {date}
+          <time className="text-xs text-gray_9FA6B2">
+            {formatDate(new Date(date))}
           </time>
         </div>
 
-        <p className="text-xs md:text-md text-black_333236">{des}</p>
+        {isEditing ? (
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="text-xs md:text-md text-black_333236 border border-gray_9FA6B2 px-[5px] py-[10px] rounded-[8px] overflow-y-auto resize-none"
+            rows={3}
+          />
+        ) : (
+          <p className="text-xs md:text-md text-black_333236">{content}</p>
+        )}
 
         <div className="flex gap-x-[14px]">
           {buttonList.map(({ label, onClick }) => (
