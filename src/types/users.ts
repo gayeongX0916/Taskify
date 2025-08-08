@@ -6,5 +6,14 @@ export interface SignupType extends LoginType {
 
 export interface UserChangeType {
   nickname: string;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
+}
+
+export interface getUserType {
+  id: number;
+  email: string;
+  nickname: string;
+  profileImageUrl: string | null;
+  createdAt: string;
+  updateAt: string;
 }
