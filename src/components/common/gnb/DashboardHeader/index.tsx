@@ -14,17 +14,22 @@ import { getMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberList } from "@/lib/api/members";
 import { useUserStore } from "@/lib/stores/user";
+import { getDashboardMemberListType } from "@/types/members";
 
 export default function DashboardHeader() {
   const { dashboardId } = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const isMyDashboardPage = pathname === "/mydashboard" || "/mypage";
+  const isMyDashboardPage =
+    pathname === "/mydashboard" || pathname === "/mypage";
   const users = ["김가영", "이가병", "김나희", "rld", "김가ㅏ", "김나나"];
   const [isOpen, setIsOpen] = useState(false);
   const myInfo = useUserStore((state) => state.myInfo);
   const setMyInfo = useUserStore((state) => state.setMyInfo);
   const addToast = useToastStore.getState().addToast;
+  const [dashboardMemberList, setDashboardMemberList] = useState<
+    getDashboardMemberListType[]
+  >([]);
 
   const dashboard = useDashboardStore((state) =>
     state.dashboardList.find((d) => d.id === Number(dashboardId))
@@ -60,19 +65,23 @@ export default function DashboardHeader() {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       await getDashboardMemberList({
-  //         size: 10,
-  //         dashboardId: Number(dashboardId),
-  //       });
-  //     } catch (error) {
-  //       addToast("멤버 목록 조회에 실패했습니다.");
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getDashboardMemberList({
+          size: 10,
+          dashboardId: Number(dashboardId),
+        });
+        const filteredMembers = res.data.members.filter(
+          (member: getDashboardMemberListType) => !member.isOwner
+        );
+        setDashboardMemberList(filteredMembers);
+      } catch (error) {
+        addToast("멤버 목록 조회에 실패했습니다.");
+      }
+    };
+    fetchData();
+  }, []);
 
   if (!isMyDashboardPage && !dashboard) {
     return (
@@ -98,12 +107,11 @@ export default function DashboardHeader() {
       <div className="flex items-center gap-x-[8px]">
         <h1
           className={`text-lg font-bold text-black_333236 md:text-2lg ${
-            !isMyDashboardPage && "hidden lg:flex"
+            !isMyDashboardPage ? "hidden lg:flex" : ""
           }`}
         >
-          {isMyDashboardPage
-            ? "내 대시보드"
-            : dashboard?.title ?? "대시보드 정보를 불러오는 중..."}
+          {(isMyDashboardPage ? "내 대시보드" : dashboard?.title) ??
+            "대시보드 정보를 불러오는 중..."}
         </h1>
         {dashboard?.createdByMe && (
           <Image
@@ -148,7 +156,11 @@ export default function DashboardHeader() {
         )}
 
         <div className="flex items-center gap-x-[16px] md:gap-x-[24px] lg:gap-x-[36px]">
-          {users && !isMyDashboardPage && <InvitedUserList users={users} />}
+          {users && !isMyDashboardPage && (
+            <InvitedUserList
+              users={dashboardMemberList.map((member) => member.nickname)}
+            />
+          )}
 
           <div className="h-[34px] border-l border-gray_D9D9D9"></div>
 
