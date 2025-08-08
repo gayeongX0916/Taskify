@@ -27,9 +27,12 @@ export default function DashboardHeader() {
   const myInfo = useUserStore((state) => state.myInfo);
   const setMyInfo = useUserStore((state) => state.setMyInfo);
   const addToast = useToastStore.getState().addToast;
-  const [dashboardMemberList, setDashboardMemberList] = useState<
-    getDashboardMemberListType[]
-  >([]);
+  const dashboardMemberList = useDashboardStore(
+    (state) => state.dashboardMemberList
+  );
+  const setDashboardMemberList = useDashboardStore(
+    (state) => state.setDashboardMemberList
+  );
 
   const dashboard = useDashboardStore((state) =>
     state.dashboardList.find((d) => d.id === Number(dashboardId))
