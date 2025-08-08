@@ -1,11 +1,26 @@
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
+import { putPasswordChange } from "@/lib/api/auth";
+import { useToastStore } from "@/lib/stores/toast";
+import { PasswordChangeType } from "@/types/auth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function PasswordCard() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
+  const addToast = useToastStore.getState().addToast;
+  const router = useRouter();
+
+  const handlePutPassword = async (data: PasswordChangeType) => {
+    try {
+      await putPasswordChange(data);
+      router.push("/mydashboard");
+    } catch (error: any) {
+      addToast(error.response.data.message);
+    }
+  };
 
   return (
     <section className="bg-white_FFFFFF px-[16px] py-[16px] rounded-[8px]">
@@ -41,7 +56,16 @@ export function PasswordCard() {
         </span>
       )}
       <div className="mt-[24px]">
-        <ModalButton mode="any" disabled={newPassword !== checkPassword}>
+        <ModalButton
+          mode="any"
+          disabled={newPassword !== checkPassword}
+          onClick={() =>
+            handlePutPassword({
+              password: currentPassword,
+              newPassword: newPassword,
+            })
+          }
+        >
           변경
         </ModalButton>
       </div>
