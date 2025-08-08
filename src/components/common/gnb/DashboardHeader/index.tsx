@@ -13,15 +13,17 @@ import { UserChangeType } from "@/types/users";
 import { getMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberList } from "@/lib/api/members";
+import { useUserStore } from "@/lib/stores/user";
 
 export default function DashboardHeader() {
   const { dashboardId } = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const isMyDashboardPage = pathname === "/mydashboard";
+  const isMyDashboardPage = pathname === "/mydashboard" || "/mypage";
   const users = ["김가영", "이가병", "김나희", "rld", "김가ㅏ", "김나나"];
   const [isOpen, setIsOpen] = useState(false);
-  const [myInfo, setMyInfo] = useState<UserChangeType>();
+  const myInfo = useUserStore((state) => state.myInfo);
+  const setMyInfo = useUserStore((state) => state.setMyInfo);
   const addToast = useToastStore.getState().addToast;
 
   const dashboard = useDashboardStore((state) =>
@@ -156,7 +158,10 @@ export default function DashboardHeader() {
           >
             {myInfo?.nickname && (
               <>
-                <Avatar username={myInfo.nickname} />
+                <Avatar
+                  username={myInfo.nickname}
+                  profileImageUrl={myInfo.profileImageUrl || ""}
+                />
                 <span className="hidden md:flex md:text-lg md:text-black_333236">
                   {myInfo.nickname}
                 </span>
