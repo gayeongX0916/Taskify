@@ -14,8 +14,8 @@ type EditDashboardCardProps = {
 };
 
 export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
-  const dashboard = useDashboardStore((state) =>
-    state.dashboardList.find((d) => d.id === dashboardId)
+  const dashboard = useDashboardStore(
+    (state) => state.dashboardsById[Number(dashboardId)]
   );
   const [color, setColor] = useState(dashboard?.color ?? "");
   const [title, setTitle] = useState(dashboard?.title ?? "");
