@@ -28,16 +28,16 @@ export default function DashboardHeader() {
   const setMyInfo = useUserStore((state) => state.setMyInfo);
   const addToast = useToastStore.getState().addToast;
   const dashboardMemberList = useDashboardStore(
-    (state) => state.dashboardMemberList
+    (state) => state.membersByDashboardId
   );
   const setDashboardMemberList = useDashboardStore(
-    (state) => state.setDashboardMemberList
+    (state) => state.setDashboardMembers
   );
-
-  const dashboard = useDashboardStore((state) =>
-    state.dashboardList.find((d) => d.id === Number(dashboardId))
+  const dashboard = useDashboardStore(
+    (state) => state.dashboardsById[Number(dashboardId)]
   );
   const addDashboard = useDashboardStore((state) => state.addDashboard);
+  const member = dashboardMemberList[Number(dashboardId)] || [];
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {
@@ -79,7 +79,7 @@ export default function DashboardHeader() {
           const filteredMembers = res.data.members.filter(
             (member: getDashboardMemberListType) => !member.isOwner
           );
-          setDashboardMemberList(filteredMembers);
+          setDashboardMemberList(Number(dashboardId), filteredMembers);
         } catch (error) {
           addToast("멤버 목록 조회에 실패했습니다.");
         }
@@ -162,9 +162,7 @@ export default function DashboardHeader() {
 
         <div className="flex items-center gap-x-[16px] md:gap-x-[24px] lg:gap-x-[36px]">
           {users && !isMyDashboardPage && (
-            <InvitedUserList
-              users={dashboardMemberList.map((member) => member.nickname)}
-            />
+            <InvitedUserList users={member.map((m) => m.nickname)} />
           )}
 
           <div className="h-[34px] border-l border-gray_D9D9D9"></div>
