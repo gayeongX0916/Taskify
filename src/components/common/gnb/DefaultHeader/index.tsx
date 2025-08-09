@@ -12,9 +12,10 @@ export default function DefaultHeader() {
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const handleGotoHome = () => router.push("/");
+
   const handleLogout = () => {
     clearAuth();
-    router.push("/login");
+    router.push("/");
   };
 
   return (
