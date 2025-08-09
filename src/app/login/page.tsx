@@ -23,6 +23,8 @@ const loginPage = () => {
     email: "",
     password: "",
   });
+  const setAuth = useAuthStore.getState().setAuth;
+  const addToast = useToastStore.getState().addToast;
 
   const handleBlur = (field: keyof typeof values) => {
     const error = validateFields({
@@ -54,8 +56,6 @@ const loginPage = () => {
   ];
 
   const handleClickLogin = async (data: LoginType) => {
-    const setAuth = useAuthStore.getState().setAuth;
-    const addToast = useToastStore.getState().addToast;
     try {
       const response = await postLogin(data);
       const token = response.data.accessToken;
@@ -72,6 +72,18 @@ const loginPage = () => {
           "error"
         );
       }
+    }
+  };
+
+  const handleClickGuestLogin = async () => {
+    try {
+      const email = "test@naver.com";
+      const password = "1234567890";
+      const res = await postLogin({ email, password });
+      setAuth(res.data.accessToken, res.data.userId);
+      router.push("/mydashboard");
+    } catch (error) {
+      addToast("게스트 로그인에 실패했습니다.");
     }
   };
 
@@ -119,9 +131,20 @@ const loginPage = () => {
         </form>
         <div className="flex items-center gap-x-[5px]">
           <span className="text-lg text-black_333236">회원이 아니신가요?</span>
-          <Link href="/signup" className="text-lg text-violet_5534DA underline">
+          <Link
+            href="/signup"
+            className="text-lg text-violet_5534DA hover:underline"
+          >
             회원가입하기
           </Link>
+          <div className="border-l-2 border-black_333236 h-5 mx-[4px]"></div>
+          <button
+            type="button"
+            className="text-lg text-[#008000] hover:underline"
+            onClick={handleClickGuestLogin}
+          >
+            게스트 로그인
+          </button>
         </div>
       </div>
     </main>
