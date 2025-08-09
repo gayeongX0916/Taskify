@@ -69,22 +69,24 @@ export default function DashboardHeader() {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getDashboardMemberList({
-          size: 10,
-          dashboardId: Number(dashboardId),
-        });
-        const filteredMembers = res.data.members.filter(
-          (member: getDashboardMemberListType) => !member.isOwner
-        );
-        setDashboardMemberList(filteredMembers);
-      } catch (error) {
-        addToast("멤버 목록 조회에 실패했습니다.");
-      }
-    };
-    fetchData();
-  }, []);
+    if (!isMyDashboardPage) {
+      const fetchData = async () => {
+        try {
+          const res = await getDashboardMemberList({
+            size: 10,
+            dashboardId: Number(dashboardId),
+          });
+          const filteredMembers = res.data.members.filter(
+            (member: getDashboardMemberListType) => !member.isOwner
+          );
+          setDashboardMemberList(filteredMembers);
+        } catch (error) {
+          addToast("멤버 목록 조회에 실패했습니다.");
+        }
+      };
+      fetchData();
+    }
+  }, [dashboardId, isMyDashboardPage]);
 
   if (!isMyDashboardPage && !dashboard) {
     return (
