@@ -9,11 +9,11 @@ type DashboardNameCardProps = {
 };
 
 export function DashboardNameCard({ dashboardId }: DashboardNameCardProps) {
-  const dashboard = useDashboardStore((state) =>
-    state.dashboardList.find((d) => d.id === dashboardId)
+  const dashboard = useDashboardStore(
+    (state) => state.dashboardsById[Number(dashboardId)]
   );
 
-  if (!dashboard) return null;
+  // if (!dashboard) return null;
 
   return (
     <button className="w-full flex justify-between items-center border border-gray_D9D9D9 rounded-[8px] px-[20px] py-[17px] lg:py-[22px] bg-white_FFFFFF">

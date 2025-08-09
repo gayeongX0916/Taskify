@@ -14,7 +14,8 @@ import { useEffect, useState } from "react";
 
 const mydashboardPage = () => {
   const router = useRouter();
-  const dashboardList = useDashboardStore((state) => state.dashboardList);
+  const dashboardList = useDashboardStore((state) => state.dashboardsById);
+  const dashboardArray = Object.values(dashboardList);
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const [isOpen, setIsOpen] = useState(false);
   const addToast = useToastStore.getState().addToast;
@@ -54,13 +55,13 @@ const mydashboardPage = () => {
             <DashboardNameCard key={d.id} dashboardId={d.id} />
           ))
         )} */}
-            {dashboardList.map(({ id }) => (
+            {dashboardArray.map(({ id }) => (
               <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>
                 <DashboardNameCard dashboardId={id} />
               </div>
             ))}
           </div>
-          {dashboardList.length > 0 && (
+          {dashboardArray.length > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
               <span className="text-xs text-black_333236 md:text-md">
                 1 페이지 중 1

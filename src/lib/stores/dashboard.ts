@@ -3,30 +3,64 @@ import { getDashboardMemberListType } from "@/types/members";
 import { create } from "zustand";
 
 interface DashboardState {
-  dashboardList: getDashboardListType[];
-  dashboardMemberList: getDashboardMemberListType[];
+  dashboardsById: Record<number, getDashboardListType>;
+  membersByDashboardId: Record<number, getDashboardMemberListType[]>;
+
   setDashboardList: (list: getDashboardListType[]) => void;
-  setDashboardMemberList: (members: getDashboardMemberListType[]) => void;
+  setDashboardMembers: (
+    dashboardId: number,
+    members: getDashboardMemberListType[]
+  ) => void;
   addDashboard: (dashboard: getDashboardListType) => void;
   removeDashboard: (id: number) => void;
   updateDashboard: (id: number, title: string, color: string) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
-  dashboardList: [],
-  dashboardMemberList: [],
-  setDashboardList: (list) => set({ dashboardList: list }),
-  setDashboardMemberList: (members) => set({ dashboardMemberList: members }),
-  addDashboard: (dashboard) =>
-    set((state) => ({ dashboardList: [dashboard, ...state.dashboardList] })),
-  removeDashboard: (id) =>
-    set((state) => ({
-      dashboardList: state.dashboardList.filter((d) => d.id !== id),
+  dashboardsById: {},
+  membersByDashboardId: {},
+
+  setDashboardList: (list) =>
+    set(() => ({
+      dashboardsById: list.reduce((acc, d) => {
+        acc[d.id] = d;
+        return acc;
+      }, {} as Record<number, getDashboardListType>),
     })),
+
+  setDashboardMembers: (dashboardId, members) =>
+    set((state) => ({
+      membersByDashboardId: {
+        ...state.membersByDashboardId,
+        [dashboardId]: members,
+      },
+    })),
+
+  addDashboard: (dashboard) =>
+    set((state) => ({
+      dashboardsById: {
+        ...state.dashboardsById,
+        [dashboard.id]: dashboard,
+      },
+    })),
+
+  removeDashboard: (id) =>
+    set((state) => {
+      const newDashboards = { ...state.dashboardsById };
+      delete newDashboards[id];
+      const newMembers = { ...state.membersByDashboardId };
+      delete newMembers[id];
+      return {
+        dashboardsById: newDashboards,
+        membersByDashboardId: newMembers,
+      };
+    }),
+
   updateDashboard: (id, title, color) =>
     set((state) => ({
-      dashboardList: state.dashboardList.map((d) =>
-        d.id === id ? { ...d, title, color } : d
-      ),
+      dashboardsById: {
+        ...state.dashboardsById,
+        [id]: { ...state.dashboardsById[id], title, color },
+      },
     })),
 }));

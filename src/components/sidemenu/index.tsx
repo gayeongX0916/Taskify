@@ -6,7 +6,7 @@ import logoPurple from "@/assets/logo_purple.svg";
 import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
 import { PaginationButton } from "../common/Button/PaginationButton";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CreateDashboardModal } from "../Modal/CreateDashboard";
 import { useEffect, useState } from "react";
 import { getDashboardList } from "@/lib/api/dashboards";
@@ -20,6 +20,7 @@ export function SideMenu() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +41,10 @@ export function SideMenu() {
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
       <CreateDashboardModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      <header className="mb-[38px] flex justify-center md:mb-[56px] lg:justify-start">
+      <header
+        className="mb-[38px] flex justify-center md:mb-[56px] lg:justify-start cursor-pointer"
+        onClick={() => router.push("/")}
+      >
         <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
         <Image src={logoPurple} alt="모바일 로고" className="flex md:hidden" />
       </header>

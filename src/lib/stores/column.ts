@@ -2,7 +2,7 @@ import { getColumnListType } from "@/types/columns";
 import { create } from "zustand";
 
 interface ColumnState {
-  columnList: getColumnListType[];
+  columnsById: Record<number, getColumnListType>;
   setColumnList: (list: getColumnListType[]) => void;
   addColumn: (column: getColumnListType) => void;
   removeColumn: (id: number) => void;
@@ -10,20 +10,36 @@ interface ColumnState {
 }
 
 export const useColumnStore = create<ColumnState>((set) => ({
-  columnList: [],
-  setColumnList: (list) => set({ columnList: list }),
+  columnsById: {},
+
+  setColumnList: (list) =>
+    set(() => ({
+      columnsById: list.reduce((acc, col) => {
+        acc[col.id] = col;
+        return acc;
+      }, {} as Record<number, getColumnListType>),
+    })),
+
   addColumn: (column) =>
     set((state) => ({
-      columnList: [...state.columnList, column],
+      columnsById: {
+        ...state.columnsById,
+        [column.id]: column,
+      },
     })),
+
   removeColumn: (id) =>
-    set((state) => ({
-      columnList: state.columnList.filter((d) => d.id !== id),
-    })),
+    set((state) => {
+      const newColumns = { ...state.columnsById };
+      delete newColumns[id];
+      return { columnsById: newColumns };
+    }),
+
   updateColumn: (id, title) =>
     set((state) => ({
-      columnList: state.columnList.map((col) =>
-        col.id === id ? { ...col, title } : col
-      ),
+      columnsById: {
+        ...state.columnsById,
+        [id]: { ...state.columnsById[id], title },
+      },
     })),
 }));

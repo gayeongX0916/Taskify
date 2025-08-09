@@ -16,7 +16,8 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const { dashboardId } = useParams();
   const addToast = useToastStore.getState().addToast;
   const addColumn = useColumnStore((state) => state.addColumn);
-  const columnList = useColumnStore((state) => state.columnList);
+  const columnList = useColumnStore((state) => state.columnsById);
+  const columnArray = Object.values(columnList);
 
   const handleCreateColumn = async (data: postColumnType) => {
     try {
@@ -30,7 +31,7 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   };
 
   useEffect(() => {
-    const isExisted = columnList.some((col) => col.title === value);
+    const isExisted = columnArray.some((col) => col.title === value);
     setExisted(isExisted);
   }, [value, columnList]);
 

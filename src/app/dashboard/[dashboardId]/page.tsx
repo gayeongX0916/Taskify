@@ -14,9 +14,10 @@ const dashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
   const [isOpen, setIsOpen] = useState(false);
   const { dashboardId } = useParams();
-  const columnList = useColumnStore((state) => state.columnList);
+  const columnList = useColumnStore((state) => state.columnsById);
+  const columnArray = Object.values(columnList);
   const setColumnList = useColumnStore((state) => state.setColumnList);
-   // const {isLoading,startLoading,stopLoading}=useLoadingStore();
+  // const {isLoading,startLoading,stopLoading}=useLoadingStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +36,7 @@ const dashboardPage = () => {
       <CreateColumnModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <div className="flex flex-col pb-[20px] lg:flex-row lg:overflow-x-auto">
         <div className="flex flex-col lg:flex-row">
-          {columnList.map(({ id, title }) => (
+          {columnArray.map(({ id, title }) => (
             <ColumnCard key={id} columnId={id} title={title} />
           ))}
         </div>
