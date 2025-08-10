@@ -8,9 +8,9 @@ import { DashBoardModal } from "@/components/Modal/Dashboard";
 import { useEffect, useMemo, useState } from "react";
 import { getCardList } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { getCardType } from "@/types/cards";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
 import { useCardStore } from "@/lib/stores/card";
+import { useParams } from "next/navigation";
 
 type ColumnCardProps = {
   columnId: number;
@@ -20,11 +20,17 @@ type ColumnCardProps = {
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
 export function ColumnCard({ columnId, title }: ColumnCardProps) {
+  const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
-  const rawCardList = useCardStore((state) => state.cardsByColumn[columnId]);
-  const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
+  const rawCardList = useCardStore(
+    (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId]
+  );
+  const cardList = useMemo(() => rawCardList, [rawCardList]);
   const setCardList = useCardStore((state) => state.setCardList);
-  const count = useCardStore((state) => state.countsByColumn[columnId] || 0);
+  const count = useCardStore(
+    (state) => state.countsByDashboard?.[dashboardIdNum]?.[columnId] ?? 0
+  );
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [modalState, setModalState] = useState({
     editColumn: false,
@@ -46,7 +52,12 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
     const fetchData = async () => {
       try {
         const res = await getCardList({ size: 10, columnId });
-        setCardList(columnId, res.data.cards, res.data.totalCount);
+        setCardList(
+          Number(dashboardId),
+          columnId,
+          res.data.cards,
+          res.data.totalCount
+        );
       } catch (error) {
         addToast("카드 목록을 조회하는데 실패했습니다.");
         console.error(error);
