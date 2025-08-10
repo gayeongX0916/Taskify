@@ -14,26 +14,27 @@ import { useEffect, useState } from "react";
 
 const mydashboardPage = () => {
   const router = useRouter();
-  const dashboardList = useDashboardStore((state) => state.dashboardsById);
-  const dashboardArray = Object.values(dashboardList);
-  const setDashboardList = useDashboardStore((state) => state.setDashboardList);
-  const [isOpen, setIsOpen] = useState(false);
   const addToast = useToastStore.getState().addToast;
-  // const {isLoading,startLoading,stopLoading}=useLoadingStore();
+  const { isLoading, startLoading, stopLoading } = useLoadingStore();
+  const dashboardList = useDashboardStore((state) => state.dashboardsById);
+  const setDashboardList = useDashboardStore((state) => state.setDashboardList);
+  const dashboardArray = Object.values(dashboardList);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        startLoading();
         const res = await getDashboardList();
         setDashboardList(res.data.dashboards);
       } catch (error: any) {
         addToast("대시보드를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        stopLoading();
       }
     };
     fetchData();
   }, []);
-
-  // if (dashboardList.length === 0) return <div>로딩 중</div>;
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -43,23 +44,21 @@ const mydashboardPage = () => {
           <div className="flex flex-col gap-y-[8px] md:grid md:grid-cols-2 md:gap-[10px] lg:grid-cols-3 lg:gap-[12px]">
             <AddButton
               mode="dashboard"
-              className="w-full py-[15px]"
+              className="w-full h-[70px]"
               onClick={() => setIsOpen(true)}
             />
-            {/* {isLoading ? (
-          <div className="py-10 text-center">로딩 중...</div>
-        ) : dashboardList.length === 0 ? (
-          <div className="py-10 text-center">대시보드가 없습니다.</div>
-        ) : (
-          dashboardList.map((d) => (
-            <DashboardNameCard key={d.id} dashboardId={d.id} />
-          ))
-        )} */}
-            {dashboardArray.map(({ id }) => (
-              <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>
-                <DashboardNameCard dashboardId={id} />
-              </div>
-            ))}
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-full h-[70px] bg-gray-200 rounded"
+                  />
+                ))
+              : dashboardArray.map(({ id }) => (
+                  <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>
+                    <DashboardNameCard dashboardId={id} />
+                  </div>
+                ))}
           </div>
           {dashboardArray.length > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
