@@ -13,8 +13,11 @@ import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
+import { useLoadingStore } from "@/lib/stores/loading";
 
 const SignUpPage = () => {
+  const addToast = useToastStore.getState().addToast;
+  const { isLoading, startLoading, stopLoading } = useLoadingStore();
   const router = useRouter();
   const [values, setValues] = useState({
     email: "",
@@ -42,21 +45,16 @@ const SignUpPage = () => {
   };
 
   const handleClickSignUp = async (data: SignupType) => {
-    const addToast = useToastStore.getState().addToast;
     try {
+      startLoading();
       const { email, nickname, password } = data;
       await postSignUp({ email, nickname, password });
       addToast("가입 완료!", "success");
       router.push("/login");
     } catch (error: any) {
-      if (error.response?.status === 409) {
-        addToast(error.response.data.message, "error");
-      } else {
-        addToast(
-          error.response.data.message || "가입에 실패했습니다.",
-          "error"
-        );
-      }
+      addToast(error.response.data.message);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -140,10 +138,12 @@ const SignUpPage = () => {
           </div>
           <LoginButton
             disabled={
-              !agree || Object.values(errors).some((error) => error !== "")
+              isLoading ||
+              !agree ||
+              Object.values(errors).some((error) => error !== "")
             }
           >
-            가입하기
+            {isLoading ? "가입 중..." : "가입하기"}
           </LoginButton>
         </form>
         <div className="flex items-center gap-x-[5px]">
