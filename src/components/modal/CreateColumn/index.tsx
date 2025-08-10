@@ -14,15 +14,21 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const [existed, setExisted] = useState(false);
   const [value, setValue] = useState("");
   const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
   const addColumn = useColumnStore((state) => state.addColumn);
-  const columnList = useColumnStore((state) => state.columnsById);
-  const columnArray = Object.values(columnList);
+  const columnsByDashboard = useColumnStore(
+    (state) => state.columnsByDashboard?.[dashboardIdNum]
+  );
+
+  const columnArray = columnsByDashboard
+    ? Object.values(columnsByDashboard)
+    : [];
 
   const handleCreateColumn = async (data: postColumnType) => {
     try {
       const res = await postColumn(data);
-      addColumn(res.data);
+      addColumn(Number(dashboardId), res.data);
       onClose();
       setValue("");
     } catch (error) {
@@ -33,7 +39,7 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   useEffect(() => {
     const isExisted = columnArray.some((col) => col.title === value);
     setExisted(isExisted);
-  }, [value, columnList]);
+  }, [value, columnsByDashboard]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>

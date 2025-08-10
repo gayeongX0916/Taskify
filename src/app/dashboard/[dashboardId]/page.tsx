@@ -14,16 +14,23 @@ const dashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
   const [isOpen, setIsOpen] = useState(false);
   const { dashboardId } = useParams();
-  const columnList = useColumnStore((state) => state.columnsById);
-  const columnArray = Object.values(columnList);
+  const dashboardIdNum = Number(dashboardId);
+
+  const columnsByDashboard = useColumnStore(
+    (state) => state.columnsByDashboard?.[dashboardIdNum]
+  );
+  const columnArray = columnsByDashboard
+    ? Object.values(columnsByDashboard)
+    : [];
   const setColumnList = useColumnStore((state) => state.setColumnList);
   // const {isLoading,startLoading,stopLoading}=useLoadingStore();
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getColumnList({ dashboardId: Number(dashboardId) });
-        setColumnList(res.data.data);
+        const res = await getColumnList({ dashboardId: dashboardIdNum });
+        setColumnList(dashboardIdNum, res.data.data);
       } catch (error) {
         addToast("컬럼 목록 조회에 실패했습니다.");
       }
