@@ -18,7 +18,7 @@ export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
     (state) => state.dashboardsById[Number(dashboardId)]
   );
   const [color, setColor] = useState(dashboard?.color ?? "");
-  const [title, setTitle] = useState(dashboard?.title ?? "");
+  const [title, setTitle] = useState("");
   const addToast = useToastStore.getState().addToast;
   const updateDashboard = useDashboardStore((state) => state.updateDashboard);
   const router = useRouter();
