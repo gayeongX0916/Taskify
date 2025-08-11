@@ -9,21 +9,27 @@ import { AddButton } from "@/components/common/Button/AddButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { deleteDashboard, getInviteDashboard } from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
-import { useEffect, useState } from "react";
+import { useLoadingStore } from "@/lib/stores/loading";
 
 const editDashboardPage = () => {
-  const { dashboardId } = useParams();
-  const router = useRouter();
-  const removeDashboard = useDashboardStore((state) => state.removeDashboard);
   const addToast = useToastStore.getState().addToast;
+  const router = useRouter();
+  const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
+  const { isLoading, startLoading, stopLoading } = useLoadingStore();
+  const removeDashboard = useDashboardStore((state) => state.removeDashboard);
 
   const handleDeleteDashboard = async (dashboardId: number) => {
     try {
+      startLoading();
       await deleteDashboard({ dashboardId });
       removeDashboard(dashboardId);
+      addToast("대시보드를 성공적으로 삭제했습니다.");
       router.push("/mydashboard");
     } catch (error) {
       addToast("대시보드 삭제에 실패했습니다.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -39,16 +45,17 @@ const editDashboardPage = () => {
         </button>
 
         <div className="flex flex-col gap-y-[16px]">
-          <EditDashboardCard dashboardId={Number(dashboardId)} />
-          <MemberOrInviteTable mode="member" dashboardId={Number(dashboardId)}/>
-          <MemberOrInviteTable mode="invite" dashboardId={Number(dashboardId)}/>
+          <EditDashboardCard dashboardId={dashboardIdNum} />
+          <MemberOrInviteTable mode="member" dashboardId={dashboardIdNum} />
+          <MemberOrInviteTable mode="invite" dashboardId={dashboardIdNum} />
         </div>
       </div>
       <div className="mt-[24px] md:flex md:justify-start">
         <AddButton
           mode="delete"
           className="w-full py-[13px] md:w-[320px] md:py-[18px]"
-          onClick={() => handleDeleteDashboard(Number(dashboardId))}
+          onClick={() => handleDeleteDashboard(dashboardIdNum)}
+          disabled={isLoading}
         />
       </div>
     </main>
