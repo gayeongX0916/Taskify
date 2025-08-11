@@ -4,6 +4,8 @@ import { useCommentStore } from "@/lib/stores/comment";
 import { useToastStore } from "@/lib/stores/toast";
 import { deleteComment, putComment } from "@/lib/api/comments";
 import { useState } from "react";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 type CommentProps = {
   name: string;
@@ -20,11 +22,15 @@ export function Comment({
   cardId,
   commentId,
 }: CommentProps) {
-  const [value, setValue] = useState(content);
+  const addToast = useToastStore.getState().addToast;
+  const key = "comment";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const removeComment = useCommentStore((state) => state.removeComment);
   const updateComment = useCommentStore((state) => state.updateComment);
-  const addToast = useToastStore.getState().addToast;
   const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState(content);
 
   const handleonEdit = () => {
     setIsEditing(true);
@@ -32,20 +38,40 @@ export function Comment({
 
   const handleonEditCompleted = async () => {
     try {
+      start(key);
       await putComment({ commentId, content: value });
       updateComment(cardId, commentId, value);
       setIsEditing(false);
     } catch (error) {
-      addToast("댓글 수정에 실패했습니다.");
+      if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "댓글 수정에 실패했습니다"
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+    } finally {
+      stop(key);
     }
   };
 
   const handleonDelete = async () => {
     try {
+      start(key);
       await deleteComment({ commentId });
       removeComment(cardId, commentId);
     } catch (error) {
-      addToast("댓글 삭제에 실패했습니다.");
+      if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "댓글 삭제에 실패했습니다"
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+    } finally {
+      stop(key);
     }
   };
 
