@@ -6,12 +6,16 @@ import { Avatar } from "@/components/common/Avatar";
 import { TagList } from "@/components/common/TagList";
 import { useEffect, useState } from "react";
 import { getCardType } from "@/types/cards";
-import { getCardDetail } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
 import { formatDate } from "@/lib/utils/formatDate";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { Spinner } from "@/components/common/Spinner";
 
 type ColumnDetailCardProps = {
+  dashboardId: number;
+  columnId: number;
   cardId: number;
 };
 
@@ -35,38 +39,35 @@ function CalendarDate({
   );
 }
 
-export function ColumnDetailCard({ cardId }: ColumnDetailCardProps) {
+export function ColumnDetailCard({
+  dashboardId,
+  columnId,
+  cardId,
+}: ColumnDetailCardProps) {
+  const cardList = useCardStore(
+    (state) => state.cardsByDashboard?.[dashboardId]?.[columnId] ?? []
+  );
+  const card = cardList.find((c) => c.id === cardId);
   const addToast = useToastStore.getState().addToast;
-  const [cardDetail, setCardDetail] = useState<getCardType>();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getCardDetail({ cardId });
-        setCardDetail(res.data);
-      } catch (error) {
-        addToast("카드 상세 조회에 실패했습니다.");
-      }
-    };
-    fetchData();
-  }, [cardId]);
-
-  if (!cardDetail) return <div>로딩 중</div>;
+  if (!card) {
+    return addToast("카드를 찾을 수 없습니다.");
+  }
 
   return (
     <article
       className={`rounded-[6px] px-[12px] pb-[5px] bg-white_FFFFFF border border-D9D9D9 flex flex-col gap-y-[4px] md:flex-row md:gap-x-[20px] md:px-[20px] lg:flex-col lg:gap-y-[16px]  ${
-        cardDetail.imageUrl
+        card.imageUrl
           ? "pt-[12px] md:py-[16px]"
           : "pt-[5px] md:py-[14px] lg:py-[16px]"
       } `}
     >
-      {cardDetail.imageUrl === null ? (
+      {card.imageUrl === null ? (
         <div className="hidden"></div>
       ) : (
         <div className="flex justify-center items-center">
           <Image
-            src={cardDetail.imageUrl}
+            src={card.imageUrl}
             alt="예시"
             width={260}
             height={150}
@@ -77,30 +78,22 @@ export function ColumnDetailCard({ cardId }: ColumnDetailCardProps) {
 
       <section className="flex flex-col gap-y-[6px] md:gap-y-[10px] md:flex-[9]">
         <header>
-          <h3 className="text-md md:text-lg text-black_333236">
-            {cardDetail.title}
-          </h3>
+          <h3 className="text-md md:text-lg text-black_333236">{card.title}</h3>
         </header>
 
         <div className="flex flex-col gap-y-[6px] md:flex-row md:gap-x-[18px] md:w-full md:justify-between lg:flex-col">
           <div className="flex md:gap-x-[16px] md:items-center">
-            <TagList
-              tags={cardDetail.tags}
-              className="gap-y-[6px] gap-x-[6px]"
-            />
+            <TagList tags={card.tags} className="gap-y-[6px] gap-x-[6px]" />
 
             <CalendarDate
               className="hidden md:flex lg:hidden"
-              date={cardDetail.createdAt}
+              date={card.createdAt}
             />
           </div>
 
           <div className="flex justify-between items-center">
-            <CalendarDate
-              className="md:hidden lg:flex"
-              date={cardDetail.createdAt}
-            />
-            <Avatar username={cardDetail.assignee.nickname} />
+            <CalendarDate className="md:hidden lg:flex" date={card.createdAt} />
+            <Avatar username={card.assignee.nickname} />
           </div>
         </div>
       </section>
