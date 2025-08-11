@@ -13,6 +13,7 @@ import { LoginType } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 const loginPage = () => {
   const setAuth = useAuthStore.getState().setAuth;
@@ -83,7 +84,13 @@ const loginPage = () => {
       addToast("게스트 로그인 성공!");
       router.push("/mydashboard");
     } catch (error) {
-      addToast("게스트 로그인에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "게스트 로그인에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
       stopLoading();
     }

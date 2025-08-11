@@ -9,6 +9,7 @@ import { getDashboardList } from "@/lib/api/dashboards";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,7 +29,14 @@ const mydashboardPage = () => {
         const res = await getDashboardList();
         setDashboardList(res.data.dashboards);
       } catch (error: any) {
-        addToast("대시보드를 불러오는 중 오류가 발생했습니다.");
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "대시보드 목록을 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
       } finally {
         stopLoading();
       }
@@ -46,6 +54,7 @@ const mydashboardPage = () => {
               mode="dashboard"
               className="w-full h-[70px]"
               onClick={() => setIsOpen(true)}
+              disabled={isLoading}
             />
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (

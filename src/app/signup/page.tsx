@@ -14,6 +14,7 @@ import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 const SignUpPage = () => {
   const addToast = useToastStore.getState().addToast;
@@ -51,8 +52,12 @@ const SignUpPage = () => {
       await postSignUp({ email, nickname, password });
       addToast("가입 완료!", "success");
       router.push("/login");
-    } catch (error: any) {
-      addToast(error.response.data.message);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "회원 가입에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
       stopLoading();
     }
