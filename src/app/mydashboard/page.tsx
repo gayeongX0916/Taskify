@@ -3,6 +3,7 @@
 import { DashboardNameCard } from "@/components/Card/DashboardName";
 import { AddButton } from "@/components/common/Button/AddButton";
 import { PaginationButton } from "@/components/common/Button/PaginationButton";
+import { Skeleton } from "@/components/common/Skeleton";
 import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
 import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
@@ -35,7 +36,7 @@ const mydashboardPage = () => {
         if (isAxiosError(error)) {
           addToast(
             error.response?.data.message ||
-              "대시보드 목록을 불러오는 중 오류가 발생했습니다."
+              "대시보드 목록을 불러오는데 실패했습니다."
           );
         } else {
           addToast("알 수 없는 오류가 발생했습니다.");
@@ -61,10 +62,7 @@ const mydashboardPage = () => {
             />
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-full h-[70px] bg-gray-200 rounded"
-                  />
+                  <Skeleton className="w-full h-[70px]" key={i} />
                 ))
               : dashboardArray.map(({ id }) => (
                   <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>

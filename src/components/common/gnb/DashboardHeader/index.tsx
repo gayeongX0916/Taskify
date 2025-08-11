@@ -44,7 +44,9 @@ export default function DashboardHeader() {
     (state) => state.dashboardsById[dashboardNum]
   );
   const addDashboard = useDashboardStore((state) => state.addDashboard);
-  const member = dashboardMemberList[dashboardNum] || [];
+  const member = (dashboardMemberList[dashboardNum] || []).filter(
+    (m) => !m.isOwner
+  );
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {
@@ -106,10 +108,7 @@ export default function DashboardHeader() {
             size: 10,
             dashboardId: dashboardNum,
           });
-          const filteredMembers = res.data.members.filter(
-            (member: getDashboardMemberListType) => !member.isOwner
-          );
-          setDashboardMemberList(dashboardNum, filteredMembers);
+          setDashboardMemberList(dashboardNum, res.data.members);
         } catch (error) {
           if (isAxiosError(error)) {
             addToast(
@@ -125,12 +124,6 @@ export default function DashboardHeader() {
       fetchData();
     }
   }, [dashboardId, isMyDashboardPage]);
-
-  useEffect(() => {
-    if (!myInfo) {
-      addToast("내 정보를 찾을 수 없습니다.");
-    }
-  }, [myInfo]);
 
   if (!isMyDashboardPage && !dashboard && isLoading) {
     return (

@@ -4,8 +4,11 @@ import arrowDropdown from "@/assets/arrow_drop_down.svg";
 import checkIcon from "@/assets/check_icon.svg";
 import { Avatar } from "@/components/common/Avatar";
 import { getDashboardMemberList } from "@/lib/api/members";
+import { useDashboardStore } from "@/lib/stores/dashboard";
+import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberListType } from "@/types/members";
+import { isAxiosError } from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,41 +23,60 @@ export function AssigneeDropdown({
   onSelect,
 }: AssigneeDropdownProps) {
   const { dashboardId } = useParams();
+  const dashboardNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
+  const key = "AssigneeDropdown";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const dashboardMemberList = useDashboardStore(
+    (state) => state.membersByDashboardId[dashboardNum]
+  );
+  const setDashboardMemberList = useDashboardStore(
+    (state) => state.setDashboardMembers
+  );
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [memberList, setMemberList] = useState<getDashboardMemberListType[]>(
-    []
-  );
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const res = await getDashboardMemberList({
-          size: 10,
-          dashboardId: Number(dashboardId),
-        });
-        setMemberList(res.data.members);
-      } catch {
-        addToast("담당자 목록 조회에 실패했습니다.");
+      if (!dashboardMemberList || dashboardMemberList.length === 0) {
+        try {
+          start(key);
+          const res = await getDashboardMemberList({
+            size: 10,
+            dashboardId: dashboardNum,
+          });
+          setDashboardMemberList(dashboardNum, res.data.members);
+        } catch (error) {
+          if (isAxiosError(error)) {
+            addToast(
+              error.response?.data.message || "담당자 목록 조회에 실패했습니다."
+            );
+          } else {
+            addToast("알 수 없는 오류가 발생했습니다.");
+          }
+        } finally {
+          stop(key);
+        }
       }
     };
     fetchData();
-  }, [dashboardId]);
+  }, [dashboardNum, dashboardMemberList]);
 
   useEffect(() => {
-    if (initialUserId && memberList.length > 0) {
+    if (initialUserId && dashboardMemberList.length > 0) {
       const initialNickname =
-        memberList.find((member) => member.userId === initialUserId)
+        dashboardMemberList.find((member) => member.userId === initialUserId)
           ?.nickname || "";
       setValue(initialNickname);
       setIsEditing(false);
     }
-  }, [initialUserId, memberList]);
+  }, [initialUserId, dashboardMemberList]);
 
   const filteredList = (input: string) =>
-    memberList.filter((member) => member.nickname.includes(input));
+    dashboardMemberList.filter((member) => member.nickname.includes(input));
 
   const handleOpenClick = () => {
     setIsOpen((prev) => !prev);
@@ -73,7 +95,9 @@ export function AssigneeDropdown({
     setIsOpen(e.target.value.length > 0 && filteredList(newValue).length > 0);
   };
 
-  const isSelected = memberList.find((member) => member.nickname === value);
+  const isSelected = dashboardMemberList.find(
+    (member) => member.nickname === value
+  );
 
   return (
     <div className="relative">
