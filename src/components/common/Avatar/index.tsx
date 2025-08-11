@@ -7,7 +7,7 @@ import Image from "next/image";
 type AvatarProps = {
   username: string;
   className?: string;
-  profileImageUrl?: string;
+  profileImageUrl?: string | null;
 };
 
 export function Avatar({ username, className, profileImageUrl }: AvatarProps) {
@@ -22,7 +22,7 @@ export function Avatar({ username, className, profileImageUrl }: AvatarProps) {
           alt="프로필"
           width={34}
           height={34}
-          className="md:w-[38px] md:h-[38px]"
+          className="md:w-[38px] md:h-[38px] rounded-full"
         />
       ) : (
         <div

@@ -7,6 +7,8 @@ import { useToastStore } from "@/lib/stores/toast";
 import { postComment } from "@/lib/api/comments";
 import { postCommentType } from "@/types/comments";
 import { useParams } from "next/navigation";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 type CommentTextareaProps = {
   cardId: number;
@@ -14,18 +16,30 @@ type CommentTextareaProps = {
 };
 
 export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
-  const [value, setValue] = useState("");
-  const addComment = useCommentStore((state) => state.addComment);
   const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
+  const key = "commentTextarea";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const addComment = useCommentStore((state) => state.addComment);
+  const [value, setValue] = useState("");
 
   const handleAddComment = async (data: postCommentType) => {
     try {
+      start(key);
       const res = await postComment(data);
       addComment(cardId, res.data);
       setValue("");
     } catch (error) {
-      addToast("댓글 생성에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "댓글 생성에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -45,12 +59,13 @@ export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
             handleAddComment({
               cardId: cardId,
               columnId: columnId,
-              dashboardId: Number(dashboardId),
+              dashboardId: dashboardIdNum,
               content: value,
             })
           }
+          disabled={isLoading}
         >
-          입력
+          {isLoading ? "입력 중..." : "입력"}
         </ActionButton>
       </div>
     </div>
