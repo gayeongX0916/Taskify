@@ -4,14 +4,9 @@ import Image from "next/image";
 import calendarIcon from "@/assets/calendar_icon.svg";
 import { Avatar } from "@/components/common/Avatar";
 import { TagList } from "@/components/common/TagList";
-import { useEffect, useState } from "react";
-import { getCardType } from "@/types/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
 import { formatDate } from "@/lib/utils/formatDate";
-import { useLoadingStore } from "@/lib/stores/loading";
-import { isAxiosError } from "axios";
-import { Spinner } from "@/components/common/Spinner";
 
 type ColumnDetailCardProps = {
   dashboardId: number;

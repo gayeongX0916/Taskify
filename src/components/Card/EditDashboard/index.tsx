@@ -5,31 +5,48 @@ import checkIcon from "@/assets/white_check_icon.svg";
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { putDashboard } from "@/lib/api/dashboards";
-import { postDashboardType, putDashboardType } from "@/types/dashboards";
+import { putDashboardType } from "@/types/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useRouter } from "next/navigation";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 type EditDashboardCardProps = {
   dashboardId: number;
 };
 
 export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
+  const router = useRouter();
+  const addToast = useToastStore.getState().addToast;
+  const key = "editDashboard";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const dashboardIdNum = Number(dashboardId);
   const dashboard = useDashboardStore(
-    (state) => state.dashboardsById[Number(dashboardId)]
+    (state) => state.dashboardsById[dashboardIdNum]
   );
+  const updateDashboard = useDashboardStore((state) => state.updateDashboard);
   const [color, setColor] = useState(dashboard?.color ?? "");
   const [title, setTitle] = useState("");
-  const addToast = useToastStore.getState().addToast;
-  const updateDashboard = useDashboardStore((state) => state.updateDashboard);
-  const router = useRouter();
 
   const handlePutDashboard = async (data: putDashboardType) => {
     try {
+      start(key);
       const res = await putDashboard(data);
       updateDashboard(res.data.id, res.data.title, res.data.color);
+      addToast("대시보드 수정에 성공했습니다.", "success");
       router.push(`/dashboard/${dashboardId}`);
     } catch (error) {
-      addToast("대시보드 수정에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "대시보드 수정에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -86,8 +103,9 @@ export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
                 color: color,
               })
             }
+            disabled={isLoading}
           >
-            변경
+            {isLoading ? "변경 중..." : "변경"}
           </ModalButton>
         </footer>
       </form>
