@@ -18,7 +18,10 @@ import { isAxiosError } from "axios";
 const loginPage = () => {
   const setAuth = useAuthStore.getState().setAuth;
   const addToast = useToastStore.getState().addToast;
-  const { isLoading, startLoading, stopLoading } = useLoadingStore();
+  const key = "login";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const router = useRouter();
   const [values, setValues] = useState({
     email: "",
@@ -60,28 +63,32 @@ const loginPage = () => {
 
   const handleClickLogin = async (data: LoginType) => {
     try {
-      startLoading();
+      start(key);
       const response = await postLogin(data);
       const token = response.data.accessToken;
       const userId = response.data.user.id;
       setAuth(token, userId);
-      addToast("로그인 성공!", "success");
+      addToast("로그인에 성공했습니다.", "success");
       router.push("/mydashboard");
-    } catch (error: any) {
-      addToast(error.response.data.message);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "로그인에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
-      stopLoading();
+      stop(key);
     }
   };
 
   const handleClickGuestLogin = async () => {
     try {
-      startLoading();
+      start(key);
       const email = "test@naver.com";
       const password = "1234567890";
       const res = await postLogin({ email, password });
       setAuth(res.data.accessToken, res.data.userId);
-      addToast("게스트 로그인 성공!");
+      addToast("게스트 로그인에 성공했습니다.", "success");
       router.push("/mydashboard");
     } catch (error) {
       if (isAxiosError(error)) {
@@ -92,11 +99,9 @@ const loginPage = () => {
         addToast("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
-      stopLoading();
+      stop(key);
     }
   };
-
-  console.log(isLoading);
 
   return (
     <main className="bg-gray_FAFAFA">

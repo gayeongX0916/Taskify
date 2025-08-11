@@ -16,7 +16,10 @@ import { useEffect, useState } from "react";
 const mydashboardPage = () => {
   const router = useRouter();
   const addToast = useToastStore.getState().addToast;
-  const { isLoading, startLoading, stopLoading } = useLoadingStore();
+  const key = "mydashboard";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const dashboardList = useDashboardStore((state) => state.dashboardsById);
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const dashboardArray = Object.values(dashboardList);
@@ -25,7 +28,7 @@ const mydashboardPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        startLoading();
+        start(key);
         const res = await getDashboardList();
         setDashboardList(res.data.dashboards);
       } catch (error: any) {
@@ -38,7 +41,7 @@ const mydashboardPage = () => {
           addToast("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
-        stopLoading();
+        stop(key);
       }
     };
     fetchData();

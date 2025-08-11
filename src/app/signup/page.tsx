@@ -18,8 +18,11 @@ import { isAxiosError } from "axios";
 
 const SignUpPage = () => {
   const addToast = useToastStore.getState().addToast;
-  const { isLoading, startLoading, stopLoading } = useLoadingStore();
   const router = useRouter();
+  const key = "signup";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const [values, setValues] = useState({
     email: "",
     nickname: "",
@@ -47,10 +50,10 @@ const SignUpPage = () => {
 
   const handleClickSignUp = async (data: SignupType) => {
     try {
-      startLoading();
+      start(key);
       const { email, nickname, password } = data;
       await postSignUp({ email, nickname, password });
-      addToast("가입 완료!", "success");
+      addToast("회원가입에 성공했습니다.", "success");
       router.push("/login");
     } catch (error) {
       if (isAxiosError(error)) {
@@ -59,7 +62,7 @@ const SignUpPage = () => {
         addToast("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
-      stopLoading();
+      stop(key);
     }
   };
 

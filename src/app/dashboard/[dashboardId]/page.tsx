@@ -16,7 +16,10 @@ const dashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-  const { isLoading, startLoading, stopLoading } = useLoadingStore();
+  const key = "dashboard";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? true);
   const [isOpen, setIsOpen] = useState(false);
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
@@ -29,7 +32,7 @@ const dashboardPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        startLoading();
+        start(key);
         const res = await getColumnList({ dashboardId: dashboardIdNum });
         setColumnList(dashboardIdNum, res.data.data);
       } catch (error) {
@@ -41,7 +44,7 @@ const dashboardPage = () => {
           addToast("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
-        stopLoading();
+        stop(key);
       }
     };
     fetchData();
