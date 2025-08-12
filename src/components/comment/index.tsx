@@ -44,13 +44,10 @@ export function Comment({
       setIsEditing(false);
     } catch (error) {
       if (isAxiosError(error)) {
-          addToast(
-            error.response?.data.message ||
-              "댓글 수정에 실패했습니다"
-          );
-        } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
-        }
+        addToast(error.response?.data.message || "댓글 수정에 실패했습니다");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
       stop(key);
     }
@@ -63,13 +60,10 @@ export function Comment({
       removeComment(cardId, commentId);
     } catch (error) {
       if (isAxiosError(error)) {
-          addToast(
-            error.response?.data.message ||
-              "댓글 삭제에 실패했습니다"
-          );
-        } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
-        }
+        addToast(error.response?.data.message || "댓글 삭제에 실패했습니다");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
       stop(key);
     }
@@ -107,6 +101,7 @@ export function Comment({
             onChange={(e) => setValue(e.target.value)}
             className="text-xs md:text-md text-black_333236 border border-gray_9FA6B2 px-[5px] py-[10px] rounded-[8px] overflow-y-auto resize-none"
             rows={3}
+            disabled={isLoading}
           />
         ) : (
           <p className="text-xs md:text-md text-black_333236">{content}</p>
@@ -118,6 +113,7 @@ export function Comment({
               key={label}
               className="text-xxs md:text-xs text-gray_9FA6B2 underline"
               onClick={onClick}
+              disabled={isLoading}
             >
               {label}
             </button>

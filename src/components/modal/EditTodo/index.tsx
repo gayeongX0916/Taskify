@@ -36,7 +36,7 @@ export function EditTodoModal({
   const addToast = useToastStore.getState().addToast;
   const [values, setValues] = useState<BaseCardType>({
     assigneeUserId: 0,
-    columnId: 0,
+    columnId: columnId,
     title: "",
     description: "",
     dueDate: "",

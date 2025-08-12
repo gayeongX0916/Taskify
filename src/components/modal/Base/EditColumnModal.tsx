@@ -6,10 +6,13 @@ import { putColumnType } from "@/types/columns";
 import { putColumn } from "@/lib/api/columns";
 import { useToastStore } from "@/lib/stores/toast";
 import { useState } from "react";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 interface EditColumnModalProps extends ModalProps {
   onDelete: () => void;
   columnId: number;
+  dashboardId: number;
 }
 
 export function EditColumnModal({
@@ -17,19 +20,31 @@ export function EditColumnModal({
   onClose,
   onDelete,
   columnId,
+  dashboardId,
 }: EditColumnModalProps) {
-  const [value, setValue] = useState("");
-  const updateColumn = useColumnStore((state) => state.updateColumn);
   const addToast = useToastStore.getState().addToast;
+  const updateColumn = useColumnStore((state) => state.updateColumn);
+  const key = "EditColumnModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const [value, setValue] = useState("");
 
   const handleUpdateColumn = async (data: putColumnType) => {
     try {
+      start(key);
       const res = await putColumn(data);
-      updateColumn(res.data.id, res.data.title);
+      updateColumn(dashboardId, res.data.id, res.data.title);
       onClose();
       setValue("");
-    } catch {
-      addToast("컬럼 수정에 실패했습니다.");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -44,7 +59,7 @@ export function EditColumnModal({
         />
       </div>
       <div className="flex gap-x-[7px]">
-        <ModalButton mode="cancel" onClick={onDelete}>
+        <ModalButton mode="cancel" onClick={onDelete} disabled={isLoading}>
           삭제
         </ModalButton>
         <ModalButton
@@ -52,8 +67,9 @@ export function EditColumnModal({
           onClick={() =>
             handleUpdateColumn({ columnId: columnId, title: value })
           }
+          disabled={isLoading}
         >
-          변경
+          {isLoading ? "변경 중..." : "변경"}
         </ModalButton>
       </div>
     </BaseModal>

@@ -127,7 +127,7 @@ export default function DashboardHeader() {
 
   if (!isMyDashboardPage && !dashboard && isLoading) {
     return (
-      <header className="flex items-center justify-center py-4">
+      <header className="flex items-center justify-center py-4 h-[70px]">
         <span className="text-gray_787486">대시보드 정보를 불러오는 중...</span>
       </header>
     );

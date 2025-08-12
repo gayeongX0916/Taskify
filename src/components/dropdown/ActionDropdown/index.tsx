@@ -4,12 +4,14 @@ type ActionDropdownProps = {
   setShowDropdown: (showDropdown: boolean) => void;
   onEdit: () => void;
   onDelete: () => void;
+  isLoading: boolean;
 };
 
 export function ActionDropdown({
   setShowDropdown,
   onEdit,
   onDelete,
+  isLoading,
 }: ActionDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownList = [
@@ -42,6 +44,7 @@ export function ActionDropdown({
         <button
           key={label}
           onClick={onClick}
+          disabled={isLoading}
           className="text-md text-black_333236 hover:bg-violet_8P hover:text-violet_5534DA hover:rounded-[4px]"
         >
           {label}

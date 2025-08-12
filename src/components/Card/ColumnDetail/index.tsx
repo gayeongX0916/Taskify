@@ -46,7 +46,8 @@ export function ColumnDetailCard({
   const addToast = useToastStore.getState().addToast;
 
   if (!card) {
-    return addToast("카드를 찾을 수 없습니다.");
+    addToast("카드를 찾을 수 없습니다.");
+    return null;
   }
 
   return (

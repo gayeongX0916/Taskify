@@ -3,16 +3,20 @@
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { postColumn } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
+import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
 import { postColumnType } from "@/types/columns";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
+import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
-  const [existed, setExisted] = useState(false);
-  const [value, setValue] = useState("");
+  const key = "CreateColumnModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
@@ -20,19 +24,27 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
   );
-
   const columnArray = columnsByDashboard
     ? Object.values(columnsByDashboard)
     : [];
+  const [existed, setExisted] = useState(false);
+  const [value, setValue] = useState("");
 
   const handleCreateColumn = async (data: postColumnType) => {
     try {
+      start(key);
       const res = await postColumn(data);
       addColumn(Number(dashboardId), res.data);
       onClose();
       setValue("");
     } catch (error) {
-      addToast("컬럼 생성에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "컬럼 생성에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -81,7 +93,12 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
               )}
             </div>
             <footer className="flex gap-x-[7px]">
-              <ModalButton mode="cancel" type="button" onClick={onClose}>
+              <ModalButton
+                mode="cancel"
+                type="button"
+                onClick={onClose}
+                disabled={isLoading}
+              >
                 취소
               </ModalButton>
               <ModalButton
@@ -93,8 +110,9 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
                     dashboardId: Number(dashboardId),
                   })
                 }
+                disabled={isLoading}
               >
-                생성
+                {isLoading ? "생성 중..." : "생성"}
               </ModalButton>
             </footer>
           </form>

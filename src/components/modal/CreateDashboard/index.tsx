@@ -11,22 +11,37 @@ import { postDashboard } from "@/lib/api/dashboards";
 import { postDashboardType } from "@/types/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useDashboardStore } from "@/lib/stores/dashboard";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
-  const [color, setColor] = useState("");
-  const [title, setTitle] = useState("");
+  const key = "CreateDashboardModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
   const addDashboard = useDashboardStore((state) => state.addDashboard);
+  const [color, setColor] = useState("");
+  const [title, setTitle] = useState("");
 
   const handleCreateDashboard = async (data: postDashboardType) => {
     try {
+      start(key);
       const res = await postDashboard(data);
       addDashboard(res.data);
       onClose();
       setTitle("");
       setColor("");
     } catch (error) {
-      addToast("대시보드 생성에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "대시보드 생성에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -74,15 +89,21 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
             </div>
 
             <footer className="flex gap-x-[7px] mt-[32px] md:mt-[40px]">
-              <ModalButton mode="cancel" type="button" onClick={onClose}>
+              <ModalButton
+                mode="cancel"
+                type="button"
+                onClick={onClose}
+                disabled={isLoading}
+              >
                 취소
               </ModalButton>
               <ModalButton
                 mode="any"
                 onClick={() => handleCreateDashboard({ title, color })}
                 type="button"
+                disabled={isLoading}
               >
-                생성
+                {isLoading ? "생성 중..." : "생성"}
               </ModalButton>
             </footer>
           </form>

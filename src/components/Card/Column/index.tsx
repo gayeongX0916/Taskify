@@ -13,7 +13,6 @@ import { useCardStore } from "@/lib/stores/card";
 import { useParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
-import { Spinner } from "@/components/common/Spinner";
 import { Skeleton } from "@/components/common/Skeleton";
 
 type ColumnCardProps = {
@@ -92,11 +91,13 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
       <DeleteColumnModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.deleteColumn}
         onClose={() => handleClickClose("deleteColumn")}
       />
       <EditColumnModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.editColumn}
         onClose={() => handleClickClose("editColumn")}
@@ -106,12 +107,14 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
         }}
       />
       <CreateTodoModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.createTodo}
         onClose={() => handleClickClose("createTodo")}
       />
       {selectedId !== null && (
         <DashBoardModal
+          dashboardId={dashboardIdNum}
           columnId={columnId}
           columnName={title}
           cardId={selectedId}
