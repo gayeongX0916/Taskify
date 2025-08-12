@@ -1,4 +1,9 @@
-import { getCardListType, postCardType, putCardType } from "@/types/cards";
+import {
+  getCardListType,
+  getCardType,
+  postCardType,
+  putCardType,
+} from "@/types/cards";
 import { api } from "./axios";
 
 // 카드 생성
@@ -9,8 +14,8 @@ export const getCardList = ({ size, columnId }: getCardListType) =>
   api.get(`/cards?size=${size}&columnId=${columnId}`);
 
 // 카드 수정
-export const putCard = ({ cardId, ...data }: putCardType) =>
-  api.put(`/cards/${cardId}`, data);
+export const putCard = ({ id, ...data }: getCardType) =>
+  api.put(`/cards/${id}`, data);
 
 // 카드 상세 조회
 export const getCardDetail = ({ cardId }: { cardId: number }) =>
