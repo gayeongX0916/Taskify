@@ -9,24 +9,31 @@ import { useEffect, useState } from "react";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardDetail } from "@/lib/api/dashboards";
 import crownIcon from "@/assets/crown.svg";
-import { UserChangeType } from "@/types/users";
 import { getMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberList } from "@/lib/api/members";
 import { useUserStore } from "@/lib/stores/user";
 import { getDashboardMemberListType } from "@/types/members";
+import { isAxiosError } from "axios";
+import { useLoadingStore } from "@/lib/stores/loading";
 
 export default function DashboardHeader() {
+  const [isOpen, setIsOpen] = useState(false);
   const { dashboardId } = useParams();
+  const dashboardNum = Number(dashboardId);
+  const key = "dashboardHeader";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const pathname = usePathname();
   const isMyDashboardPage =
     pathname === "/mydashboard" || pathname === "/mypage";
-  const users = ["김가영", "이가병", "김나희", "rld", "김가ㅏ", "김나나"];
-  const [isOpen, setIsOpen] = useState(false);
+
   const myInfo = useUserStore((state) => state.myInfo);
   const setMyInfo = useUserStore((state) => state.setMyInfo);
-  const addToast = useToastStore.getState().addToast;
+
   const dashboardMemberList = useDashboardStore(
     (state) => state.membersByDashboardId
   );
@@ -34,63 +41,93 @@ export default function DashboardHeader() {
     (state) => state.setDashboardMembers
   );
   const dashboard = useDashboardStore(
-    (state) => state.dashboardsById[Number(dashboardId)]
+    (state) => state.dashboardsById[dashboardNum]
   );
   const addDashboard = useDashboardStore((state) => state.addDashboard);
-  const member = dashboardMemberList[Number(dashboardId)] || [];
+  const member = (dashboardMemberList[dashboardNum] || []).filter(
+    (m) => !m.isOwner
+  );
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {
       const fetchDashboard = async () => {
         try {
+          start(key);
           const res = await getDashboardDetail({
             dashboardId: Number(dashboardId),
           });
           addDashboard(res.data);
         } catch (error) {
-          console.error("대시보드 정보를 불러오는 데 실패했습니다.", error);
+          if (isAxiosError(error)) {
+            addToast(
+              error.response?.data.message ||
+                "대시보드를 불러오는데 실패했습니다."
+            );
+          } else {
+            addToast("알 수 없는 오류가 발생했습니다.");
+          }
+        } finally {
+          stop(key);
         }
       };
 
       fetchDashboard();
     }
-  }, [dashboardId, dashboard, isMyDashboardPage, addDashboard]);
+  }, [dashboardId, dashboard, isMyDashboardPage]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getMyInfo();
-        setMyInfo(res.data);
-      } catch (error) {
-        addToast("내 정보를 가져오는데 실패했습니다.");
-      }
-    };
-    fetchData();
+    if (!myInfo) {
+      const fetchData = async () => {
+        try {
+          start(key);
+          const res = await getMyInfo();
+          setMyInfo(res.data);
+        } catch (error) {
+          if (isAxiosError(error)) {
+            addToast(
+              error.response?.data.message ||
+                "내 정보를 가져오는데 실패했습니다."
+            );
+          } else {
+            addToast("알 수 없는 오류가 발생했습니다.");
+          }
+        } finally {
+          stop(key);
+        }
+      };
+      fetchData();
+    }
   }, []);
 
   useEffect(() => {
     if (!isMyDashboardPage) {
       const fetchData = async () => {
         try {
+          start(key);
           const res = await getDashboardMemberList({
             size: 10,
-            dashboardId: Number(dashboardId),
+            dashboardId: dashboardNum,
           });
-          const filteredMembers = res.data.members.filter(
-            (member: getDashboardMemberListType) => !member.isOwner
-          );
-          setDashboardMemberList(Number(dashboardId), filteredMembers);
+          setDashboardMemberList(dashboardNum, res.data.members);
         } catch (error) {
-          addToast("멤버 목록 조회에 실패했습니다.");
+          if (isAxiosError(error)) {
+            addToast(
+              error.response?.data.message || "멤버 목록 조회에 실패했습니다."
+            );
+          } else {
+            addToast("알 수 없는 오류가 발생했습니다.");
+          }
+        } finally {
+          stop(key);
         }
       };
       fetchData();
     }
   }, [dashboardId, isMyDashboardPage]);
 
-  if (!isMyDashboardPage && !dashboard) {
+  if (!isMyDashboardPage && !dashboard && isLoading) {
     return (
-      <header className="flex items-center justify-center py-4">
+      <header className="flex items-center justify-center py-4 h-[70px]">
         <span className="text-gray_787486">대시보드 정보를 불러오는 중...</span>
       </header>
     );
@@ -99,7 +136,7 @@ export default function DashboardHeader() {
   return (
     <header
       className={`flex items-center border-b border-[#d9d9d9] pl-[16px] pr-[8px] py-[13px] md:pl-[40px] md:pr-[32px] md:py-[15px] ${
-        users.length > 0 && !isMyDashboardPage
+        member.length > 0 && !isMyDashboardPage
           ? "justify-end lg:justify-between"
           : "justify-between"
       }`}
@@ -107,7 +144,7 @@ export default function DashboardHeader() {
       <InviteModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        dashboardId={Number(dashboardId)}
+        dashboardId={dashboardNum}
       />
       <div className="flex items-center gap-x-[8px]">
         <h1
@@ -115,8 +152,7 @@ export default function DashboardHeader() {
             !isMyDashboardPage ? "hidden lg:flex" : ""
           }`}
         >
-          {(isMyDashboardPage ? "내 대시보드" : dashboard?.title) ??
-            "대시보드 정보를 불러오는 중..."}
+          {isMyDashboardPage ? "내 대시보드" : dashboard?.title}
         </h1>
         {dashboard?.createdByMe && (
           <Image
@@ -161,7 +197,7 @@ export default function DashboardHeader() {
         )}
 
         <div className="flex items-center gap-x-[16px] md:gap-x-[24px] lg:gap-x-[36px]">
-          {users && !isMyDashboardPage && (
+          {member && !isMyDashboardPage && (
             <InvitedUserList users={member.map((m) => m.nickname)} />
           )}
 
@@ -175,7 +211,7 @@ export default function DashboardHeader() {
               <>
                 <Avatar
                   username={myInfo.nickname}
-                  profileImageUrl={myInfo.profileImageUrl || ""}
+                  profileImageUrl={myInfo.profileImageUrl || null}
                 />
                 <span className="hidden md:flex md:text-lg md:text-black_333236">
                   {myInfo.nickname}

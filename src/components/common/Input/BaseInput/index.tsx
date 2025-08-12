@@ -37,7 +37,7 @@ export function BaseInput({
             : "text-black_333236"
         }`}
         placeholder={placeholder}
-        value={value}
+        value={value ?? ""}
         onChange={handleChange}
         readOnly={readonly}
       />

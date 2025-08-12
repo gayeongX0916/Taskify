@@ -12,8 +12,16 @@ import { useAuthStore } from "@/lib/stores/auth";
 import { LoginType } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useToastStore } from "@/lib/stores/toast";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 const loginPage = () => {
+  const setAuth = useAuthStore.getState().setAuth;
+  const addToast = useToastStore.getState().addToast;
+  const key = "login";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const router = useRouter();
   const [values, setValues] = useState({
     email: "",
@@ -23,17 +31,6 @@ const loginPage = () => {
     email: "",
     password: "",
   });
-  const setAuth = useAuthStore.getState().setAuth;
-  const addToast = useToastStore.getState().addToast;
-
-  const handleBlur = (field: keyof typeof values) => {
-    const error = validateFields({
-      fields: field,
-      value: values[field],
-      values,
-    });
-    setErrors((prev) => ({ ...prev, [field]: error }));
-  };
 
   const formFields: {
     key: keyof typeof values;
@@ -55,35 +52,54 @@ const loginPage = () => {
     },
   ];
 
+  const handleBlur = (field: keyof typeof values) => {
+    const error = validateFields({
+      fields: field,
+      value: values[field],
+      values,
+    });
+    setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
   const handleClickLogin = async (data: LoginType) => {
     try {
+      start(key);
       const response = await postLogin(data);
       const token = response.data.accessToken;
       const userId = response.data.user.id;
       setAuth(token, userId);
+      addToast("로그인에 성공했습니다.", "success");
       router.push("/mydashboard");
-      addToast("로그인 성공!", "success");
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        addToast(error.response.data.message, "error");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "로그인에 실패했습니다.");
       } else {
-        addToast(
-          error.response.data.message || "비밀번호가 일치하지 않습니다.",
-          "error"
-        );
+        addToast("알 수 없는 오류가 발생했습니다.");
       }
+    } finally {
+      stop(key);
     }
   };
 
   const handleClickGuestLogin = async () => {
     try {
+      start(key);
       const email = "test@naver.com";
       const password = "1234567890";
       const res = await postLogin({ email, password });
       setAuth(res.data.accessToken, res.data.userId);
+      addToast("게스트 로그인에 성공했습니다.", "success");
       router.push("/mydashboard");
     } catch (error) {
-      addToast("게스트 로그인에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "게스트 로그인에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -122,11 +138,12 @@ const loginPage = () => {
           ))}
           <LoginButton
             disabled={
+              isLoading ||
               Object.values(values).some((v) => v === "") ||
               Object.values(errors).some((e) => e !== "")
             }
           >
-            로그인
+            {isLoading ? "로그인 중..." : "로그인"}
           </LoginButton>
         </form>
         <div className="flex items-center gap-x-[5px]">

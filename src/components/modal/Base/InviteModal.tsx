@@ -5,22 +5,38 @@ import { useState } from "react";
 import { postInviteDashboard } from "@/lib/api/dashboards";
 import { postInviteDashboardType } from "@/types/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 interface InviteMoalProps extends ModalProps {
   dashboardId: number;
 }
 
 export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
-  const [value, setValue] = useState("");
   const addToast = useToastStore.getState().addToast;
+  const key = "InviteModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const [value, setValue] = useState("");
 
   const handleInviteDashboard = async (data: postInviteDashboardType) => {
     try {
+      start(key);
       await postInviteDashboard(data);
       onClose();
       setValue("");
-    } catch {
-      addToast("대시보드 초대에 실패했습니다.");
+      addToast("대시보드 초대에 성공했습니다.", "success");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "대시보드 초대에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -35,7 +51,7 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
         />
       </div>
       <div className="flex gap-x-[7px]">
-        <ModalButton mode="cancel" onClick={onClose}>
+        <ModalButton mode="cancel" onClick={onClose} disabled={isLoading}>
           취소
         </ModalButton>
         <ModalButton
@@ -46,8 +62,9 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
               email: value.trim(),
             })
           }
+          disabled={isLoading}
         >
-          생성
+          {isLoading ? "초대 중..." : "초대"}
         </ModalButton>
       </div>
     </BaseModal>

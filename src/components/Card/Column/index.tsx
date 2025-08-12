@@ -8,9 +8,12 @@ import { DashBoardModal } from "@/components/Modal/Dashboard";
 import { useEffect, useMemo, useState } from "react";
 import { getCardList } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { getCardType } from "@/types/cards";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
 import { useCardStore } from "@/lib/stores/card";
+import { useParams } from "next/navigation";
+import { isAxiosError } from "axios";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { Skeleton } from "@/components/common/Skeleton";
 
 type ColumnCardProps = {
   columnId: number;
@@ -20,11 +23,21 @@ type ColumnCardProps = {
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
 export function ColumnCard({ columnId, title }: ColumnCardProps) {
+  const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
+  const key = "columncard";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const rawCardList = useCardStore((state) => state.cardsByColumn[columnId]);
+  const rawCardList = useCardStore(
+    (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId]
+  );
   const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
   const setCardList = useCardStore((state) => state.setCardList);
-  const count = useCardStore((state) => state.countsByColumn[columnId] || 0);
+  const count = useCardStore(
+    (state) => state.countsByDashboard?.[dashboardIdNum]?.[columnId] ?? 0
+  );
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [modalState, setModalState] = useState({
     editColumn: false,
@@ -32,7 +45,6 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
     dashboard: false,
     deleteColumn: false,
   });
-
   const handleClickOpen = (modalName: ModalName) => {
     setModalState((prev) => ({ ...prev, [modalName]: true }));
   };
@@ -45,15 +57,28 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        start(key);
         const res = await getCardList({ size: 10, columnId });
-        setCardList(columnId, res.data.cards, res.data.totalCount);
+        setCardList(
+          dashboardIdNum,
+          columnId,
+          res.data.cards,
+          res.data.totalCount
+        );
       } catch (error) {
-        addToast("카드 목록을 조회하는데 실패했습니다.");
-        console.error(error);
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message || "카드 목록 조회에 실패했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
     };
     fetchData();
-  }, [columnId, setCardList, addToast]);
+  }, [columnId, setCardList]);
 
   const sortedCardList = useMemo(() => {
     if (!cardList) return [];
@@ -66,11 +91,13 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
       <DeleteColumnModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.deleteColumn}
         onClose={() => handleClickClose("deleteColumn")}
       />
       <EditColumnModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.editColumn}
         onClose={() => handleClickClose("editColumn")}
@@ -80,12 +107,14 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
         }}
       />
       <CreateTodoModal
+        dashboardId={dashboardIdNum}
         columnId={columnId}
         isOpen={modalState.createTodo}
         onClose={() => handleClickClose("createTodo")}
       />
       {selectedId !== null && (
         <DashBoardModal
+          dashboardId={dashboardIdNum}
           columnId={columnId}
           columnName={title}
           cardId={selectedId}
@@ -123,19 +152,30 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
         />
       </div>
       <div className="flex flex-col md:gap-y-[16px]">
-        {sortedCardList.map(({ id }, idx) => (
-          <div
-            role="button"
-            key={idx}
-            className={`${idx > 0 ? "hidden md:block" : ""}`}
-            onClick={() => {
-              setSelectedId(id);
-              handleClickOpen("dashboard");
-            }}
-          >
-            <ColumnDetailCard cardId={id} />
-          </div>
-        ))}
+        {isLoading ? (
+          // ? Array.from({ length: 3 }).map((_, i) => (
+          //     <Skeleton className="w-full h-[250px] md:h-[90px] lg:h-[250px]" />
+          //   ))
+          <Skeleton className="w-full h-[250px] md:h-[90px] lg:h-[250px]" />
+        ) : (
+          sortedCardList.map(({ id }, idx) => (
+            <div
+              role="button"
+              key={idx}
+              className={`${idx > 0 ? "hidden md:block" : ""}`}
+              onClick={() => {
+                setSelectedId(id);
+                handleClickOpen("dashboard");
+              }}
+            >
+              <ColumnDetailCard
+                dashboardId={dashboardIdNum}
+                columnId={columnId}
+                cardId={id}
+              />
+            </div>
+          ))
+        )}
       </div>
     </section>
   );

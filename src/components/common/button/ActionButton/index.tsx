@@ -4,12 +4,14 @@ type ActionButtonProps = {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
+  disabled?:boolean;
 };
 
 export function ActionButton({
   children,
   className,
   onClick,
+  disabled
 }: ActionButtonProps) {
   return (
     <button
@@ -17,6 +19,7 @@ export function ActionButton({
         className ?? ""
       }`}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

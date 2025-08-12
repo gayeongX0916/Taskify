@@ -12,14 +12,18 @@ import { DateInput } from "@/components/common/Input/ModalInput/DateInput";
 import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
-import { getCardDetail, putCard } from "@/lib/api/cards";
+import { putCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { BaseCardType } from "@/types/cards";
+import { BaseCardType, getCardType } from "@/types/cards";
 import { getColumnList } from "@/lib/api/columns";
 import { useParams } from "next/navigation";
 import { getColumnListType } from "@/types/columns";
 import { formatDate } from "@/lib/utils/formatDate";
 import { useCardStore } from "@/lib/stores/card";
+import { useColumnStore } from "@/lib/stores/column";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { Spinner } from "@/components/common/Spinner";
 
 interface EditTodoModalProps extends ModalProps {
   cardId: number;
@@ -33,66 +37,58 @@ export function EditTodoModal({
   columnId,
 }: EditTodoModalProps) {
   const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
+  const key = "EditTodoModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const [values, setValues] = useState<BaseCardType>({
-    assigneeUserId: 0,
-    columnId: 0,
-    title: "",
-    description: "",
-    dueDate: "",
-    tags: [],
-    imageUrl: "",
-  });
-  const [columnList, setColumnList] = useState<getColumnListType[]>([]);
+  const columnList = useColumnStore(
+    (state) => state.columnsByDashboard[dashboardIdNum]
+  );
+  const columnArray = Object.values(columnList) ?? [];
+  const cardList = useCardStore(
+    (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId] ?? []
+  );
+  const card = cardList.find((c) => c.id === cardId);
   const updateCard = useCardStore((state) => state.updateCard);
+  const [values, setValues] = useState<getCardType>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getCardDetail({ cardId });
-        const card = res.data;
-        setValues({
-          assigneeUserId: card.assignee?.id ?? 0,
-          columnId: card.columnId,
-          title: card.title,
-          description: card.description,
-          dueDate: card.dueDate,
-          tags: card.tags,
-          imageUrl: card.imageUrl,
-        });
-      } catch (error) {
-        addToast("");
-      }
-    };
-    fetchData();
-  }, []);
+    if (card) {
+      setValues(card);
+    }
+  }, [card]);
 
-  useEffect(() => {
-    const fetchColumnList = async () => {
-      try {
-        const res = await getColumnList({ dashboardId: Number(dashboardId) });
-        setColumnList(res.data.data);
-      } catch (error) {
-        addToast("컬럼 목록 조회에 실패했습니다.");
-      }
-    };
-    fetchColumnList();
-  }, []);
+  if (!values || isLoading)
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
+        <div className="flex flex-col justify-center items-center h-[600px] bg-white_FFFFFF min-w-[327px] w-full rounded-[16px] md:w-[540px]">
+          <Spinner />
+        </div>
+      </div>
+    );
 
-  if (!values) return null;
-
-  const handleEditTodo = async (data: BaseCardType) => {
-    if (!values) return;
+  const handleEditTodo = async (data: getCardType) => {
     try {
+      start(key);
       const payload = { ...data };
-      if (!payload.imageUrl || payload.imageUrl.trim() === "") {
+      if (!payload.imageUrl?.trim()) {
         delete payload.imageUrl;
       }
-      const res = await putCard({ cardId, ...payload });
-      updateCard(columnId, res.data);
+      const { id, ...restPayload } = payload;
+      const res = await putCard({ id: cardId, ...restPayload });
+      updateCard(dashboardIdNum, columnId, res.data);
       onClose();
+      addToast("컬럼 수정에 성공했습니다.", "success");
     } catch (error) {
-      addToast("컬럼 수정에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -109,8 +105,8 @@ export function EditTodoModal({
               <div className="flex flex-col gap-y-[8px] w-full md:w-[256px]">
                 <span className="text-lg text-black_333236">상태</span>
                 <ProgressDropdown
-                  columnId={columnId}
-                  columnList={columnList}
+                  columnId={values.columnId}
+                  columnList={columnArray}
                   onSelect={(columnId) =>
                     setValues({ ...values, columnId: columnId })
                   }
@@ -119,11 +115,11 @@ export function EditTodoModal({
               <div className="flex flex-col gap-y-[8px] w-full md:w-[256px]">
                 <span className="text-lg text-black_333236">담당자</span>
                 <AssigneeDropdown
-                  initialUserId={values.assigneeUserId}
+                  initialUserId={values.assignee.id}
                   onSelect={(userId) =>
                     setValues({
                       ...values,
-                      assigneeUserId: userId, // BaseCardType 유지
+                      assignee: { ...values.assignee, id: userId },
                     })
                   }
                 />

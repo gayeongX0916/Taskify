@@ -13,9 +13,16 @@ import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 const SignUpPage = () => {
+  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
+  const key = "signup";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const [values, setValues] = useState({
     email: "",
     nickname: "",
@@ -42,21 +49,20 @@ const SignUpPage = () => {
   };
 
   const handleClickSignUp = async (data: SignupType) => {
-    const addToast = useToastStore.getState().addToast;
     try {
+      start(key);
       const { email, nickname, password } = data;
       await postSignUp({ email, nickname, password });
-      addToast("가입 완료!", "success");
+      addToast("회원가입에 성공했습니다.", "success");
       router.push("/login");
-    } catch (error: any) {
-      if (error.response?.status === 409) {
-        addToast(error.response.data.message, "error");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "회원 가입에 실패했습니다.");
       } else {
-        addToast(
-          error.response.data.message || "가입에 실패했습니다.",
-          "error"
-        );
+        addToast("알 수 없는 오류가 발생했습니다.");
       }
+    } finally {
+      stop(key);
     }
   };
 
@@ -140,10 +146,12 @@ const SignUpPage = () => {
           </div>
           <LoginButton
             disabled={
-              !agree || Object.values(errors).some((error) => error !== "")
+              isLoading ||
+              !agree ||
+              Object.values(errors).some((error) => error !== "")
             }
           >
-            가입하기
+            {isLoading ? "가입 중..." : "가입하기"}
           </LoginButton>
         </form>
         <div className="flex items-center gap-x-[5px]">

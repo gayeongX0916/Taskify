@@ -28,7 +28,7 @@ export interface getCardType {
   description: string;
   dueDate: string;
   tags: string[];
-  imageUrl: string;
+  imageUrl?: string;
   createdAt:string;
   updatedAt:string;
   assignee: {

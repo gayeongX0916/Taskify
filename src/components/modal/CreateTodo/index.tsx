@@ -14,25 +14,31 @@ import { postCardType } from "@/types/cards";
 import { postCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
-import { useParams } from "next/navigation";
 import { formatDate } from "@/lib/utils/formatDate";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
 
 interface CreateTodoModalProps extends ModalProps {
   columnId: number;
+  dashboardId: number;
 }
 
 export function CreateTodoModal({
   isOpen,
   onClose,
   columnId,
+  dashboardId,
 }: CreateTodoModalProps) {
-  const { dashboardId } = useParams();
+  const key = "CreateTodoModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
   const addCard = useCardStore((state) => state.addCard);
   const [values, setValues] = useState<postCardType>({
     assigneeUserId: 0,
     columnId: columnId,
-    dashboardId: Number(dashboardId),
+    dashboardId: dashboardId,
     title: "",
     description: "",
     dueDate: "",
@@ -42,16 +48,24 @@ export function CreateTodoModal({
 
   const handlePostCard = async (data: postCardType) => {
     try {
+      start(key);
       const payload = { ...data };
 
       if (!payload.imageUrl || payload.imageUrl.trim() === "") {
         delete payload.imageUrl;
       }
       const res = await postCard(payload);
-      addCard(columnId, res.data);
+      addCard(dashboardId, columnId, res.data);
       onClose();
+      addToast("카드 생성에 성공했습니다.", "success");
     } catch (error) {
-      addToast("카드 생성에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "카드 생성에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -111,11 +125,15 @@ export function CreateTodoModal({
           </main>
 
           <footer className="flex gap-x-[11px] mt-[24px]">
-            <ModalButton mode="cancel" onClick={onClose}>
+            <ModalButton mode="cancel" onClick={onClose} disabled={isLoading}>
               취소
             </ModalButton>
-            <ModalButton mode="any" onClick={() => handlePostCard(values)}>
-              생성
+            <ModalButton
+              mode="any"
+              onClick={() => handlePostCard(values)}
+              disabled={isLoading}
+            >
+              {isLoading ? "생성 중..." : "생성"}
             </ModalButton>
           </footer>
         </section>

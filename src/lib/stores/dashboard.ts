@@ -14,6 +14,7 @@ interface DashboardState {
   addDashboard: (dashboard: getDashboardListType) => void;
   removeDashboard: (id: number) => void;
   updateDashboard: (id: number, title: string, color: string) => void;
+  removeDashboardMember: (dashboardId: number, memberId: number) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -63,4 +64,15 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         [id]: { ...state.dashboardsById[id], title, color },
       },
     })),
+
+  removeDashboardMember: (dashboardId, memberId) =>
+    set((state) => {
+      const currentMembers = state.membersByDashboardId[dashboardId] || [];
+      return {
+        membersByDashboardId: {
+          ...state.membersByDashboardId,
+          [dashboardId]: currentMembers.filter((m) => m.id !== memberId),
+        },
+      };
+    }),
 }));

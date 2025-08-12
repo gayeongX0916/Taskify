@@ -19,11 +19,15 @@ import { EditTodoModal } from "../EditTodo";
 import { useCardStore } from "@/lib/stores/card";
 import { getComment } from "@/lib/api/comments";
 import { useCommentStore } from "@/lib/stores/comment";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { Spinner } from "@/components/common/Spinner";
 
 interface DashBoardModalProps extends ModalProps {
   cardId: number;
   columnName: string;
   columnId: number;
+  dashboardId: number;
 }
 
 export function DashBoardModal({
@@ -32,52 +36,66 @@ export function DashBoardModal({
   cardId,
   columnName,
   columnId,
+  dashboardId,
 }: DashBoardModalProps) {
-  const removeCard = useCardStore((state) => state.removeCard);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const key = "DashboardModal";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const [detail, setDetail] = useState<getCardType>();
+  const cardList = useCardStore(
+    (state) => state.cardsByDashboard?.[dashboardId]?.[columnId] ?? []
+  );
+  const card = cardList.find((c) => c.id === cardId);
+  const removeCard = useCardStore((state) => state.removeCard);
   const commentByCard = useCommentStore((state) => state.commentsByCard);
   const commentList = commentByCard[cardId] || [];
   const setCommentList = useCommentStore((state) => state.setCommentList);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getCardDetail({ cardId });
-        setDetail(res.data);
-      } catch (error) {
-        addToast("카드 상세 조회에 실패했습니다.");
-      }
-    };
-    fetchData();
-  }, [cardId]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
+        start(key);
         const res = await getComment({ size: 6, cardId });
         setCommentList(cardId, res.data.comments);
       } catch (error) {
-        addToast("댓글 조회에 실패했습니다.");
+        if (isAxiosError(error)) {
+          addToast(error.response?.data.message || "댓글 조회에 실패했습니다.");
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
     };
     fetchData();
   }, []);
 
-  if (!detail) return <div>디테일 로딩 중</div>;
-
   const handleDeleteCard = async () => {
     try {
+      start(key);
       await deleteCardDetail({ cardId });
-      removeCard(columnId, cardId);
+      removeCard(dashboardId, columnId, cardId);
       setShowDropdown(false);
       onClose();
+      addToast("카드 삭제에 성공했습니다.", "success");
     } catch (error) {
-      addToast("카드 삭제에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "카드 삭제에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
+
+  if (!card) {
+    addToast("카드를 찾을 수 없습니다.");
+    return null;
+  }
 
   return (
     <>
@@ -92,7 +110,7 @@ export function DashBoardModal({
           <section className="bg-white_FFFFFF w-full md:w-[730px] px-[16px] py-[16px] md:pt-[30px] md:pr-[38px] md:pb-[33px] md:pl-[18px] rounded-[8px]">
             <header className="flex justify-end md:justify-between items-center mb-[16px] md:mb-[24px]">
               <h2 className="hidden md:block md:text-2xl md:text-black_333236 md:font-bold">
-                {detail.title}
+                {card.title}
               </h2>
 
               <div className="flex gap-x-[16px] md:gap-x-[24px] relative">
@@ -129,6 +147,7 @@ export function DashBoardModal({
                         setShowEditModal(true);
                       }}
                       onDelete={() => handleDeleteCard()}
+                      isLoading={isLoading}
                     />
                   </div>
                 )}
@@ -136,7 +155,7 @@ export function DashBoardModal({
             </header>
 
             <h2 className="text-xl text-black_333236 font-bold flex justify-start mb-[8px] md:hidden">
-              {detail.title}
+              {card.title}
             </h2>
 
             <main className="flex flex-col-reverse md:flex-row md:justify-between max-h-[70vh] overflow-y-auto pr-[20px] md:gap-x-[20px]">
@@ -145,20 +164,20 @@ export function DashBoardModal({
                   <Chip name={columnName} className="text-xs" />
                   <span className="border-l border-gray_D9D9D9 h-[20px]" />
                   <TagList
-                    tags={detail.tags}
+                    tags={card.tags}
                     className="gap-x-[8px] md:gap-x-[6px]"
                   />
                 </div>
 
                 <p className="text-md mt-[16px] lg:mt-[26px]">
-                  {detail.description}
+                  {card.description}
                 </p>
 
-                {detail.imageUrl === null ? (
+                {card.imageUrl === null ? (
                   <div className="hidden"></div>
                 ) : (
                   <Image
-                    src={detail.imageUrl}
+                    src={card.imageUrl}
                     alt="예시"
                     width={290}
                     height={168}
@@ -171,23 +190,28 @@ export function DashBoardModal({
                 </div>
 
                 <div className="mt-[16px] md:mt-[24px] flex flex-col gap-y-[8px]">
-                  {commentList.map(({ id, author, createdAt, content,cardId }) => (
-                    <Comment
-                      key={id}
-                      name={author.nickname}
-                      date={createdAt}
-                      content={content}
-                      cardId={cardId}
-                      commentId={id}
-                    />
-                  ))}
+                  {isLoading ? (
+                    <div className="flex justify-center pt-[30px] items-center">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    commentList.map(
+                      ({ id, author, createdAt, content, cardId }) => (
+                        <Comment
+                          key={id}
+                          name={author.nickname}
+                          date={createdAt}
+                          content={content}
+                          cardId={cardId}
+                          commentId={id}
+                        />
+                      )
+                    )
+                  )}
                 </div>
               </article>
 
-              <AssigneeCard
-                name={detail.assignee.nickname}
-                date={detail.dueDate}
-              />
+              <AssigneeCard name={card.assignee.nickname} date={card.dueDate} />
             </main>
           </section>
         </div>

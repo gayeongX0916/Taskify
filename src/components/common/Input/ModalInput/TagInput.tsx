@@ -1,4 +1,3 @@
-import { getTagColor } from "@/lib/utils/getTagColor";
 import { useState } from "react";
 import { TagList } from "../../TagList";
 

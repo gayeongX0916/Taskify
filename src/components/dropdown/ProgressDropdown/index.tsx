@@ -5,10 +5,11 @@ import arrowDropdown from "@/assets/arrow_drop_down.svg";
 import Image from "next/image";
 import { Chip } from "@/components/common/Chip";
 import checkIcon from "@/assets/check_icon.svg";
+import { getColumnListType } from "@/types/columns";
 
 type ProgressDropdownProps = {
   columnId: number;
-  columnList: { id: number; title: string }[];
+  columnList: getColumnListType[];
   onSelect?: (columnId: number) => void;
 };
 

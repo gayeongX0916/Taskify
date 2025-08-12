@@ -13,8 +13,6 @@ export function DashboardNameCard({ dashboardId }: DashboardNameCardProps) {
     (state) => state.dashboardsById[Number(dashboardId)]
   );
 
-  // if (!dashboard) return null;
-
   return (
     <button className="w-full flex justify-between items-center border border-gray_D9D9D9 rounded-[8px] px-[20px] py-[17px] lg:py-[22px] bg-white_FFFFFF">
       <div className="flex items-center gap-x-[16px]">

@@ -2,44 +2,64 @@ import { getColumnListType } from "@/types/columns";
 import { create } from "zustand";
 
 interface ColumnState {
-  columnsById: Record<number, getColumnListType>;
-  setColumnList: (list: getColumnListType[]) => void;
-  addColumn: (column: getColumnListType) => void;
-  removeColumn: (id: number) => void;
-  updateColumn: (id: number, title: string) => void;
+  columnsByDashboard: Record<number, Record<number, getColumnListType>>;
+  setColumnList: (dashboardId: number, list: getColumnListType[]) => void;
+  addColumn: (dashboardId: number, column: getColumnListType) => void;
+  removeColumn: (dashboardId: number, id: number) => void;
+  updateColumn: (dashboardId: number, id: number, title: string) => void;
 }
 
 export const useColumnStore = create<ColumnState>((set) => ({
-  columnsById: {},
+  columnsByDashboard: {},
 
-  setColumnList: (list) =>
-    set(() => ({
-      columnsById: list.reduce((acc, col) => {
-        acc[col.id] = col;
-        return acc;
-      }, {} as Record<number, getColumnListType>),
-    })),
-
-  addColumn: (column) =>
+  setColumnList: (dashboardId, list) =>
     set((state) => ({
-      columnsById: {
-        ...state.columnsById,
-        [column.id]: column,
+      columnsByDashboard: {
+        ...state.columnsByDashboard,
+        [dashboardId]: list.reduce((acc, col) => {
+          acc[col.id] = col;
+          return acc;
+        }, {} as Record<number, getColumnListType>),
       },
     })),
 
-  removeColumn: (id) =>
+  addColumn: (dashboardId, column) =>
     set((state) => {
-      const newColumns = { ...state.columnsById };
-      delete newColumns[id];
-      return { columnsById: newColumns };
+      const prevColumns = state.columnsByDashboard[dashboardId] || {};
+      return {
+        columnsByDashboard: {
+          ...state.columnsByDashboard,
+          [dashboardId]: {
+            ...prevColumns,
+            [column.id]: column,
+          },
+        },
+      };
     }),
 
-  updateColumn: (id, title) =>
-    set((state) => ({
-      columnsById: {
-        ...state.columnsById,
-        [id]: { ...state.columnsById[id], title },
-      },
-    })),
+  removeColumn: (dashboardId, id) =>
+    set((state) => {
+      const prevColumns = { ...(state.columnsByDashboard[dashboardId] || {}) };
+      delete prevColumns[id];
+      return {
+        columnsByDashboard: {
+          ...state.columnsByDashboard,
+          [dashboardId]: prevColumns,
+        },
+      };
+    }),
+
+  updateColumn: (dashboardId, id, title) =>
+    set((state) => {
+      const prevColumns = state.columnsByDashboard[dashboardId] || {};
+      return {
+        columnsByDashboard: {
+          ...state.columnsByDashboard,
+          [dashboardId]: {
+            ...prevColumns,
+            [id]: { ...prevColumns[id], title },
+          },
+        },
+      };
+    }),
 }));

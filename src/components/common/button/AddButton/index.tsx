@@ -5,9 +5,15 @@ type AddButtonProps = {
   mode: "column" | "dashboard" | "todo" | "delete";
   className?: string;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
-export function AddButton({ mode, className, onClick }: AddButtonProps) {
+export function AddButton({
+  mode,
+  className,
+  onClick,
+  disabled,
+}: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
@@ -31,6 +37,7 @@ export function AddButton({ mode, className, onClick }: AddButtonProps) {
       className={`flex gap-x-[12px] justify-center items-center border border-D9D9D9 rounded-[10px] bg-white_FFFFFF ${
         className ?? "py-[20px]"
       }`}
+      disabled={disabled}
     >
       {text && (
         <span className="text-md text-black_333236 md:text-lg">{text}</span>

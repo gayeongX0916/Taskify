@@ -9,21 +9,18 @@ import { getMyInfo, postProfileImg, putMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { UserChangeType } from "@/types/users";
 import { useUserStore } from "@/lib/stores/user";
+import { isAxiosError } from "axios";
+import { LoadingProps } from "@/types/loading";
 
-type ProfileType = {
-  email: string;
-  nickname: string;
-  file: string | null;
-};
-
-export function ProfileCard() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
+  const key = "profile";
   const addToast = useToastStore.getState().addToast;
-  const [isSaved, setIsSaved] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const myInfo = useUserStore((state) => state.myInfo);
   const setMyInfo = useUserStore((state) => state.setMyInfo);
   const updateMyInfo = useUserStore((state) => state.updateMyInfo);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [localNickname, setLocalNickname] = useState(myInfo?.nickname ?? "");
   const [localProfileImageUrl, setLocalProfileImageUrl] = useState(
     myInfo?.profileImageUrl ?? null
@@ -38,16 +35,27 @@ export function ProfileCard() {
     if (myInfo && !localNickname) {
       setLocalNickname(myInfo.nickname);
     }
+    if (myInfo && localProfileImageUrl === null) {
+      setLocalProfileImageUrl(myInfo.profileImageUrl ?? null);
+    }
   }, [myInfo]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        start(key);
         const res = await getMyInfo();
         setMyInfo(res.data);
-        // setProfile(res.data);
       } catch (error) {
-        addToast("내 정보 조회에 실패했습니다.");
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message || "내 정보 조회에 실패했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
     };
     fetchData();
@@ -59,21 +67,37 @@ export function ProfileCard() {
     if (!selectedFile) return;
 
     try {
+      start(key);
       const res = await postProfileImg(selectedFile);
       setLocalProfileImageUrl(res.data.profileImageUrl);
       setIsTyping(true);
+      addToast("이미지 생성에 성공했습니다.", "success");
     } catch (error) {
-      addToast("이미지 생성에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "이미지 생성에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
   const handlePutMyInfo = async (data: UserChangeType) => {
     try {
+      start(key);
       await putMyInfo(data);
       setIsTyping(false);
       setIsSaved((prev) => !prev);
+      addToast("프로필 수정에 성공했습니다.", "success");
     } catch (error) {
-      addToast("내 정보 수정에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "프로필 수정에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -93,6 +117,7 @@ export function ProfileCard() {
           <button
             className="w-[100px] h-[100px] flex justify-center items-center bg-[#F5F5F5] rounded-[6px] md:w-[182px] md:h-[182px]"
             onClick={handleInputClick}
+            disabled={isLoading}
           >
             {localProfileImageUrl ? (
               <Image
@@ -119,6 +144,7 @@ export function ProfileCard() {
               setLocalProfileImageUrl(null);
               setIsTyping(true);
             }}
+            disabled={isLoading}
           >
             프로필 삭제하기
           </button>
@@ -145,7 +171,7 @@ export function ProfileCard() {
               label="닉네임"
               value={localNickname}
               onChange={(nickname: string) => {
-                setLocalNickname(nickname); // 👈 전역 말고 로컬 상태만 변경
+                setLocalNickname(nickname);
                 setIsTyping(true);
               }}
               isTyping={isTyping}
@@ -153,18 +179,19 @@ export function ProfileCard() {
           </div>
 
           <ModalButton
+            disabled={isLoading}
             mode="any"
             onClick={() => {
               const updatedData: UserChangeType = {
                 nickname: localNickname,
-                profileImageUrl: localProfileImageUrl, // ✅ null 또는 이미지 URL 전달
+                profileImageUrl: localProfileImageUrl,
               };
 
               handlePutMyInfo(updatedData);
-              updateMyInfo(updatedData); // 전역 상태 반영
+              updateMyInfo(updatedData);
             }}
           >
-            저장
+            {isLoading ? "저장 중..." : "저장"}
           </ModalButton>
         </div>
       </form>

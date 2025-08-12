@@ -1,24 +1,39 @@
+"use client";
+
 import { ModalButton } from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { putPasswordChange } from "@/lib/api/auth";
 import { useToastStore } from "@/lib/stores/toast";
 import { PasswordChangeType } from "@/types/auth";
+import { LoadingProps } from "@/types/loading";
+import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function PasswordCard() {
+export function PasswordCard({ isLoading, start, stop }: LoadingProps) {
+  const key = "password";
+  const addToast = useToastStore.getState().addToast;
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
-  const addToast = useToastStore.getState().addToast;
-  const router = useRouter();
 
   const handlePutPassword = async (data: PasswordChangeType) => {
     try {
+      start(key);
       await putPasswordChange(data);
+      addToast("비밀번호 변경에 성공했습니다.", "success");
       router.push("/mydashboard");
-    } catch (error: any) {
-      addToast(error.response.data.message);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "비밀번호 변경에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -58,7 +73,7 @@ export function PasswordCard() {
       <div className="mt-[24px]">
         <ModalButton
           mode="any"
-          disabled={newPassword !== checkPassword}
+          disabled={newPassword !== checkPassword || isLoading}
           onClick={() =>
             handlePutPassword({
               password: currentPassword,
@@ -66,7 +81,7 @@ export function PasswordCard() {
             })
           }
         >
-          변경
+          {isLoading ? "변경 중..." : "변경"}
         </ModalButton>
       </div>
     </section>
