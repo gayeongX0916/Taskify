@@ -7,7 +7,6 @@ import { getDashboardMemberList } from "@/lib/api/members";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
-import { getDashboardMemberListType } from "@/types/members";
 import { isAxiosError } from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";

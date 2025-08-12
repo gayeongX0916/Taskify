@@ -26,6 +26,7 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
       await postInviteDashboard(data);
       onClose();
       setValue("");
+      addToast("대시보드 초대에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(
