@@ -9,27 +9,31 @@ import {
   getInviteDashboard,
 } from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
-import { getInvitationType, InviteUser } from "@/types/invitation";
+import { getInvitationType, InviteUser } from "@/types/invite";
 import { InviteModal } from "@/components/Modal/Base/InviteModal";
-import { getDashboardMemberListType } from "@/types/members";
-import { getDashboardMemberList } from "@/lib/api/members";
+import { deleteDashboardMember } from "@/lib/api/members";
+import { useDashboardStore } from "@/lib/stores/dashboard";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { useInviteStore } from "@/lib/stores/invite";
 
 type MemberTableProps = {
   mode: "member" | "invite";
   dashboardId: number;
 };
 
-function InviteButton({
-  className,
-  onClick,
-}: {
+type InviteButtonProps = {
   className?: string;
   onClick: () => void;
-}) {
+  isLoading: boolean;
+};
+
+function InviteButton({ className, onClick, isLoading }: InviteButtonProps) {
   return (
     <button
       className={`px-[12px] py-[4px] rounded-[4px] bg-violet_5534DA flex gap-x-[6px] items-center justify-center ${className}`}
       onClick={onClick}
+      disabled={isLoading}
     >
       <Image src={addBoxWhiteIcon} alt="초대하기" width={16} height={16} />
       <span className="text-white_FFFFFF text-xs md:text-md">초대하기</span>
@@ -38,18 +42,31 @@ function InviteButton({
 }
 
 export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
-  const [inviteUserList, setInviteUserList] = useState<InviteUser[]>([]);
-  const [memberList, setMemberList] = useState<getDashboardMemberListType[]>(
-    []
+  const key = "MemberOrInviteTable";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const dashboardMemberList = useDashboardStore(
+    (state) => state.membersByDashboardId
   );
+  const memberList = (dashboardMemberList[dashboardId] || []).filter(
+    (m) => !m.isOwner
+  );
+  const removeDashboardMember = useDashboardStore(
+    (state) => state.removeDashboardMember
+  );
+  const sentInvites = useInviteStore((state) => state.sentInvites);
+  const setSetInvites = useInviteStore((state) => state.setSentInvites);
+  const removeSentInvite = useInviteStore((state) => state.removeSentInvite);
   const addToast = useToastStore.getState().addToast;
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        start(key);
         const res = await getInviteDashboard({
-          dashboardId: Number(dashboardId),
+          dashboardId: dashboardId,
           size: 6,
         });
         const users = res.data.invitations.map(
@@ -58,42 +75,59 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
             invitationId: invitation.id,
           })
         );
-
-        setInviteUserList(users);
+        setSetInvites(users);
       } catch (error) {
-        addToast("대시보드 초대 목록 불러오는데 실패했습니다.");
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "대시보드 초대 목록 불러오는데 실패했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
     };
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getDashboardMemberList({ size: 6, dashboardId });
-        const members = res.data.members.filter(
-          (member: getDashboardMemberListType) => !member.isOwner
-        );
-
-        setMemberList(members);
-      } catch (error) {
-        addToast("대시보드 멤버 목록 불러오는데 실패했습니다.");
-      }
-    };
-    fetchData();
-  }, []);
+  }, [dashboardId, isOpen]);
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
+      start(key);
       await deleteInviteDashboard({
         dashboardId,
         invitationId,
       });
-      setInviteUserList((prev) =>
-        prev.filter((user) => user.invitationId !== invitationId)
-      );
+      removeSentInvite(invitationId);
+      addToast("초대 취소에 성공했습니다.", "success");
     } catch (error) {
-      addToast("초대 취소에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "초대 취소에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
+    }
+  };
+
+  const handleDeleteMemberList = async (memberId: number) => {
+    try {
+      start(key);
+      await deleteDashboardMember({ memberId });
+      removeDashboardMember(dashboardId, memberId);
+      addToast("대시보드 멤버 삭제에 성공했습니다.", "success");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        addToast(
+          error.response?.data.message || "대시보드 멤버 삭제에 실패했습니다."
+        );
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
@@ -118,6 +152,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
             <InviteButton
               className="hidden md:flex md:h-full md:w-[105px]"
               onClick={() => setIsOpen(true)}
+              isLoading={isLoading}
             />
           )}
         </div>
@@ -135,6 +170,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
           <InviteButton
             className="flex md:hidden"
             onClick={() => setIsOpen(true)}
+            isLoading={isLoading}
           />
         )}
       </div>
@@ -153,10 +189,16 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
                   </span>
                 </div>
 
-                <ActionButton className="md:text-md">삭제</ActionButton>
+                <ActionButton
+                  className="md:text-md"
+                  onClick={() => handleDeleteMemberList(member.id)}
+                  disabled={isLoading}
+                >
+                  삭제
+                </ActionButton>
               </div>
             ))
-          : inviteUserList.map((user) => (
+          : sentInvites.map((user) => (
               <div
                 key={user.invitationId}
                 className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE"
@@ -167,6 +209,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
                 <ActionButton
                   className="md:text-md"
                   onClick={() => handleCancelInvitation(user.invitationId)}
+                  disabled={isLoading}
                 >
                   취소
                 </ActionButton>

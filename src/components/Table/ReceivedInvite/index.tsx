@@ -7,13 +7,19 @@ import { DashboardButton } from "@/components/common/Button/DashboardButton";
 import { useEffect, useState } from "react";
 import { getInvitationList, putInvitationAnswer } from "@/lib/api/invitations";
 import { useToastStore } from "@/lib/stores/toast";
-import { getInvitationType, putInvitationAnswerType } from "@/types/invitation";
+import { getInvitationType, putInvitationAnswerType } from "@/types/invite";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { useInviteStore } from "@/lib/stores/invite";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/common/Spinner";
 
 type MobileInviteListProps = {
   name: string;
   invite: string;
   id: number;
   onRespond: (invitationId: number, accepted: boolean) => void;
+  isLoading: boolean;
 };
 
 function MobileInviteList({
@@ -21,6 +27,7 @@ function MobileInviteList({
   invite,
   id,
   onRespond,
+  isLoading,
 }: MobileInviteListProps) {
   return (
     <li className="px-[16px] py-[14px] border-b border-gray_EEEEEE">
@@ -40,31 +47,60 @@ function MobileInviteList({
       </dl>
 
       <div className="flex gap-x-[10px] mt-[14px]">
-        <DashboardButton mode="accept" onClick={() => onRespond(id, true)} />
-        <DashboardButton mode="deny" onClick={() => onRespond(id, false)} />
+        <DashboardButton
+          mode="accept"
+          onClick={() => onRespond(id, true)}
+          isLoading={isLoading}
+        />
+        <DashboardButton
+          mode="deny"
+          onClick={() => onRespond(id, false)}
+          isLoading={isLoading}
+        />
       </div>
     </li>
   );
 }
 
 export function ReceivedInviteTable() {
-  const [value, setValue] = useState("");
+  const key = "ReceivedInviteTable";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? true);
+  const receivedInvites = useInviteStore((state) => state.receivedInvites);
+  const setReceivedInvites = useInviteStore(
+    (state) => state.setReceivedInvites
+  );
+  const removeReceivedInvite = useInviteStore(
+    (state) => state.removeReceivedInvite
+  );
   const addToast = useToastStore.getState().addToast;
-  const [invitedList, setInvitedList] = useState<getInvitationType[]>([]);
+  const router = useRouter();
+  const [value, setValue] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        start(key);
         const res = await getInvitationList({ size: 6 });
-        setInvitedList(res.data.invitations);
+        setReceivedInvites(res.data.invitations);
       } catch (error) {
-        addToast("초대받은 목록을 불러오는데 실패했습니다.");
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "초대받은 목록을 불러오는데 실패했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
     };
     fetchData();
   }, []);
 
-  const filteredList = invitedList.filter((item) =>
+  const filteredList = receivedInvites.filter((item) =>
     item.inviter.nickname.includes(value)
   );
 
@@ -73,17 +109,31 @@ export function ReceivedInviteTable() {
     inviteAccepted: boolean
   ) => {
     try {
-      await putInvitationAnswer({ invitationId, inviteAccepted });
-      setInvitedList((prev) => prev.filter((item) => item.id !== invitationId));
+      start(key);
+      const res = await putInvitationAnswer({ invitationId, inviteAccepted });
+      removeReceivedInvite(invitationId);
+      if (inviteAccepted) {
+        const dashboardId = res.data.dashboard.id;
+        if (dashboardId) {
+          router.push(`/dashboard/${dashboardId}`);
+        }
+      }
+      addToast("초대 응답에 성공했습니다.", "success");
     } catch (error) {
-      addToast("초대 응답에 실패했습니다.");
+      if (isAxiosError(error)) {
+        addToast(error.response?.data.message || "초대 응답에 실패했습니다.");
+      } else {
+        addToast("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      stop(key);
     }
   };
 
   return (
     <section
       className={`flex flex-col bg-white_FFFFFF rounded-[16px] ${
-        invitedList.length === 0
+        receivedInvites.length === 0
           ? "gap-y-[100px] md:gap-y-[60px] px-[20px] pt-[24px] pb-[80px] md:px-[40px]"
           : "px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] md:px-[28px] gap-y-[13px] md:gap-y-[24px]"
       }`}
@@ -92,7 +142,7 @@ export function ReceivedInviteTable() {
         <h1 className="text-lg text-black-333236 font-bold md:text-xl">
           초대받은 대시보드
         </h1>
-        {invitedList.length > 0 && (
+        {receivedInvites.length > 0 && (
           <form className="relative" role="search">
             <input
               type="search"
@@ -110,7 +160,11 @@ export function ReceivedInviteTable() {
         )}
       </header>
 
-      {invitedList.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center pt-[30px]">
+          <Spinner />
+        </div>
+      ) : receivedInvites.length === 0 ? (
         <div className="flex flex-col items-center gap-y-[16px] md:gap-y-[24px]">
           <Image
             src={emptyDashboard}
@@ -132,6 +186,7 @@ export function ReceivedInviteTable() {
                 invite={inviter.nickname}
                 id={id}
                 onRespond={handlePutInvitation}
+                isLoading={isLoading}
               />
             ))}
           </ul>
@@ -158,10 +213,12 @@ export function ReceivedInviteTable() {
                     <DashboardButton
                       mode="accept"
                       onClick={() => handlePutInvitation(id, true)}
+                      isLoading={isLoading}
                     />
                     <DashboardButton
                       mode="deny"
                       onClick={() => handlePutInvitation(id, false)}
+                      isLoading={isLoading}
                     />
                   </div>
                 </li>
