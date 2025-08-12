@@ -31,6 +31,7 @@ export function DeleteColumnModal({
       await deleteColumn({ columnId });
       removeColumn(dashboardId, columnId);
       onClose();
+      addToast("컬럼 삭제에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "컬럼 삭제에 실패했습니다.");

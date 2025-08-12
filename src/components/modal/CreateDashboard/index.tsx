@@ -32,6 +32,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
       onClose();
       setTitle("");
       setColor("");
+      addToast("대시보드 생성에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(

@@ -37,6 +37,7 @@ export function EditColumnModal({
       updateColumn(dashboardId, res.data.id, res.data.title);
       onClose();
       setValue("");
+      addToast("컬럼 수정에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");

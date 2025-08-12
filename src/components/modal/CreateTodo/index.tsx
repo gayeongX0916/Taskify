@@ -57,6 +57,7 @@ export function CreateTodoModal({
       const res = await postCard(payload);
       addCard(dashboardId, columnId, res.data);
       onClose();
+      addToast("카드 생성에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "카드 생성에 실패했습니다.");
