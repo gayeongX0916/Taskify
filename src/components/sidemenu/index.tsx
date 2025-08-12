@@ -6,37 +6,38 @@ import logoPurple from "@/assets/logo_purple.svg";
 import addBoxIcon from "@/assets/add_box.svg";
 import crownIcon from "@/assets/crown.svg";
 import { PaginationButton } from "../common/Button/PaginationButton";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { CreateDashboardModal } from "../Modal/CreateDashboard";
 import { useEffect, useState } from "react";
-import { getDashboardList } from "@/lib/api/dashboards";
 import { dashboardColoMap } from "@/lib/utils/dashboardColor";
-import { getDashboardListType } from "@/types/dashboards";
+import { useDashboardStore } from "@/lib/stores/dashboard";
 
 export function SideMenu() {
-  const [dashboardList, setDashboardList] = useState<getDashboardListType[]>(
-    []
-  );
+  const { dashboardId } = useParams();
+  const dashboardIdNum = Number(dashboardId);
+  const dashboardList = useDashboardStore((state) => state.dashboardsById);
+  const dashboardArray = Object.values(dashboardList);
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getDashboardList();
-        setDashboardList(res.data.dashboards);
-      } catch (error: any) {
-        setError("대시보드를 불러오는 중 오류가 발생했습니다.");
-      }
-    };
-    fetchData();
-  }, []);
+    if (dashboardIdNum) {
+      setSelectedId(dashboardIdNum);
+    } else {
+      setSelectedId(null);
+    }
+  }, [dashboardIdNum]);
 
   if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
     return null;
   }
+
+  const handleClickDashboard = (id: number) => {
+    router.push(`/dashboard/${id}`);
+    setSelectedId(id);
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
@@ -58,9 +59,15 @@ export function SideMenu() {
           </button>
         </div>
         <ul className="flex flex-col items-center md:gap-y-[8px] md:items-start gap-y-[6px] md:w-full">
-          {dashboardList.map(({ title, color, createdByMe }) => (
-            <li key={title} className="md:w-full">
-              <button className="flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px]  md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px]">
+          {dashboardArray.map(({ id, title, color, createdByMe }) => (
+            <li key={id} className="md:w-full">
+              <button
+                className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
+                  (id === selectedId || dashboardIdNum === id) &&
+                  "bg-violet_8P rounded-[4px]"
+                }`}
+                onClick={() => handleClickDashboard(id)}
+              >
                 <div
                   className={`${dashboardColoMap[color]} rounded-full w-[8px] h-[8px]`}
                 ></div>

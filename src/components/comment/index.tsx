@@ -42,6 +42,7 @@ export function Comment({
       await putComment({ commentId, content: value });
       updateComment(cardId, commentId, value);
       setIsEditing(false);
+      addToast("댓글 수정에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "댓글 수정에 실패했습니다");
@@ -58,6 +59,7 @@ export function Comment({
       start(key);
       await deleteComment({ commentId });
       removeComment(cardId, commentId);
+      addToast("댓글 삭제에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "댓글 삭제에 실패했습니다");

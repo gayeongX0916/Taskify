@@ -5,7 +5,7 @@ import { EditDashboardCard } from "@/components/Card/EditDashboard";
 import { MemberOrInviteTable } from "@/components/Table/MemberOrInvite";
 import { AddButton } from "@/components/common/Button/AddButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
-import { deleteDashboard, getInviteDashboard } from "@/lib/api/dashboards";
+import { deleteDashboard} from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { BackButton } from "@/components/common/Button/BackButton";
