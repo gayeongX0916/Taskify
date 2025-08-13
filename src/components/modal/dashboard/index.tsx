@@ -173,9 +173,7 @@ export function DashBoardModal({
                   {card.description}
                 </p>
 
-                {card.imageUrl === null ? (
-                  <div className="hidden"></div>
-                ) : (
+                {card.imageUrl && (
                   <Image
                     src={card.imageUrl}
                     alt="예시"

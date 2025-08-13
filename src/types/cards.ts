@@ -3,7 +3,7 @@ export interface BaseCardType {
   columnId: number;
   title: string;
   description: string;
-  dueDate: string;
+  dueDate:string;
   tags: string[];
   imageUrl?: string;
 }
@@ -29,12 +29,12 @@ export interface getCardType {
   dueDate: string;
   tags: string[];
   imageUrl?: string;
-  createdAt:string;
-  updatedAt:string;
+  createdAt: string;
+  updatedAt: string;
   assignee: {
     profileImageUrl: string;
     nickname: string;
     id: number;
   };
-  dashboardId:number;
+  dashboardId: number;
 }

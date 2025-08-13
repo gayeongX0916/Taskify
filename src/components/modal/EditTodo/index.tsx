@@ -14,16 +14,23 @@ import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
 import { putCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { BaseCardType, getCardType } from "@/types/cards";
-import { getColumnList } from "@/lib/api/columns";
-import { useParams } from "next/navigation";
-import { getColumnListType } from "@/types/columns";
-import { formatDate } from "@/lib/utils/formatDate";
+import { useParams } from "next/navigation";;
+import { formatDateTime } from "@/lib/utils/formatDate";
 import { useCardStore } from "@/lib/stores/card";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { Spinner } from "@/components/common/Spinner";
+
+interface EditCardFormValues {
+  columnId: number;
+  title: string;
+  description: string;
+  dueDate: Date | null;
+  tags: string[];
+  imageUrl?: string;
+  assigneeUserId: number;
+}
 
 interface EditTodoModalProps extends ModalProps {
   cardId: number;
@@ -52,11 +59,27 @@ export function EditTodoModal({
   );
   const card = cardList.find((c) => c.id === cardId);
   const updateCard = useCardStore((state) => state.updateCard);
-  const [values, setValues] = useState<getCardType>();
+  const [values, setValues] = useState<EditCardFormValues>({
+    columnId,
+    title: "",
+    description: "",
+    dueDate: null,
+    tags: [],
+    imageUrl: "",
+    assigneeUserId: 0,
+  });
 
   useEffect(() => {
     if (card) {
-      setValues(card);
+      setValues({
+        columnId: card.columnId,
+        title: card.title,
+        description: card.description,
+        dueDate: card.dueDate ? new Date(card.dueDate) : null,
+        tags: card.tags,
+        imageUrl: card.imageUrl || "",
+        assigneeUserId: card.assignee.id,
+      });
     }
   }, [card]);
 
@@ -69,18 +92,29 @@ export function EditTodoModal({
       </div>
     );
 
-  const handleEditTodo = async (data: getCardType) => {
+  const handleEditTodo = async (data: EditCardFormValues) => {
     try {
       start(key);
-      const payload = { ...data };
+      const payload = {
+        ...data,
+        dueDate: data.dueDate ? formatDateTime(data.dueDate) : "",
+      };
       if (!payload.imageUrl?.trim()) {
         delete payload.imageUrl;
       }
-      const { id, ...restPayload } = payload;
-      const res = await putCard({ id: cardId, ...restPayload });
-      updateCard(dashboardIdNum, columnId, res.data);
+      const res = await putCard({ id: cardId, ...payload });
+      updateCard(dashboardIdNum, payload.columnId, res.data);
       onClose();
       addToast("컬럼 수정에 성공했습니다.", "success");
+      setValues({
+        columnId,
+        title: "",
+        description: "",
+        dueDate: null,
+        tags: [],
+        imageUrl: "",
+        assigneeUserId: 0,
+      });
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
@@ -115,12 +149,9 @@ export function EditTodoModal({
               <div className="flex flex-col gap-y-[8px] w-full md:w-[256px]">
                 <span className="text-lg text-black_333236">담당자</span>
                 <AssigneeDropdown
-                  initialUserId={values.assignee.id}
+                  initialUserId={values.assigneeUserId}
                   onSelect={(userId) =>
-                    setValues({
-                      ...values,
-                      assignee: { ...values.assignee, id: userId },
-                    })
+                    setValues({ ...values, assigneeUserId: userId })
                   }
                 />
               </div>
@@ -142,13 +173,8 @@ export function EditTodoModal({
             <DateInput
               label="마감일 *"
               placeholder="날짜를 입력해 주세요"
-              value={values.dueDate ? new Date(values.dueDate) : null}
-              onChange={(date) =>
-                setValues({
-                  ...values,
-                  dueDate: formatDate(date),
-                })
-              }
+              value={values.dueDate}
+              onChange={(date) => setValues({ ...values, dueDate: date })}
             />
             <TagInput
               label="태그"
