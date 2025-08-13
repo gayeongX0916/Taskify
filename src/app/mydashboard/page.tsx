@@ -22,7 +22,6 @@ const mydashboardPage = () => {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const dashboardList = useDashboardStore((state) => state.dashboardsById);
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const [dashboards, setDashboards] = useState<getDashboardListType[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,47 +29,33 @@ const mydashboardPage = () => {
   const totalPages = Math.ceil(totalCount / 5);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 5;
-  const filledArray = [
-    ...dashboards,
-    ...Array.from({ length: PAGE_SIZE - dashboards.length }).map((_, i) => ({
-      id: `empty-${i}`,
-      isEmpty: true,
-    })),
-  ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         start(key);
-        const res = await getDashboardList({ page: page, size: PAGE_SIZE });
+        const res = await getDashboardList({ page, size: PAGE_SIZE });
         setDashboardList(res.data.dashboards);
+        setDashboards(res.data.dashboards);
         setTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error)) {
           addToast(
-            error.response?.data.message ||
-              "대시보드 목록을 불러오는데 실패했습니다."
+            error.response?.data.message || "대시보드 목록 불러오기 실패"
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          addToast("알 수 없는 오류 발생");
         }
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [page]);
+  }, [page, isOpen]);
 
-  useEffect(() => {
-    const pageDashboards = Object.values(dashboardList)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    setDashboards(pageDashboards);
-  }, [page, dashboardList]);
+  const filledArray = Array.from({ length: PAGE_SIZE }).map(
+    (_, i) => dashboards[i] || { id: `empty-${i}`, isEmpty: true }
+  );
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -84,23 +69,19 @@ const mydashboardPage = () => {
               onClick={() => setIsOpen(true)}
               disabled={isLoading}
             />
-            {isLoading
-              ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                  <Skeleton className="w-full h-[61px] lg:h-[70px]" key={i} />
-                ))
-              : filledArray.map(({ id, isEmpty }) =>
-                  isEmpty ? (
-                    <div key={id} className="w-full h-[61px] lg:h-[70px]"></div>
-                  ) : (
-                    <div
-                      key={id}
-                      onClick={() => router.push(`/dashboard/${id}`)}
-                    >
-                      <DashboardNameCard dashboardId={Number(id)} />
-                    </div>
-                  )
+
+            {filledArray.map(({ id, isEmpty }) => (
+              <div key={id} className="relative w-full h-[61px] lg:h-[70px]">
+                {!isEmpty && (
+                  <div onClick={() => router.push(`/dashboard/${id}`)}>
+                    <DashboardNameCard dashboardId={Number(id)} />
+                  </div>
                 )}
+                {isLoading && <Skeleton className="absolute inset-0" />}
+              </div>
+            ))}
           </div>
+
           {totalCount > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
               <span className="text-xs text-black_333236 md:text-md">
@@ -109,7 +90,7 @@ const mydashboardPage = () => {
               <PaginationButton
                 currentPage={page}
                 totalPages={totalPages}
-                onPageChange={(newPage) => setPage(newPage)}
+                onPageChange={setPage}
               />
             </div>
           )}

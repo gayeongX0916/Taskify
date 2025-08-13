@@ -10,7 +10,6 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { CreateDashboardModal } from "../Modal/CreateDashboard";
 import { useEffect, useState } from "react";
 import { dashboardColoMap } from "@/lib/utils/dashboardColor";
-import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
@@ -35,47 +34,37 @@ export function SideMenu() {
   const totalPages = Math.ceil(totalCount / 10);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
-  const dashboardList = useDashboardStore((state) => state.dashboardsById);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         start(key);
-        const res = await getDashboardList({ page: page, size: PAGE_SIZE });
+        const res = await getDashboardList({ page, size: PAGE_SIZE });
         setDashboards(res.data.dashboards);
         setTotalCount(res.data.totalCount);
       } catch (error) {
-        if (isAxiosError(error)) {
-          addToast(
-            error.response?.data.message ||
-              "대시보드 목록을 불러오는데 실패했습니다."
-          );
-        } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
-        }
+        if (isAxiosError(error))
+          addToast(error.response?.data.message || "대시보드 목록 실패");
+        else addToast("알 수 없는 오류 발생");
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [page, dashboardList]);
+  }, [page, isOpen]);
 
-  useEffect(() => {
-    if (dashboardIdNum) {
-      setSelectedId(dashboardIdNum);
+  useEffect(() => setSelectedId(dashboardIdNum || null), [dashboardIdNum]);
+
+  if (["/login", "/signup", "/"].includes(pathname)) return null;
+
+  const filledArray = Array.from({ length: PAGE_SIZE }).map((_, i) => {
+    const dashboard = dashboards[i];
+    if (dashboard) {
+      return { ...dashboard, isEmpty: false };
     } else {
-      setSelectedId(null);
+      return { id: `empty-${i}`, isEmpty: true };
     }
-  }, [dashboardIdNum]);
-
-  if (pathname === "/login" || pathname === "/signup" || pathname === "/") {
-    return null;
-  }
-
-  const handleClickDashboard = (id: number) => {
-    router.push(`/dashboard/${id}`);
-    setSelectedId(id);
-  };
+  });
 
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
@@ -87,6 +76,7 @@ export function SideMenu() {
         <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
         <Image src={logoPurple} alt="모바일 로고" className="flex md:hidden" />
       </header>
+
       <section className="flex flex-col gap-y-[22px] md:gap-y-[16px] mb-[32px]">
         <div className="flex justify-center md:justify-between md:items-center">
           <span className="hidden md:block md:text-xs md:text-gray_787486 md:font-semibold">
@@ -96,40 +86,49 @@ export function SideMenu() {
             <Image src={addBoxIcon} alt="추가" width={20} height={20} />
           </button>
         </div>
+
         <ul className="flex flex-col items-center md:gap-y-[8px] md:items-start gap-y-[6px] md:w-full">
-          {isLoading
-            ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <Skeleton className="w-[40px] h-[40px] md:w-full" key={i} />
-              ))
-            : dashboards.map(({ id, title, color, createdByMe }) => (
-                <li key={id} className="md:w-full">
-                  <button
-                    className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
-                      (id === selectedId || dashboardIdNum === id) &&
-                      "bg-violet_8P rounded-[4px]"
-                    }`}
-                    onClick={() => handleClickDashboard(id)}
-                    disabled={isLoading}
-                  >
-                    <div
-                      className={`${dashboardColoMap[color]} rounded-full w-[8px] h-[8px]`}
-                    ></div>
-                    <div className="hidden md:flex md:gap-x-[6px]">
-                      <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
-                        {title}
-                      </span>
-                      {createdByMe && <Image src={crownIcon} alt="주인" />}
-                    </div>
-                  </button>
-                </li>
-              ))}
+          {filledArray.map(({ id, isEmpty }, i) => (
+            <li key={id} className="md:w-full relative">
+              {!isEmpty ? (
+                <button
+                  className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
+                    id === selectedId ? "bg-violet_8P rounded-[4px]" : ""
+                  }`}
+                  onClick={() => {
+                    router.push(`/dashboard/${id}`);
+                    setSelectedId(Number(id));
+                  }}
+                  disabled={isLoading}
+                >
+                  <div
+                    className={`${
+                      dashboardColoMap[dashboards[i].color]
+                    } rounded-full w-[8px] h-[8px]`}
+                  />
+                  <div className="hidden md:flex md:gap-x-[6px]">
+                    <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
+                      {dashboards[i].title}
+                    </span>
+                    {dashboards[i].createdByMe && (
+                      <Image src={crownIcon} alt="주인" />
+                    )}
+                  </div>
+                </button>
+              ) : (
+                <div className="w-full h-[40px]" />
+              )}
+              {isLoading && <Skeleton className="absolute inset-0" />}
+            </li>
+          ))}
         </ul>
       </section>
+
       <div className="hidden md:flex">
         <PaginationButton
           currentPage={page}
           totalPages={totalPages}
-          onPageChange={(newPage) => setPage(newPage)}
+          onPageChange={setPage}
         />
       </div>
     </nav>
