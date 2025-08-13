@@ -25,14 +25,28 @@ const mydashboardPage = () => {
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
   const dashboardArray = Object.values(dashboardList);
   const [isOpen, setIsOpen] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / 5);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 5;
+  const filledArray = [
+    ...dashboardArray,
+    ...Array.from({ length: PAGE_SIZE - dashboardArray.length }).map(
+      (_, i) => ({
+        id: `empty-${i}`,
+        isEmpty: true,
+      })
+    ),
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         start(key);
-        const res = await getDashboardList();
+        const res = await getDashboardList({ page: page });
         setDashboardList(res.data.dashboards);
-      } catch (error: any) {
+        setTotalCount(res.data.totalCount);
+      } catch (error) {
         if (isAxiosError(error)) {
           addToast(
             error.response?.data.message ||
@@ -46,7 +60,7 @@ const mydashboardPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [page]);
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -56,26 +70,37 @@ const mydashboardPage = () => {
           <div className="flex flex-col gap-y-[8px] md:grid md:grid-cols-2 md:gap-[10px] lg:grid-cols-3 lg:gap-[12px]">
             <AddButton
               mode="dashboard"
-              className="w-full h-[70px]"
+              className="w-full h-[61px] lg:h-[70px]"
               onClick={() => setIsOpen(true)}
               disabled={isLoading}
             />
             {isLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton className="w-full h-[70px]" key={i} />
+              ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                  <Skeleton className="w-full h-[61px] lg:h-[70px]" key={i} />
                 ))
-              : dashboardArray.map(({ id }) => (
-                  <div key={id} onClick={() => router.push(`/dashboard/${id}`)}>
-                    <DashboardNameCard dashboardId={id} />
-                  </div>
-                ))}
+              : filledArray.map(({ id, isEmpty }) =>
+                  isEmpty ? (
+                    <div key={id} className="w-full h-[61px] lg:h-[70px]"></div>
+                  ) : (
+                    <div
+                      key={id}
+                      onClick={() => router.push(`/dashboard/${id}`)}
+                    >
+                      <DashboardNameCard dashboardId={Number(id)} />
+                    </div>
+                  )
+                )}
           </div>
           {dashboardArray.length > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
               <span className="text-xs text-black_333236 md:text-md">
-                1 페이지 중 1
+                {totalPages} 페이지 중 {page}
               </span>
-              <PaginationButton />
+              <PaginationButton
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={(newPage) => setPage(newPage)}
+              />
             </div>
           )}
         </div>
