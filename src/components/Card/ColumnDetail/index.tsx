@@ -58,18 +58,14 @@ export function ColumnDetailCard({
           : "pt-[5px] md:py-[14px] lg:py-[16px]"
       } `}
     >
-      {card.imageUrl === null ? (
-        <div className="hidden"></div>
-      ) : (
-        <div className="flex justify-center items-center">
-          <Image
-            src={card.imageUrl}
-            alt="예시"
-            width={260}
-            height={150}
-            className="md:w-[90px] md:h-[53px] lg:w-[274px] lg:h-[160px]"
-          />
-        </div>
+      {card.imageUrl && (
+        <Image
+          src={card.imageUrl}
+          alt="예시"
+          width={290}
+          height={168}
+          className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
+        />
       )}
 
       <section className="flex flex-col gap-y-[6px] md:gap-y-[10px] md:flex-[9]">
