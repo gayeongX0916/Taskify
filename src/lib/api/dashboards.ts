@@ -11,8 +11,14 @@ export const postDashboard = (data: postDashboardType) =>
   api.post("/dashboards", data);
 
 // 대시보드 목록 조회
-export const getDashboardList = ({ page }: { page: number }) =>
-  api.get(`/dashboards?navigationMethod=pagination&page=${page}&size=5`);
+export const getDashboardList = ({
+  page,
+  size,
+}: {
+  page: number;
+  size: number;
+}) =>
+  api.get(`/dashboards?navigationMethod=pagination&page=${page}&size=${size}`);
 
 // 대시보드 상세 조회
 export const getDashboardDetail = ({ dashboardId }: { dashboardId: number }) =>
