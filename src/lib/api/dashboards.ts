@@ -11,8 +11,8 @@ export const postDashboard = (data: postDashboardType) =>
   api.post("/dashboards", data);
 
 // 대시보드 목록 조회
-export const getDashboardList = () =>
-  api.get(`/dashboards?navigationMethod=pagination&page=1&size=6`);
+export const getDashboardList = ({ page }: { page: number }) =>
+  api.get(`/dashboards?navigationMethod=pagination&page=${page}&size=5`);
 
 // 대시보드 상세 조회
 export const getDashboardDetail = ({ dashboardId }: { dashboardId: number }) =>
@@ -31,7 +31,7 @@ export const postInviteDashboard = ({
   dashboardId,
   email,
 }: postInviteDashboardType) =>
-  api.post(`/dashboards/${dashboardId}/invitations`, {email});
+  api.post(`/dashboards/${dashboardId}/invitations`, { email });
 
 // 대시보드 초대 불러오기
 export const getInviteDashboard = ({
