@@ -1,4 +1,5 @@
 import { Avatar } from "@/components/common/Avatar";
+import { formatDateTime } from "@/lib/utils/formatDate";
 
 type AssigneeCardProps = {
   name: string;
@@ -21,7 +22,9 @@ export function AssigneeCard({ name, date }: AssigneeCardProps) {
 
       <div className="flex flex-col gap-y-[8px] md:gap-y-[6px]">
         <span className="text-xs font-semibold">마감일</span>
-        <span className="text-xs md:text-md text-black_333236">{date}</span>
+        <span className="text-xs md:text-md text-black_333236">
+          {formatDateTime(new Date(date))}
+        </span>
       </div>
     </section>
   );
