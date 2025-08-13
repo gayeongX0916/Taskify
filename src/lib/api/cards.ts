@@ -1,4 +1,5 @@
 import {
+  BaseCardType,
   getCardListType,
   getCardType,
   postCardType,
@@ -14,7 +15,7 @@ export const getCardList = ({ size, columnId }: getCardListType) =>
   api.get(`/cards?size=${size}&columnId=${columnId}`);
 
 // 카드 수정
-export const putCard = ({ id, ...data }: getCardType) =>
+export const putCard = ({ id, ...data }: { id: number } & BaseCardType) =>
   api.put(`/cards/${id}`, data);
 
 // 카드 상세 조회
