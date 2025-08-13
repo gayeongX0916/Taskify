@@ -7,4 +7,5 @@ export interface getDashboardMemberListType {
   updatedAt: string;
   isOwner: boolean;
   userId: number;
+  isEmpty?: boolean;
 }

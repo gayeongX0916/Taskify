@@ -25,7 +25,8 @@ export interface getInvitationType {
   updatedAt: string;
 }
 
-export interface InviteUser{
-  email:string;
-  invitationId:number;
+export interface InviteUser {
+  email: string;
+  invitationId: number;
+  isEmpty?: string;
 }

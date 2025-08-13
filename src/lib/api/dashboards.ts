@@ -43,10 +43,12 @@ export const postInviteDashboard = ({
 export const getInviteDashboard = ({
   dashboardId,
   size,
+  page,
 }: {
   dashboardId: number;
   size: number;
-}) => api.get(`/dashboards/${dashboardId}/invitations?page=1&size=${size}`);
+  page?:number;
+}) => api.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
 
 // 대시보드 초대 취소
 export const deleteInviteDashboard = ({
