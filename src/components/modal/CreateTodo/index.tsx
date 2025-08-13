@@ -10,13 +10,23 @@ import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
 import { ModalProps } from "@/types/ModalProps";
-import { postCardType } from "@/types/cards";
 import { postCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
-import { formatDate } from "@/lib/utils/formatDate";
+import { formatDateTime } from "@/lib/utils/formatDate";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+
+interface postCardFormValues {
+  assigneeUserId: number;
+  columnId: number;
+  dashboardId: number;
+  title: string;
+  description: string;
+  dueDate: Date | null;
+  tags: string[];
+  imageUrl?: string;
+}
 
 interface CreateTodoModalProps extends ModalProps {
   columnId: number;
@@ -35,29 +45,34 @@ export function CreateTodoModal({
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
   const addCard = useCardStore((state) => state.addCard);
-  const [values, setValues] = useState<postCardType>({
+  const initialValues: postCardFormValues = {
     assigneeUserId: 0,
     columnId: columnId,
     dashboardId: dashboardId,
     title: "",
     description: "",
-    dueDate: "",
+    dueDate: null,
     tags: [],
     imageUrl: "",
-  });
+  };
+  const [values, setValues] = useState<postCardFormValues>(initialValues);
 
-  const handlePostCard = async (data: postCardType) => {
+  const handlePostCard = async () => {
     try {
       start(key);
-      const payload = { ...data };
+      const payload = {
+        ...values,
+        dueDate: values.dueDate ? formatDateTime(values.dueDate) : "",
+      };
 
       if (!payload.imageUrl || payload.imageUrl.trim() === "") {
         delete payload.imageUrl;
       }
-      const res = await postCard(payload);
+      const res = await postCard({ ...payload });
       addCard(dashboardId, columnId, res.data);
       onClose();
       addToast("카드 생성에 성공했습니다.", "success");
+      setValues(initialValues);
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "카드 생성에 실패했습니다.");
@@ -103,13 +118,8 @@ export function CreateTodoModal({
             <DateInput
               label="마감일 *"
               placeholder="날짜를 입력해 주세요"
-              value={values.dueDate ? new Date(values.dueDate) : null}
-              onChange={(date) =>
-                setValues({
-                  ...values,
-                  dueDate: formatDate(date),
-                })
-              }
+              value={values.dueDate}
+              onChange={(date) => setValues({ ...values, dueDate: date })}
             />
             <TagInput
               label="태그"
@@ -130,7 +140,7 @@ export function CreateTodoModal({
             </ModalButton>
             <ModalButton
               mode="any"
-              onClick={() => handlePostCard(values)}
+              onClick={handlePostCard}
               disabled={isLoading}
             >
               {isLoading ? "생성 중..." : "생성"}
