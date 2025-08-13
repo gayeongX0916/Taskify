@@ -11,16 +11,54 @@ import { CreateDashboardModal } from "../Modal/CreateDashboard";
 import { useEffect, useState } from "react";
 import { dashboardColoMap } from "@/lib/utils/dashboardColor";
 import { useDashboardStore } from "@/lib/stores/dashboard";
+import { getDashboardList } from "@/lib/api/dashboards";
+import { useLoadingStore } from "@/lib/stores/loading";
+import { isAxiosError } from "axios";
+import { useToastStore } from "@/lib/stores/toast";
+import { getDashboardListType } from "@/types/dashboards";
+import { Skeleton } from "../common/Skeleton";
 
 export function SideMenu() {
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-  const dashboardList = useDashboardStore((state) => state.dashboardsById);
-  const dashboardArray = Object.values(dashboardList);
+  const addToast = useToastStore.getState().addToast;
+  const key = "SideMenu";
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [dashboards, setDashboards] = useState<getDashboardListType[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / 10);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
+  const dashboardList = useDashboardStore((state) => state.dashboardsById);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        start(key);
+        const res = await getDashboardList({ page: page, size: PAGE_SIZE });
+        setDashboards(res.data.dashboards);
+        setTotalCount(res.data.totalCount);
+      } catch (error) {
+        if (isAxiosError(error)) {
+          addToast(
+            error.response?.data.message ||
+              "대시보드 목록을 불러오는데 실패했습니다."
+          );
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
+      }
+    };
+    fetchData();
+  }, [page, dashboardList]);
 
   useEffect(() => {
     if (dashboardIdNum) {
@@ -59,31 +97,40 @@ export function SideMenu() {
           </button>
         </div>
         <ul className="flex flex-col items-center md:gap-y-[8px] md:items-start gap-y-[6px] md:w-full">
-          {dashboardArray.map(({ id, title, color, createdByMe }) => (
-            <li key={id} className="md:w-full">
-              <button
-                className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
-                  (id === selectedId || dashboardIdNum === id) &&
-                  "bg-violet_8P rounded-[4px]"
-                }`}
-                onClick={() => handleClickDashboard(id)}
-              >
-                <div
-                  className={`${dashboardColoMap[color]} rounded-full w-[8px] h-[8px]`}
-                ></div>
-                <div className="hidden md:flex md:gap-x-[6px]">
-                  <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
-                    {title}
-                  </span>
-                  {createdByMe && <Image src={crownIcon} alt="주인" />}
-                </div>
-              </button>
-            </li>
-          ))}
+          {isLoading
+            ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                <Skeleton className="w-[40px] h-[40px] md:w-full" key={i} />
+              ))
+            : dashboards.map(({ id, title, color, createdByMe }) => (
+                <li key={id} className="md:w-full">
+                  <button
+                    className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
+                      (id === selectedId || dashboardIdNum === id) &&
+                      "bg-violet_8P rounded-[4px]"
+                    }`}
+                    onClick={() => handleClickDashboard(id)}
+                    disabled={isLoading}
+                  >
+                    <div
+                      className={`${dashboardColoMap[color]} rounded-full w-[8px] h-[8px]`}
+                    ></div>
+                    <div className="hidden md:flex md:gap-x-[6px]">
+                      <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
+                        {title}
+                      </span>
+                      {createdByMe && <Image src={crownIcon} alt="주인" />}
+                    </div>
+                  </button>
+                </li>
+              ))}
         </ul>
       </section>
       <div className="hidden md:flex">
-        <PaginationButton />
+        <PaginationButton
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
       </div>
     </nav>
   );

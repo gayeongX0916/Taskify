@@ -10,6 +10,7 @@ import { getDashboardList } from "@/lib/api/dashboards";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
+import { getDashboardListType } from "@/types/dashboards";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,27 +24,25 @@ const mydashboardPage = () => {
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const dashboardList = useDashboardStore((state) => state.dashboardsById);
   const setDashboardList = useDashboardStore((state) => state.setDashboardList);
-  const dashboardArray = Object.values(dashboardList);
+  const [dashboards, setDashboards] = useState<getDashboardListType[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const totalPages = Math.ceil(totalCount / 5);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 5;
   const filledArray = [
-    ...dashboardArray,
-    ...Array.from({ length: PAGE_SIZE - dashboardArray.length }).map(
-      (_, i) => ({
-        id: `empty-${i}`,
-        isEmpty: true,
-      })
-    ),
+    ...dashboards,
+    ...Array.from({ length: PAGE_SIZE - dashboards.length }).map((_, i) => ({
+      id: `empty-${i}`,
+      isEmpty: true,
+    })),
   ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         start(key);
-        const res = await getDashboardList({ page: page });
+        const res = await getDashboardList({ page: page, size: PAGE_SIZE });
         setDashboardList(res.data.dashboards);
         setTotalCount(res.data.totalCount);
       } catch (error) {
@@ -61,6 +60,17 @@ const mydashboardPage = () => {
     };
     fetchData();
   }, [page]);
+
+  useEffect(() => {
+    const pageDashboards = Object.values(dashboardList)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    setDashboards(pageDashboards);
+  }, [page, dashboardList]);
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -91,7 +101,7 @@ const mydashboardPage = () => {
                   )
                 )}
           </div>
-          {dashboardArray.length > 0 && (
+          {totalCount > 0 && (
             <div className="flex items-center justify-end gap-x-[16px]">
               <span className="text-xs text-black_333236 md:text-md">
                 {totalPages} 페이지 중 {page}
