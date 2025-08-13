@@ -23,46 +23,12 @@ export function AssigneeDropdown({
 }: AssigneeDropdownProps) {
   const { dashboardId } = useParams();
   const dashboardNum = Number(dashboardId);
-  const addToast = useToastStore.getState().addToast;
-  const key = "AssigneeDropdown";
-  const start = useLoadingStore((s) => s.startLoading);
-  const stop = useLoadingStore((s) => s.stopLoading);
-  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const dashboardMemberList = useDashboardStore(
     (state) => state.membersByDashboardId[dashboardNum]
-  );
-  const setDashboardMemberList = useDashboardStore(
-    (state) => state.setDashboardMembers
   );
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!dashboardMemberList || dashboardMemberList.length === 0) {
-        try {
-          start(key);
-          const res = await getDashboardMemberList({
-            size: 10,
-            dashboardId: dashboardNum,
-          });
-          setDashboardMemberList(dashboardNum, res.data.members);
-        } catch (error) {
-          if (isAxiosError(error)) {
-            addToast(
-              error.response?.data.message || "담당자 목록 조회에 실패했습니다."
-            );
-          } else {
-            addToast("알 수 없는 오류가 발생했습니다.");
-          }
-        } finally {
-          stop(key);
-        }
-      }
-    };
-    fetchData();
-  }, [dashboardNum, dashboardMemberList]);
 
   useEffect(() => {
     if (initialUserId && dashboardMemberList.length > 0) {
@@ -133,7 +99,7 @@ export function AssigneeDropdown({
         <div className="absolute bg-white_FFFFFF w-full px-[16px] py-[14px] flex flex-col gap-y-[11px] border border-gray_D9D9D9 rounded-[6px] mt-[2px] overflow-y-auto max-h-[300px]">
           {filteredList(value).map(({ userId, nickname }) => (
             <button
-              key={nickname}
+              key={userId}
               className="flex gap-x-[8px]"
               onClick={() => handleSelectClick(userId, nickname)}
             >

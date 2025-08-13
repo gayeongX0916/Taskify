@@ -22,11 +22,14 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   membersByDashboardId: {},
 
   setDashboardList: (list) =>
-    set(() => ({
-      dashboardsById: list.reduce((acc, d) => {
-        acc[d.id] = d;
-        return acc;
-      }, {} as Record<number, getDashboardListType>),
+    set((state) => ({
+      dashboardsById: {
+        ...state.dashboardsById,
+        ...list.reduce((acc, d) => {
+          acc[d.id] = d;
+          return acc;
+        }, {} as Record<number, getDashboardListType>),
+      },
     })),
 
   setDashboardMembers: (dashboardId, members) =>

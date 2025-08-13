@@ -25,4 +25,5 @@ export interface getDashboardListType {
   updatedAt: string;
   createdByMe: boolean;
   userId: number;
+  isEmpty?: boolean;
 }
