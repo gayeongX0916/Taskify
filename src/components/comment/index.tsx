@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/utils/formatDate";
+import { formatDateTimeUTC } from "@/lib/utils/formatDate";
 import { Avatar } from "../common/Avatar";
 import { useCommentStore } from "@/lib/stores/comment";
 import { useToastStore } from "@/lib/stores/toast";
@@ -93,7 +93,7 @@ export function Comment({
           </span>
 
           <time className="text-xs text-gray_9FA6B2">
-            {formatDate(new Date(date))}
+            {formatDateTimeUTC(new Date(date))}
           </time>
         </div>
 
