@@ -7,6 +7,7 @@ import { postInviteDashboardType } from "@/types/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { useInviteStore } from "@/lib/stores/invite";
 
 interface InviteMoalProps extends ModalProps {
   dashboardId: number;
@@ -18,15 +19,20 @@ export function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const addSentInvtie = useInviteStore((state) => state.addSentInvite);
   const [value, setValue] = useState("");
 
   const handleInviteDashboard = async (data: postInviteDashboardType) => {
     try {
       start(key);
-      await postInviteDashboard(data);
-      onClose();
+      const res = await postInviteDashboard(data);
+      addSentInvtie({
+        email: res.data.invitee.email,
+        invitationId: res.data.id,
+      });
       setValue("");
       addToast("대시보드 초대에 성공했습니다.", "success");
+      onClose();
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(

@@ -50,9 +50,6 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const setDashboardMemberList = useDashboardStore(
-    (state) => state.setDashboardMembers
-  );
   const removeDashboardMember = useDashboardStore(
     (state) => state.removeDashboardMember
   );
@@ -93,7 +90,6 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
           dashboardId: dashboardId,
           page: memberPage,
         });
-        setDashboardMemberList(dashboardId, res.data.members);
         setMemberList(res.data.members);
         setMemberTotalCount(res.data.totalCount);
       } catch (error) {
