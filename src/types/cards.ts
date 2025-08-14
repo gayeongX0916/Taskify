@@ -3,13 +3,20 @@ export interface BaseCardType {
   columnId: number;
   title: string;
   description: string;
-  dueDate:string;
+  dueDate: string;
   tags: string[];
-  imageUrl?: string;
+  imageUrl: string | null;
 }
 
-export interface postCardType extends BaseCardType {
+export interface postCardType {
   dashboardId: number;
+  assigneeUserId: number;
+  columnId: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  tags: string[];
+  imageUrl?: string;
 }
 
 export interface getCardListType {
