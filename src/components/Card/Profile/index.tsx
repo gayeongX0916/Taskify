@@ -5,7 +5,7 @@ import Image from "next/image";
 import plusIcon from "@/assets/plus_icon.svg";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { ModalButton } from "@/components/common/Button/ModalButton";
-import { getMyInfo, postProfileImg, putMyInfo } from "@/lib/api/users";
+import { postProfileImg, putMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { UserChangeType } from "@/types/users";
 import { useUserStore } from "@/lib/stores/user";
@@ -17,9 +17,7 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
   const addToast = useToastStore.getState().addToast;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const myInfo = useUserStore((state) => state.myInfo);
-  const setMyInfo = useUserStore((state) => state.setMyInfo);
   const updateMyInfo = useUserStore((state) => state.updateMyInfo);
-  const [isSaved, setIsSaved] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [localNickname, setLocalNickname] = useState(myInfo?.nickname ?? "");
   const [localProfileImageUrl, setLocalProfileImageUrl] = useState(
@@ -39,27 +37,6 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
       setLocalProfileImageUrl(myInfo.profileImageUrl ?? null);
     }
   }, [myInfo]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        start(key);
-        const res = await getMyInfo();
-        setMyInfo(res.data);
-      } catch (error) {
-        if (isAxiosError(error)) {
-          addToast(
-            error.response?.data.message || "내 정보 조회에 실패했습니다."
-          );
-        } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
-        }
-      } finally {
-        stop(key);
-      }
-    };
-    fetchData();
-  }, [isSaved]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -88,7 +65,6 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
       start(key);
       await putMyInfo(data);
       setIsTyping(false);
-      setIsSaved((prev) => !prev);
       addToast("프로필 수정에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
