@@ -14,7 +14,7 @@ import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
 import { putCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
-import { useParams } from "next/navigation";;
+import { useParams } from "next/navigation";
 import { formatDateTime } from "@/lib/utils/formatDate";
 import { useCardStore } from "@/lib/stores/card";
 import { useColumnStore } from "@/lib/stores/column";
@@ -98,10 +98,8 @@ export function EditTodoModal({
       const payload = {
         ...data,
         dueDate: data.dueDate ? formatDateTime(data.dueDate) : "",
+        imageUrl: data.imageUrl?.trim() ? data.imageUrl : null, 
       };
-      if (!payload.imageUrl?.trim()) {
-        delete payload.imageUrl;
-      }
       const res = await putCard({ id: cardId, ...payload });
       updateCard(dashboardIdNum, payload.columnId, res.data);
       onClose();

@@ -74,6 +74,21 @@ export function ImageInput({
         className="hidden"
         onChange={handleFileChange}
       />
+      {file && (
+        <button
+          type="button"
+          className="text-red-500 underline text-sm self-start"
+          onClick={() => {
+            setFile(""); 
+            onChange(""); 
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+          }}
+        >
+          이미지 삭제하기
+        </button>
+      )}
     </div>
   );
 }
