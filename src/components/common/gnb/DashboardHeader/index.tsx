@@ -16,6 +16,7 @@ import { useUserStore } from "@/lib/stores/user";
 import { getDashboardMemberListType } from "@/types/members";
 import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
+import { useAuthStore } from "@/lib/stores/auth";
 
 export default function DashboardHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,9 +45,8 @@ export default function DashboardHeader() {
     (state) => state.dashboardsById[dashboardNum]
   );
   const addDashboard = useDashboardStore((state) => state.addDashboard);
-  const member = (dashboardMemberList[dashboardNum] || []).filter(
-    (m) => !m.isOwner
-  );
+  const member = dashboardMemberList[dashboardNum] || [];
+  const userId = useAuthStore((state) => state.userId);
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {
@@ -165,7 +165,7 @@ export default function DashboardHeader() {
         )}
       </div>
       <div className="flex items-center gap-x-[16px] md:gap-x-[32px] lg:gap-x-[40px]">
-        {!isMyDashboardPage && (
+        {!isMyDashboardPage && dashboard?.createdByMe && (
           <div className="flex gap-x-[6px] md:gap-x-[16px]">
             <button
               onClick={() => router.push(`/dashboard/${dashboardId}/edit`)}
@@ -206,6 +206,7 @@ export default function DashboardHeader() {
           <button
             className="flex items-center gap-x-[12px]"
             onClick={() => router.push("/mypage")}
+            disabled={myInfo?.id !== userId}
           >
             {myInfo?.nickname && (
               <>
