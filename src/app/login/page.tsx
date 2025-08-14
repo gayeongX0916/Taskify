@@ -87,7 +87,7 @@ const loginPage = () => {
       const email = "test@naver.com";
       const password = "1234567890";
       const res = await postLogin({ email, password });
-      setAuth(res.data.accessToken, res.data.userId);
+      setAuth(res.data.accessToken, res.data.user.id);
       addToast("게스트 로그인에 성공했습니다.", "success");
       router.push("/mydashboard");
     } catch (error) {
