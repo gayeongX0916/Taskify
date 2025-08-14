@@ -79,8 +79,8 @@ export function DashBoardModal({
       await deleteCardDetail({ cardId });
       removeCard(dashboardId, columnId, cardId);
       setShowDropdown(false);
-      onClose();
       addToast("카드 삭제에 성공했습니다.", "success");
+      onClose();
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(error.response?.data.message || "카드 삭제에 실패했습니다.");
