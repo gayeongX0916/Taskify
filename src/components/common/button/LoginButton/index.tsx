@@ -1,4 +1,5 @@
-import { Children, ReactNode } from "react";
+import React from "react";
+import { ReactNode } from "react";
 
 type LoginButtonPros = {
   disabled?: boolean;
@@ -6,7 +7,7 @@ type LoginButtonPros = {
   onClick?: () => void;
 };
 
-export function LoginButton({ disabled, children, onClick }: LoginButtonPros) {
+function LoginButton({ disabled, children, onClick }: LoginButtonPros) {
   return (
     <button
       type="submit"
@@ -18,3 +19,5 @@ export function LoginButton({ disabled, children, onClick }: LoginButtonPros) {
     </button>
   );
 }
+
+export default React.memo(LoginButton);

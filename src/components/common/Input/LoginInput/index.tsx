@@ -3,10 +3,10 @@
 import visibilityOffIcon from "@/assets/visibility_off.svg";
 import visibilityIcon from "@/assets/visibility.svg";
 import Image from "next/image";
-import { useState } from "react";
+import React, { useState } from "react";
 
 type LoginInputProps = {
-  mode: "any" | "password";
+  mode: "text" | "password";
   value: string;
   label: string;
   placeholder: string;
@@ -15,7 +15,7 @@ type LoginInputProps = {
   onBlur?: () => void;
 };
 
-export function LoginInput({
+function LoginInput({
   mode,
   label,
   value,
@@ -38,7 +38,7 @@ export function LoginInput({
       <input
         type={isPassword ? (showPassword ? "text" : "password") : "text"}
         placeholder={placeholder}
-        className={`border border-gray_D9D9D9 rounded-[8px] px-[16px] py-[12px] focus:outline-none focus:border-violet_5534DA ${
+        className={`border border-gray_D9D9D9 rounded-[8px] pl-[16px] pr-[48px] py-[12px] focus:outline-none focus:border-violet_5534DA ${
           errorMessage && "border border-red_D6173A"
         }`}
         value={value}
@@ -65,3 +65,5 @@ export function LoginInput({
     </div>
   );
 }
+
+export default React.memo(LoginInput);
