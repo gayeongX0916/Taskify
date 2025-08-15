@@ -3,6 +3,7 @@ import arrowRight from "@/assets/arrow_right.svg";
 import arrowLeftNone from "@/assets/arrow_left_none.svg";
 import arrowLeft from "@/assets/arrow_left.svg";
 import Image from "next/image";
+import React from "react";
 
 type PaginationButtonProps = {
   className?: string;
@@ -11,7 +12,7 @@ type PaginationButtonProps = {
   onPageChange: (page: number) => void;
 };
 
-export function PaginationButton({
+function PaginationButton({
   className,
   currentPage,
   totalPages,
@@ -51,3 +52,5 @@ export function PaginationButton({
     </div>
   );
 }
+
+export default React.memo(PaginationButton);
