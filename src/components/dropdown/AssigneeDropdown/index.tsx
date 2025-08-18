@@ -2,14 +2,11 @@
 
 import arrowDropdown from "@/assets/arrow_drop_down.svg";
 import checkIcon from "@/assets/check_icon.svg";
-import { Avatar } from "@/components/common/Avatar";
-import { getDashboardMemberList } from "@/lib/api/members";
+import Avatar from "@/components/common/Avatar";
 import { useDashboardStore } from "@/lib/stores/dashboard";
-import { useLoadingStore } from "@/lib/stores/loading";
-import { useToastStore } from "@/lib/stores/toast";
-import { isAxiosError } from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import React from "react";
 import { useEffect, useState } from "react";
 
 type AssigneeDropdownProps = {
@@ -17,7 +14,7 @@ type AssigneeDropdownProps = {
   onSelect?: (userId: number) => void;
 };
 
-export function AssigneeDropdown({
+function AssigneeDropdown({
   initialUserId,
   onSelect,
 }: AssigneeDropdownProps) {
@@ -119,3 +116,5 @@ export function AssigneeDropdown({
     </div>
   );
 }
+
+export default React.memo(AssigneeDropdown)
