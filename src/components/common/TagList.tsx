@@ -1,4 +1,5 @@
 import { getTagColor } from "@/lib/utils/getTagColor";
+import React from "react";
 
 type TagListProps = {
   tags: string[];
@@ -7,7 +8,7 @@ type TagListProps = {
   onClickTag?: (tag: string) => void;
 };
 
-export function TagList({
+function TagList({
   tags,
   className,
   isButton = false,
@@ -48,3 +49,5 @@ export function TagList({
     </ul>
   );
 }
+
+export default React.memo(TagList);

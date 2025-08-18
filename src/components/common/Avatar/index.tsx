@@ -3,6 +3,7 @@ import {
   getRandomColor,
 } from "@/lib/utils/randomColor";
 import Image from "next/image";
+import React from "react";
 
 type AvatarProps = {
   username: string;
@@ -10,7 +11,7 @@ type AvatarProps = {
   profileImageUrl?: string | null;
 };
 
-export function Avatar({ username, className, profileImageUrl }: AvatarProps) {
+function Avatar({ username, className, profileImageUrl }: AvatarProps) {
   const initial = getInitialFromUserName(username);
   const bgColor = getRandomColor(initial);
 
@@ -38,3 +39,5 @@ export function Avatar({ username, className, profileImageUrl }: AvatarProps) {
     </>
   );
 }
+
+export default React.memo(Avatar);
