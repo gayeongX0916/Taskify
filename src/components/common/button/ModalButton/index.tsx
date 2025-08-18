@@ -1,3 +1,4 @@
+import React from "react";
 import { ReactNode } from "react";
 
 type ModalButtonProps = {
@@ -9,7 +10,7 @@ type ModalButtonProps = {
   type?: "button" | "submit";
 };
 
-export function ModalButton({
+function ModalButton({
   mode,
   children,
   onClick,
@@ -34,3 +35,5 @@ export function ModalButton({
     </button>
   );
 }
+
+export default React.memo(ModalButton);
