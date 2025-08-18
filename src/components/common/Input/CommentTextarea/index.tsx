@@ -16,7 +16,7 @@ type CommentTextareaProps = {
   columnId: number;
 };
 
-function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
+export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
   const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
@@ -72,5 +72,3 @@ function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
     </div>
   );
 }
-
-export default React.memo(CommentTextarea);

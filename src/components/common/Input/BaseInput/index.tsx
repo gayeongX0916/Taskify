@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 type DefaultInputProps = {
   label: string;
   placeholder?: string;

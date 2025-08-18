@@ -2,6 +2,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import calendarIcon from "@/assets/calendar_icon.svg";
 import Image from "next/image";
+import React from "react";
 
 type DateInputProps = {
   label: string;
@@ -10,12 +11,7 @@ type DateInputProps = {
   onChange: (value: Date | null) => void;
 };
 
-export function DateInput({
-  label,
-  placeholder,
-  value,
-  onChange,
-}: DateInputProps) {
+export function DateInput({ label, placeholder, value, onChange }: DateInputProps) {
   return (
     <div className="flex flex-col gap-y-[8px]">
       <span className="text-md text-black_333236 md:text-lg">{label}</span>
