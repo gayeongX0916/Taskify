@@ -1,7 +1,8 @@
 import { Dialog } from "@headlessui/react";
 import Image from "next/image";
-import { ReactNode } from "react";
+import { ReactNode, useCallback, useState } from "react";
 import closeIcon from "@/assets/close_icon_gray.svg";
+import React from "react";
 
 type BaseModalProps = {
   isOpen: boolean;
@@ -9,6 +10,8 @@ type BaseModalProps = {
   title: string;
   children: ReactNode;
 };
+
+const CloseIcon = React.memo(() => <Image src={closeIcon} alt="닫기" />);
 
 export function BaseModal({
   isOpen,
@@ -23,7 +26,7 @@ export function BaseModal({
           <div className="flex justify-between items-center mb-[16px]">
             <h1 className="text-xl font-bold text-black_333236">{title}</h1>
             <button onClick={onClose}>
-              <Image src={closeIcon} alt="닫기" />
+              <CloseIcon />
             </button>
           </div>
           {children}

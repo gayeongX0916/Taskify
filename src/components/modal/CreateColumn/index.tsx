@@ -1,6 +1,6 @@
 "use client";
 
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { postColumn } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";

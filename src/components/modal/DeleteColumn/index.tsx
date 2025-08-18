@@ -1,4 +1,4 @@
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { deleteColumn } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
@@ -6,6 +6,7 @@ import { useToastStore } from "@/lib/stores/toast";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 import { isAxiosError } from "axios";
+import { useCallback } from "react";
 
 interface DeleteColumnModalProps extends ModalProps {
   columnId: number;
@@ -25,7 +26,7 @@ export function DeleteColumnModal({
   const addToast = useToastStore.getState().addToast;
   const removeColumn = useColumnStore((state) => state.removeColumn);
 
-  const handleDeleteColumn = async () => {
+  const handleDeleteColumn = useCallback(async () => {
     try {
       start(key);
       await deleteColumn({ columnId });
@@ -41,7 +42,7 @@ export function DeleteColumnModal({
     } finally {
       stop(key);
     }
-  };
+  }, [removeColumn, addToast, onClose]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
