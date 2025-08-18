@@ -1,11 +1,12 @@
 import { formatDateTimeUTC } from "@/lib/utils/formatDate";
-import { Avatar } from "../common/Avatar";
+import  Avatar  from "../common/Avatar";
 import { useCommentStore } from "@/lib/stores/comment";
 import { useToastStore } from "@/lib/stores/toast";
 import { deleteComment, putComment } from "@/lib/api/comments";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import React from "react";
 
 type CommentProps = {
   name: string;
@@ -15,13 +16,7 @@ type CommentProps = {
   commentId: number;
 };
 
-export function Comment({
-  name,
-  date,
-  content,
-  cardId,
-  commentId,
-}: CommentProps) {
+function Comment({ name, date, content, cardId, commentId }: CommentProps) {
   const addToast = useToastStore.getState().addToast;
   const key = "comment";
   const start = useLoadingStore((s) => s.startLoading);
@@ -32,11 +27,11 @@ export function Comment({
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(content);
 
-  const handleonEdit = () => {
+  const handleonEdit = useCallback(() => {
     setIsEditing(true);
-  };
+  }, []);
 
-  const handleonEditCompleted = async () => {
+  const handleonEditCompleted = useCallback(async () => {
     try {
       start(key);
       await putComment({ commentId, content: value });
@@ -52,9 +47,9 @@ export function Comment({
     } finally {
       stop(key);
     }
-  };
+  }, [commentId, value, updateComment, cardId, addToast]);
 
-  const handleonDelete = async () => {
+  const handleonDelete = useCallback(async () => {
     try {
       start(key);
       await deleteComment({ commentId });
@@ -69,15 +64,18 @@ export function Comment({
     } finally {
       stop(key);
     }
-  };
+  }, [commentId, removeComment, cardId, addToast]);
 
-  const buttonList = [
-    {
-      label: isEditing ? "완료" : "수정",
-      onClick: isEditing ? handleonEditCompleted : handleonEdit,
-    },
-    { label: "삭제", onClick: handleonDelete },
-  ];
+  const buttonList = useMemo(
+    () => [
+      {
+        label: isEditing ? "완료" : "수정",
+        onClick: isEditing ? handleonEditCompleted : handleonEdit,
+      },
+      { label: "삭제", onClick: handleonDelete },
+    ],
+    [isEditing, handleonEditCompleted, handleonEdit, handleonDelete]
+  );
 
   return (
     <div className="flex gap-x-[10px]">
@@ -125,3 +123,5 @@ export function Comment({
     </div>
   );
 }
+
+export default React.memo(Comment);

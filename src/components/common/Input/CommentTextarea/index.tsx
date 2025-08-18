@@ -9,13 +9,14 @@ import { postCommentType } from "@/types/comments";
 import { useParams } from "next/navigation";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import React from "react";
 
 type CommentTextareaProps = {
   cardId: number;
   columnId: number;
 };
 
-export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
+function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
   const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
@@ -71,3 +72,5 @@ export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
     </div>
   );
 }
+
+export default React.memo(CommentTextarea);
