@@ -3,20 +3,21 @@
 import { useParams, useRouter } from "next/navigation";
 import { EditDashboardCard } from "@/components/Card/EditDashboard";
 import { MemberOrInviteTable } from "@/components/Table/MemberOrInvite";
-import { AddButton } from "@/components/common/Button/AddButton";
+import AddButton from "@/components/common/Button/AddButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
-import { deleteDashboard} from "@/lib/api/dashboards";
+import { deleteDashboard } from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { BackButton } from "@/components/common/Button/BackButton";
 import { isAxiosError } from "axios";
+import { useCallback } from "react";
 
 const editDashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-const key = "edit";
+  const key = "edit";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
@@ -45,7 +46,7 @@ const key = "edit";
   return (
     <main className="bg-gray_FAFAFA pt-[16px] px-[12px] pb-[60px] md:px-[20px] md:pt-[20px]">
       <div className="flex flex-col gap-y-[6px] md:gap-y-[29px] max-w-[670px]">
-        <BackButton isLoading={isLoading}/>
+        <BackButton isLoading={isLoading} />
 
         <div className="flex flex-col gap-y-[16px]">
           <EditDashboardCard dashboardId={dashboardIdNum} />

@@ -2,7 +2,7 @@ import { colorList } from "@/lib/utils/dashboardColor";
 import Image from "next/image";
 import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { putDashboard } from "@/lib/api/dashboards";
 import { putDashboardType } from "@/types/dashboards";
