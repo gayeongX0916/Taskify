@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import calendarIcon from "@/assets/calendar_icon.svg";
-import { Avatar } from "@/components/common/Avatar";
-import { TagList } from "@/components/common/TagList";
+import Avatar from "@/components/common/Avatar";
+import TagList from "@/components/common/TagList";
 import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
 import { formatDate } from "@/lib/utils/formatDate";
+import React, { useEffect, useMemo } from "react";
 
 type ColumnDetailCardProps = {
   dashboardId: number;
@@ -34,7 +35,7 @@ function CalendarDate({
   );
 }
 
-export function ColumnDetailCard({
+function ColumnDetailCard({
   dashboardId,
   columnId,
   cardId,
@@ -42,13 +43,17 @@ export function ColumnDetailCard({
   const cardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardId]?.[columnId] ?? []
   );
-  const card = cardList.find((c) => c.id === cardId);
+  const card = useMemo(
+    () => cardList.find((c) => c.id === cardId),
+    [cardList, cardId]
+  );
   const addToast = useToastStore.getState().addToast;
 
-  if (!card) {
-    addToast("카드를 찾을 수 없습니다.");
-    return null;
-  }
+  useEffect(() => {
+    if (!card) addToast("카드를 찾을 수 없습니다.");
+  }, [card, addToast]);
+
+  if (!card) return null;
 
   return (
     <article
@@ -92,3 +97,5 @@ export function ColumnDetailCard({
     </article>
   );
 }
+
+export default React.memo(ColumnDetailCard);

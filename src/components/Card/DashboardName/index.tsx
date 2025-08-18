@@ -3,12 +3,13 @@ import arrowRightIcon from "@/assets/arrow_right.svg";
 import Image from "next/image";
 import { dashboardColoMap } from "@/lib/utils/dashboardColor";
 import { useDashboardStore } from "@/lib/stores/dashboard";
+import React from "react";
 
 type DashboardNameCardProps = {
   dashboardId: number;
 };
 
-export function DashboardNameCard({ dashboardId }: DashboardNameCardProps) {
+function DashboardNameCard({ dashboardId }: DashboardNameCardProps) {
   const dashboard = useDashboardStore(
     (state) => state.dashboardsById[Number(dashboardId)]
   );
@@ -33,3 +34,5 @@ export function DashboardNameCard({ dashboardId }: DashboardNameCardProps) {
     </button>
   );
 }
+
+export default React.memo(DashboardNameCard);

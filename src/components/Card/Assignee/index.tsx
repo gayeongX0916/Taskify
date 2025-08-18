@@ -1,12 +1,13 @@
-import { Avatar } from "@/components/common/Avatar";
+import Avatar from "@/components/common/Avatar";
 import { formatDateTime } from "@/lib/utils/formatDate";
+import React from "react";
 
 type AssigneeCardProps = {
   name: string;
   date: string;
 };
 
-export function AssigneeCard({ name, date }: AssigneeCardProps) {
+function AssigneeCard({ name, date }: AssigneeCardProps) {
   return (
     <section className="flex mt-[10px] mb-[16px] md:flex-col md:gap-y-[16px] border border-gray_D9D9D9 rounded-[8px] px-[16px] py-[9px] justify-around md:py-[13px] md:pl-[16px] w-full md:w-[200px] md:h-full md:mb-0 md:mt-0">
       <div className="flex flex-col gap-y-[6px]">
@@ -29,3 +30,5 @@ export function AssigneeCard({ name, date }: AssigneeCardProps) {
     </section>
   );
 }
+
+export default React.memo(AssigneeCard);
