@@ -9,6 +9,7 @@ import { postCommentType } from "@/types/comments";
 import { useParams } from "next/navigation";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import React from "react";
 
 type CommentTextareaProps = {
   cardId: number;

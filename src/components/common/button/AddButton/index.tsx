@@ -1,5 +1,6 @@
 import addBoxIcon from "@/assets/add_box_purple.svg";
 import Image from "next/image";
+import React from "react";
 
 type AddButtonProps = {
   mode: "column" | "dashboard" | "todo" | "delete";
@@ -8,12 +9,11 @@ type AddButtonProps = {
   disabled?: boolean;
 };
 
-export function AddButton({
-  mode,
-  className,
-  onClick,
-  disabled,
-}: AddButtonProps) {
+const AddBoxIcon = React.memo(() => (
+  <Image src={addBoxIcon} alt="추가하기" width={22} height={22} />
+));
+
+function AddButton({ mode, className, onClick, disabled }: AddButtonProps) {
   const getText = () => {
     switch (mode) {
       case "column":
@@ -42,9 +42,9 @@ export function AddButton({
       {text && (
         <span className="text-md text-black_333236 md:text-lg">{text}</span>
       )}
-      {showImage && (
-        <Image src={addBoxIcon} alt="추가하기" width={22} height={22} />
-      )}
+      {showImage && <AddBoxIcon />}
     </button>
   );
 }
+
+export default React.memo(AddButton);

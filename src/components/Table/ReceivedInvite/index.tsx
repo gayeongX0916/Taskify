@@ -7,12 +7,12 @@ import { DashboardButton } from "@/components/common/Button/DashboardButton";
 import { useEffect, useState } from "react";
 import { getInvitationList, putInvitationAnswer } from "@/lib/api/invitations";
 import { useToastStore } from "@/lib/stores/toast";
-import { getInvitationType, putInvitationAnswerType } from "@/types/invite";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useInviteStore } from "@/lib/stores/invite";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/common/Spinner";
+import React from "react";
 
 type MobileInviteListProps = {
   name: string;
@@ -21,6 +21,14 @@ type MobileInviteListProps = {
   onRespond: (invitationId: number, accepted: boolean) => void;
   isLoading: boolean;
 };
+
+const SearchIcon = React.memo(() => (
+  <Image
+    src={searchIcon}
+    alt="검색"
+    className="absolute left-[12px] top-1/2 -translate-y-1/2"
+  />
+));
 
 function MobileInviteList({
   name,
@@ -62,7 +70,7 @@ function MobileInviteList({
   );
 }
 
-export function ReceivedInviteTable() {
+function ReceivedInviteTable() {
   const key = "ReceivedInviteTable";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -151,11 +159,7 @@ export function ReceivedInviteTable() {
               placeholder="검색"
               className="pl-[44px] pr-[12px] py-[5px] rounded-[6px] border border-gray_D9D9D9 w-full h-[36px]"
             />
-            <Image
-              src={searchIcon}
-              alt="검색"
-              className="absolute left-[12px] top-1/2 -translate-y-1/2"
-            />
+            <SearchIcon />
           </form>
         )}
       </header>
@@ -230,3 +234,5 @@ export function ReceivedInviteTable() {
     </section>
   );
 }
+
+export default React.memo(ReceivedInviteTable);

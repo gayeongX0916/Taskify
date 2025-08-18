@@ -1,11 +1,11 @@
 "use client";
 
-import { DashboardNameCard } from "@/components/Card/DashboardName";
-import { AddButton } from "@/components/common/Button/AddButton";
-import { PaginationButton } from "@/components/common/Button/PaginationButton";
+import DashboardNameCard from "@/components/Card/DashboardName";
+import AddButton from "@/components/common/Button/AddButton";
+import PaginationButton from "@/components/common/Button/PaginationButton";
 import { Skeleton } from "@/components/common/Skeleton";
 import { CreateDashboardModal } from "@/components/Modal/CreateDashboard";
-import { ReceivedInviteTable } from "@/components/Table/ReceivedInvite";
+import ReceivedInviteTable from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
@@ -13,7 +13,7 @@ import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardListType } from "@/types/dashboards";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const mydashboardPage = () => {
   const router = useRouter();
@@ -53,9 +53,15 @@ const mydashboardPage = () => {
     fetchData();
   }, [page, isOpen]);
 
-  const filledArray = Array.from({ length: PAGE_SIZE }).map(
-    (_, i) => dashboards[i] || { id: `empty-${i}`, isEmpty: true }
+  const filledArray = useMemo(
+    () =>
+      Array.from({ length: PAGE_SIZE }).map(
+        (_, i) => dashboards[i] || { id: `empty-${i}`, isEmpty: true }
+      ),
+    [dashboards]
   );
+
+  const handleOpenCreateDashboard = useCallback(() => setIsOpen(true), []);
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -66,7 +72,7 @@ const mydashboardPage = () => {
             <AddButton
               mode="dashboard"
               className="w-full h-[61px] lg:h-[70px]"
-              onClick={() => setIsOpen(true)}
+              onClick={handleOpenCreateDashboard}
               disabled={isLoading}
             />
 

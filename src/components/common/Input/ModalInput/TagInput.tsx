@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { TagList } from "../../TagList";
+import TagList from "../../TagList";
+import React from "react";
 
 type TagInputProps = {
   label: string;

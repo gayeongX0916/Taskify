@@ -1,9 +1,11 @@
+import React from "react";
+
 type ChipProps = {
   name: string;
   className?: string;
 };
 
-export function Chip({ name, className }: ChipProps) {
+function Chip({ name, className }: ChipProps) {
   return (
     <div className="flex w-fit items-center gap-x-[9px] bg-violet_8P rounded-[16px] px-[10px] py-[4px]">
       <div className="w-[6px] h-[6px] bg-violet_5534DA rounded-full"></div>
@@ -17,3 +19,5 @@ export function Chip({ name, className }: ChipProps) {
     </div>
   );
 }
+
+export default React.memo(Chip);

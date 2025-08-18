@@ -1,7 +1,7 @@
 "use client";
 
-import { ColumnCard } from "@/components/Card/Column";
-import { AddButton } from "@/components/common/Button/AddButton";
+import ColumnCard from "@/components/Card/Column";
+import AddButton from "@/components/common/Button/AddButton";
 import { Spinner } from "@/components/common/Spinner";
 import { CreateColumnModal } from "@/components/Modal/CreateColumn";
 import { getColumnList } from "@/lib/api/columns";
@@ -10,7 +10,7 @@ import { useLoadingStore } from "@/lib/stores/loading";
 import { useToastStore } from "@/lib/stores/toast";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const dashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
@@ -28,6 +28,8 @@ const dashboardPage = () => {
     ? Object.values(columnsByDashboard)
     : [];
   const setColumnList = useColumnStore((state) => state.setColumnList);
+
+  const handleOpen = useCallback(() => setIsOpen(true), []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +50,7 @@ const dashboardPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [dashboardIdNum, start, stop, setColumnList, addToast]);
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -71,7 +73,7 @@ const dashboardPage = () => {
             <AddButton
               mode="column"
               className="w-full font-bold py-[20px] lg:w-[354px]"
-              onClick={() => setIsOpen(true)}
+              onClick={handleOpen}
               disabled={isLoading}
             />
           </div>

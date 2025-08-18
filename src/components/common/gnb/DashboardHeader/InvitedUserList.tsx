@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar } from "../../Avatar";
+import Avatar from "../../Avatar";
+import React from "react";
 
 type InvitedUserListProps = {
   users: string[];
 };
 
-export function InvitedUserList({ users }: InvitedUserListProps) {
+function InvitedUserList({ users }: InvitedUserListProps) {
   const [maxVisible, setMaxVisible] = useState(4);
   const visibleUsers = users.slice(0, maxVisible);
   const remainingCount = users.length - maxVisible;
@@ -44,3 +45,5 @@ export function InvitedUserList({ users }: InvitedUserListProps) {
     </div>
   );
 }
+
+export default React.memo(InvitedUserList)

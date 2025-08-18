@@ -1,11 +1,11 @@
 import { ModalProps } from "@/types/ModalProps";
 import { BaseModal } from ".";
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { useColumnStore } from "@/lib/stores/column";
 import { putColumnType } from "@/types/columns";
 import { putColumn } from "@/lib/api/columns";
 import { useToastStore } from "@/lib/stores/toast";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 
@@ -30,27 +30,35 @@ export function EditColumnModal({
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const [value, setValue] = useState("");
 
-  const handleUpdateColumn = async (data: putColumnType) => {
-    try {
-      start(key);
-      const res = await putColumn(data);
-      updateColumn(dashboardId, res.data.id, res.data.title);
-      onClose();
-      setValue("");
-      addToast("컬럼 수정에 성공했습니다.", "success");
-    } catch (error) {
-      if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
-      } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+  const handleUpdateColumn = useCallback(
+    async (data: putColumnType) => {
+      try {
+        start(key);
+        const res = await putColumn(data);
+        updateColumn(dashboardId, res.data.id, res.data.title);
+        onClose();
+        setValue("");
+        addToast("컬럼 수정에 성공했습니다.", "success");
+      } catch (error) {
+        if (isAxiosError(error)) {
+          addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
+        } else {
+          addToast("알 수 없는 오류가 발생했습니다.");
+        }
+      } finally {
+        stop(key);
       }
-    } finally {
-      stop(key);
-    }
-  };
+    },
+    [updateColumn, onClose, addToast]
+  );
+
+  const handleClose = useCallback(() => {
+    onClose();
+    setValue("");
+  }, [onClose]);
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="컬럼 관리">
+    <BaseModal isOpen={isOpen} onClose={handleClose} title="컬럼 관리">
       <div className="flex flex-col gap-y-[8px] mb-[24px]">
         <span className="text-lg text-black_333236">이름</span>
         <input

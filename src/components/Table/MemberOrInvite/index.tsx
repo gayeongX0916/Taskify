@@ -1,16 +1,16 @@
 import addBoxWhiteIcon from "@/assets/add_box_white.svg";
 import Image from "next/image";
 import { ActionButton } from "@/components/common/Button/ActionButton";
-import { PaginationButton } from "@/components/common/Button/PaginationButton";
-import { Avatar } from "@/components/common/Avatar";
-import { useEffect, useState } from "react";
+import PaginationButton from "@/components/common/Button/PaginationButton";
+import Avatar from "@/components/common/Avatar";
+import { useCallback, useEffect, useState } from "react";
 import {
   deleteInviteDashboard,
   getInviteDashboard,
 } from "@/lib/api/dashboards";
 import { useToastStore } from "@/lib/stores/toast";
 import { getInvitationType, InviteUser } from "@/types/invite";
-import { InviteModal } from "@/components/Modal/Base/InviteModal";
+import InviteModal from "@/components/Modal/Base/InviteModal";
 import {
   deleteDashboardMember,
   getDashboardMemberList,

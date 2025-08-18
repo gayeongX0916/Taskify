@@ -1,11 +1,11 @@
 import Image from "next/image";
 import settingIcon from "@/assets/setting_icon.svg";
-import { AddButton } from "@/components/common/Button/AddButton";
-import { ColumnDetailCard } from "../ColumnDetail";
+import AddButton from "@/components/common/Button/AddButton";
+import ColumnDetailCard from "../ColumnDetail";
 import { EditColumnModal } from "@/components/Modal/Base/EditColumnModal";
 import { CreateTodoModal } from "@/components/Modal/CreateTodo";
-import { DashBoardModal } from "@/components/Modal/Dashboard";
-import { useEffect, useMemo, useState } from "react";
+import DashBoardModal from "@/components/Modal/Dashboard";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCardList } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { Skeleton } from "@/components/common/Skeleton";
+import React from "react";
 
 type ColumnCardProps = {
   columnId: number;
@@ -22,7 +23,18 @@ type ColumnCardProps = {
 
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
-export function ColumnCard({ columnId, title }: ColumnCardProps) {
+const SettingIcon = React.memo(({ onClick }: { onClick: () => void }) => (
+  <button onClick={onClick} aria-label="컬럼 관리">
+    <Image
+      src={settingIcon}
+      alt="컬럼 관리"
+      width={22}
+      height={22}
+      className="md:w-[24px] md:h-[24px]"
+    />
+  </button>
+));
+function ColumnCard({ columnId, title }: ColumnCardProps) {
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const key = "columncard";
@@ -33,7 +45,6 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
   const rawCardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId]
   );
-  const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
   const setCardList = useCardStore((state) => state.setCardList);
   const count = useCardStore(
     (state) => state.countsByDashboard?.[dashboardIdNum]?.[columnId] ?? 0
@@ -45,6 +56,9 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
     dashboard: false,
     deleteColumn: false,
   });
+  const [maxVisible, setMaxVisible] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(maxVisible);
+
   const handleClickOpen = (modalName: ModalName) => {
     setModalState((prev) => ({ ...prev, [modalName]: true }));
   };
@@ -52,6 +66,14 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
   const handleClickClose = (modalName: ModalName) => {
     setModalState((prev) => ({ ...prev, [modalName]: false }));
   };
+
+  const handleOpenEditColumn = useCallback(() => {
+    handleClickOpen("editColumn");
+  }, []);
+
+  const handleOpenCreateTodo = useCallback(() => {
+    handleClickOpen("createTodo");
+  }, []);
 
   // ssr로 미리 5개 받아오기?
   useEffect(() => {
@@ -80,13 +102,31 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
     fetchData();
   }, [columnId, setCardList]);
 
+  useEffect(() => {
+    const updateMaxVisible = () => {
+      const width = window.innerWidth;
+      if (width < 768) setMaxVisible(1);
+      else if (width < 1200) setMaxVisible(2);
+      else setMaxVisible(3);
+    };
+
+    updateMaxVisible();
+    window.addEventListener("resize", updateMaxVisible);
+    return () => window.removeEventListener("resize", updateMaxVisible);
+  }, []);
+
+  useEffect(() => {
+    setVisibleCount(maxVisible);
+  }, [maxVisible]);
+
+  const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
   const sortedCardList = useMemo(() => {
-    if (!cardList) return [];
     return [...cardList].sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
   }, [cardList]);
+  const visibleCards = sortedCardList.slice(0, visibleCount);
 
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
@@ -114,6 +154,7 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
       />
       {selectedId !== null && (
         <DashBoardModal
+          key={selectedId}
           dashboardId={dashboardIdNum}
           columnId={columnId}
           columnName={title}
@@ -133,22 +174,14 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
           </div>
         </div>
 
-        <button onClick={() => handleClickOpen("editColumn")}>
-          <Image
-            src={settingIcon}
-            alt="컬럼 관리"
-            width={22}
-            height={22}
-            className="md:w-[24px] md:h-[24px]"
-          />
-        </button>
+        <SettingIcon onClick={handleOpenEditColumn} />
       </header>
 
       <div className="mb-[10px]">
         <AddButton
           mode="todo"
           className="w-full h-[32px] md:h-[40px] py-[6px] md:py-[9px]"
-          onClick={() => handleClickOpen("createTodo")}
+          onClick={handleOpenCreateTodo}
         />
       </div>
       <div className="flex flex-col md:gap-y-[16px]">
@@ -158,10 +191,10 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
           //   ))
           <Skeleton className="w-full h-[250px] md:h-[90px] lg:h-[250px]" />
         ) : (
-          sortedCardList.map(({ id }, idx) => (
+          visibleCards.map(({ id }, idx) => (
             <div
               role="button"
-              key={idx}
+              key={id}
               className={`${idx > 0 ? "hidden md:block" : ""}`}
               onClick={() => {
                 setSelectedId(id);
@@ -176,7 +209,17 @@ export function ColumnCard({ columnId, title }: ColumnCardProps) {
             </div>
           ))
         )}
+        {!isLoading && visibleCount < sortedCardList.length && (
+          <button
+            className="text-2lg text-violet_5534DA hidden lg:block"
+            onClick={() => setVisibleCount((prev) => prev + maxVisible)}
+          >
+            더보기
+          </button>
+        )}
       </div>
     </section>
   );
 }
+
+export default React.memo(ColumnCard);

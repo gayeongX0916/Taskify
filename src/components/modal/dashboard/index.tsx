@@ -1,20 +1,26 @@
 "use client";
 
 import { Dialog } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import moreIcon from "@/assets/more_icon.svg";
 import closeIcon from "@/assets/close_icon.svg";
 import Image from "next/image";
-import { Chip } from "@/components/common/Chip";
+import Chip from "@/components/common/Chip";
 import { CommentTextarea } from "@/components/common/Input/CommentTextarea";
-import { Comment } from "@/components/Comment";
-import { AssigneeCard } from "@/components/Card/Assignee";
+import Comment from "@/components/Comment";
+import AssigneeCard from "@/components/Card/Assignee";
 import { ActionDropdown } from "@/components/Dropdown/ActionDropdown";
 import { ModalProps } from "@/types/ModalProps";
-import { TagList } from "@/components/common/TagList";
-import { getCardType } from "@/types/cards";
+import TagList from "@/components/common/TagList";
 import { useToastStore } from "@/lib/stores/toast";
-import { deleteCardDetail, getCardDetail } from "@/lib/api/cards";
+import { deleteCardDetail } from "@/lib/api/cards";
 import { EditTodoModal } from "../EditTodo";
 import { useCardStore } from "@/lib/stores/card";
 import { getComment } from "@/lib/api/comments";
@@ -22,6 +28,7 @@ import { useCommentStore } from "@/lib/stores/comment";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { Spinner } from "@/components/common/Spinner";
+import React from "react";
 
 interface DashBoardModalProps extends ModalProps {
   cardId: number;
@@ -30,7 +37,52 @@ interface DashBoardModalProps extends ModalProps {
   dashboardId: number;
 }
 
-export function DashBoardModal({
+const MoreIcon = React.memo(
+  ({
+    setShowDropdown,
+  }: {
+    setShowDropdown: Dispatch<SetStateAction<boolean>>;
+  }) => (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowDropdown((prev) => !prev);
+      }}
+    >
+      <Image
+        src={moreIcon}
+        alt="더보기"
+        width={24}
+        height={24}
+        className="md:w-[28px] md:h-[28px]"
+      />
+    </button>
+  )
+);
+
+const CloseIcon = React.memo(({ onClose }: { onClose: () => void }) => (
+  <button onClick={onClose}>
+    <Image
+      src={closeIcon}
+      alt="닫기"
+      width={24}
+      height={24}
+      className="md:w-[28px] md:h-[28px]"
+    />
+  </button>
+));
+
+const CardImage = React.memo(({ imageUrl }: { imageUrl: string }) => (
+  <Image
+    src={imageUrl}
+    alt="카드 이미지"
+    width={290}
+    height={168}
+    className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
+  />
+));
+
+function DashBoardModal({
   isOpen,
   onClose,
   cardId,
@@ -38,20 +90,22 @@ export function DashBoardModal({
   columnId,
   dashboardId,
 }: DashBoardModalProps) {
-  const key = "DashboardModal";
+  const key = `dashboard-modal-${cardId}`;
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
+  const commentList = useCommentStore(
+    (state) => state.commentsByCard?.[cardId]
+  );
+  const commentArray = commentList ?? [];
+  const setCommentList = useCommentStore((state) => state.setCommentList);
   const cardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardId]?.[columnId] ?? []
   );
   const card = cardList.find((c) => c.id === cardId);
   const removeCard = useCardStore((state) => state.removeCard);
-  const commentByCard = useCommentStore((state) => state.commentsByCard);
-  const commentList = commentByCard[cardId] || [];
-  const setCommentList = useCommentStore((state) => state.setCommentList);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
@@ -71,9 +125,9 @@ export function DashBoardModal({
       }
     };
     fetchData();
-  }, []);
+  }, [cardId, setCommentList, addToast]);
 
-  const handleDeleteCard = async () => {
+  const handleDeleteCard = useCallback(async () => {
     try {
       start(key);
       await deleteCardDetail({ cardId });
@@ -90,7 +144,7 @@ export function DashBoardModal({
     } finally {
       stop(key);
     }
-  };
+  }, [removeCard, dashboardId, columnId, cardId, addToast, onClose]);
 
   if (!card) {
     addToast("카드를 찾을 수 없습니다.");
@@ -114,29 +168,8 @@ export function DashBoardModal({
               </h2>
 
               <div className="flex gap-x-[16px] md:gap-x-[24px] relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowDropdown((prev) => !prev);
-                  }}
-                >
-                  <Image
-                    src={moreIcon}
-                    alt="더보기"
-                    width={24}
-                    height={24}
-                    className="md:w-[28px] md:h-[28px]"
-                  />
-                </button>
-                <button onClick={onClose}>
-                  <Image
-                    src={closeIcon}
-                    alt="닫기"
-                    width={24}
-                    height={24}
-                    className="md:w-[28px] md:h-[28px]"
-                  />
-                </button>
+                <MoreIcon setShowDropdown={setShowDropdown} />
+                <CloseIcon onClose={onClose} />
                 {showDropdown && (
                   <div className="absolute right-[50px] top-full mt-[8px] z-10">
                     <ActionDropdown
@@ -173,15 +206,7 @@ export function DashBoardModal({
                   {card.description}
                 </p>
 
-                {card.imageUrl && (
-                  <Image
-                    src={card.imageUrl}
-                    alt="예시"
-                    width={290}
-                    height={168}
-                    className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
-                  />
-                )}
+                {card.imageUrl && <CardImage imageUrl={card.imageUrl} />}
 
                 <div className="mt-[24px] lg:mt-[16px]">
                   <CommentTextarea cardId={cardId} columnId={columnId} />
@@ -193,7 +218,7 @@ export function DashBoardModal({
                       <Spinner />
                     </div>
                   ) : (
-                    commentList.map(
+                    commentArray.map(
                       ({ id, author, createdAt, content, cardId }) => (
                         <Comment
                           key={id}
@@ -217,3 +242,5 @@ export function DashBoardModal({
     </>
   );
 }
+
+export default React.memo(DashBoardModal);

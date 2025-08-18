@@ -1,11 +1,10 @@
 "use client";
 
-import { AssigneeDropdown } from "@/components/Dropdown/AssigneeDropdown";
+import  AssigneeDropdown  from "@/components/Dropdown/AssigneeDropdown";
 import { ProgressDropdown } from "@/components/Dropdown/ProgressDropdown";
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import editIcon from "@/assets/edit_icon.svg";
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton  from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { TextareaInput } from "@/components/common/Input/ModalInput/TextareaInput";
 import { DateInput } from "@/components/common/Input/ModalInput/DateInput";

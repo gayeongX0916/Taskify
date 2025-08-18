@@ -1,3 +1,5 @@
+import React from "react";
+
 type TextareaInputProps = {
   label: string;
   placeholder?: string;

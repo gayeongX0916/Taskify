@@ -5,6 +5,7 @@ import { postCardImg } from "@/lib/api/columns";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import React from "react";
 
 type ImageInputProps = {
   label: string;
@@ -79,8 +80,8 @@ export function ImageInput({
           type="button"
           className="text-red-500 underline text-sm self-start"
           onClick={() => {
-            setFile(""); 
-            onChange(""); 
+            setFile("");
+            onChange("");
             if (fileInputRef.current) {
               fileInputRef.current.value = "";
             }
