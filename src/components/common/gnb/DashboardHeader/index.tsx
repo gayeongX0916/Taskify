@@ -1,11 +1,11 @@
 import Image from "next/image";
 import settingIcon from "@/assets/setting_icon.svg";
 import addBoxIcon from "@/assets/add_box.svg";
-import { Avatar } from "../../Avatar";
-import { InvitedUserList } from "./InvitedUserList";
+import Avatar from "../../Avatar";
+import InvitedUserList from "./InvitedUserList";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { InviteModal } from "@/components/Modal/Base/InviteModal";
-import { useEffect, useState } from "react";
+import  InviteModal  from "@/components/Modal/Base/InviteModal";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardDetail } from "@/lib/api/dashboards";
 import crownIcon from "@/assets/crown.svg";
@@ -13,10 +13,40 @@ import { getMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberList } from "@/lib/api/members";
 import { useUserStore } from "@/lib/stores/user";
-import { getDashboardMemberListType } from "@/types/members";
 import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { useAuthStore } from "@/lib/stores/auth";
+import React from "react";
+
+const SettingIcon = React.memo(() => (
+  <Image
+    src={settingIcon}
+    alt="관리"
+    width={20}
+    height={20}
+    className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
+  />
+));
+
+const AddBoxIcon = React.memo(() => (
+  <Image
+    src={addBoxIcon}
+    alt="초대하기"
+    width={20}
+    height={20}
+    className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
+  />
+));
+
+const CronwIcon = React.memo(() => (
+  <Image
+    src={crownIcon}
+    alt="주인"
+    width={20}
+    height={20}
+    className="hidden lg:block"
+  />
+));
 
 export default function DashboardHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +77,7 @@ export default function DashboardHeader() {
   const addDashboard = useDashboardStore((state) => state.addDashboard);
   const member = dashboardMemberList[dashboardNum] || [];
   const userId = useAuthStore((state) => state.userId);
+  const visibleMembers = useMemo(() => member.map(m => m.nickname), [member]);
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {
@@ -125,6 +156,8 @@ export default function DashboardHeader() {
     }
   }, [dashboardId, isMyDashboardPage]);
 
+  const handleOpen = useCallback(() => setIsOpen(true), []);
+
   if (!isMyDashboardPage && !dashboard && isLoading) {
     return (
       <header className="flex items-center justify-center py-4 h-[70px]">
@@ -154,15 +187,7 @@ export default function DashboardHeader() {
         >
           {isMyDashboardPage ? "내 대시보드" : dashboard?.title}
         </h1>
-        {dashboard?.createdByMe && (
-          <Image
-            src={crownIcon}
-            alt="주인"
-            width={20}
-            height={20}
-            className="hidden lg:block"
-          />
-        )}
+        {dashboard?.createdByMe && <CronwIcon />}
       </div>
       <div className="flex items-center gap-x-[16px] md:gap-x-[32px] lg:gap-x-[40px]">
         {!isMyDashboardPage && dashboard?.createdByMe && (
@@ -171,26 +196,14 @@ export default function DashboardHeader() {
               onClick={() => router.push(`/dashboard/${dashboardId}/edit`)}
               className="px-[12px] py-[3px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
             >
-              <Image
-                src={settingIcon}
-                alt="관리"
-                width={20}
-                height={20}
-                className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
-              />
+              <SettingIcon />
               관리
             </button>
             <button
-              onClick={() => setIsOpen(true)}
+              onClick={handleOpen}
               className="px-[12px] py-[6px] text-md text-gray_787486 border border-gray_D9D9D9 rounded-[6px] flex items-center gap-x-[8px] lg:text-lg md:px-[16px] md:py-[7px]"
             >
-              <Image
-                src={addBoxIcon}
-                alt="초대하기"
-                width={20}
-                height={20}
-                className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
-              />
+              <AddBoxIcon />
               초대하기
             </button>
           </div>
@@ -198,7 +211,7 @@ export default function DashboardHeader() {
 
         <div className="flex items-center gap-x-[16px] md:gap-x-[24px] lg:gap-x-[36px]">
           {member && !isMyDashboardPage && (
-            <InvitedUserList users={member.map((m) => m.nickname)} />
+            <InvitedUserList users={visibleMembers} />
           )}
 
           <div className="h-[34px] border-l border-gray_D9D9D9"></div>
