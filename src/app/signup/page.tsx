@@ -13,7 +13,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
