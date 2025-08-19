@@ -53,7 +53,10 @@ export function SideMenu() {
         setTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error))
-          addToast(error.response?.data.message || "대시보드 목록 실패");
+          addToast(
+            error.response?.data.message ||
+              "대시보드 목록 불러오기에 실패했습니다."
+          );
         else addToast("알 수 없는 오류 발생");
       } finally {
         stop(key);
@@ -118,7 +121,7 @@ export function SideMenu() {
                   <div
                     className={`${
                       dashboardColoMap[dashboards[i].color]
-                    } rounded-full w-[8px] h-[8px]`}
+                    } rounded-full min-w-[8px] min-h-[8px]`}
                   />
                   <div className="hidden md:flex md:gap-x-[6px]">
                     <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">

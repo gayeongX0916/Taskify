@@ -4,7 +4,7 @@ import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import checkIcon from "@/assets/white_check_icon.svg";
 import Image from "next/image";
-import  ModalButton  from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { colorList } from "@/lib/utils/dashboardColor";
 import { ModalProps } from "@/types/ModalProps";
 import { postDashboard } from "@/lib/api/dashboards";
@@ -29,6 +29,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
       start(key);
       const res = await postDashboard(data);
       addDashboard(res.data);
+      
       onClose();
       setTitle("");
       setColor("");
