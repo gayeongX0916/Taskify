@@ -75,7 +75,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
     handleClickOpen("createTodo");
   }, []);
 
-  // ssr로 미리 5개 받아오기?
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -185,30 +184,30 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
         />
       </div>
       <div className="flex flex-col md:gap-y-[16px]">
-        {isLoading ? (
-          // ? Array.from({ length: 3 }).map((_, i) => (
-          //     <Skeleton className="w-full h-[250px] md:h-[90px] lg:h-[250px]" />
-          //   ))
-          <Skeleton className="w-full h-[250px] md:h-[90px] lg:h-[250px]" />
-        ) : (
-          visibleCards.map(({ id }, idx) => (
-            <div
-              role="button"
-              key={id}
-              className={`${idx > 0 ? "hidden md:block" : ""}`}
-              onClick={() => {
-                setSelectedId(id);
-                handleClickOpen("dashboard");
-              }}
-            >
-              <ColumnDetailCard
-                dashboardId={dashboardIdNum}
-                columnId={columnId}
-                cardId={id}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className="w-full h-[250px] md:h-[90px] lg:h-[250px]"
               />
-            </div>
-          ))
-        )}
+            ))
+          : visibleCards.map(({ id }, idx) => (
+              <div
+                role="button"
+                key={id}
+                className={`${idx > 0 ? "hidden md:block" : ""}`}
+                onClick={() => {
+                  setSelectedId(id);
+                  handleClickOpen("dashboard");
+                }}
+              >
+                <ColumnDetailCard
+                  dashboardId={dashboardIdNum}
+                  columnId={columnId}
+                  cardId={id}
+                />
+              </div>
+            ))}
         {!isLoading && visibleCount < sortedCardList.length && (
           <button
             className="text-2lg text-violet_5534DA hidden lg:block"
