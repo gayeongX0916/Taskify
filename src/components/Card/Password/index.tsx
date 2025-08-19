@@ -1,6 +1,6 @@
 "use client";
 
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { putPasswordChange } from "@/lib/api/auth";
 import { useToastStore } from "@/lib/stores/toast";

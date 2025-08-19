@@ -50,7 +50,7 @@ const dashboardPage = () => {
       }
     };
     fetchData();
-  }, [dashboardIdNum, start, stop, setColumnList, addToast]);
+  }, [dashboardIdNum, setColumnList, addToast]);
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
@@ -62,22 +62,24 @@ const dashboardPage = () => {
               <Spinner />
             </div>
           ) : (
-            columnArray.map(({ id, title }) => (
-              <ColumnCard key={id} columnId={id} title={title} />
-            ))
+            <>
+              {columnArray.map(({ id, title }) => (
+                <ColumnCard key={id} columnId={id} title={title} />
+              ))}
+              <div className="flex-shrink-0 w-[20px]" />
+              {!isLoading && (
+                <div className="px-[12px] pt-[16px] pb-[49px] md:py-[20px] md:px-[20px] lg:pt-[68px] lg:pl-0 lg:pr-[70px]">
+                  <AddButton
+                    mode="column"
+                    className="w-full font-bold py-[20px] lg:w-[354px]"
+                    onClick={handleOpen}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
-
-        {!isLoading && (
-          <div className="px-[12px] pt-[16px] pb-[49px] md:py-[20px] md:px-[20px] lg:pt-[68px] lg:pb[0] lg:pl-[20px] lg:pr-[100px]">
-            <AddButton
-              mode="column"
-              className="w-full font-bold py-[20px] lg:w-[354px]"
-              onClick={handleOpen}
-              disabled={isLoading}
-            />
-          </div>
-        )}
       </div>
     </main>
   );

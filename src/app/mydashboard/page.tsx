@@ -41,7 +41,8 @@ const mydashboardPage = () => {
       } catch (error) {
         if (isAxiosError(error)) {
           addToast(
-            error.response?.data.message || "대시보드 목록 불러오기 실패"
+            error.response?.data.message ||
+              "대시보드 목록 불러오기에 실패했습니다."
           );
         } else {
           addToast("알 수 없는 오류 발생");
@@ -65,7 +66,10 @@ const mydashboardPage = () => {
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
-      <CreateDashboardModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <CreateDashboardModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
       <div className="max-w-[960px] px-[24px] py-[24px] flex flex-col gap-y-[32px] md:gap-y-[40px] md:px-[40px] md:py-[40px]">
         <div className="flex flex-col gap-y-[16px] lg:gap-y-[12px]">
           <div className="flex flex-col gap-y-[8px] md:grid md:grid-cols-2 md:gap-[10px] lg:grid-cols-3 lg:gap-[12px]">

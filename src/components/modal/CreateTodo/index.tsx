@@ -94,7 +94,7 @@ export function CreateTodoModal({
 
           <main className="flex flex-col gap-y-[24px] overflow-y-auto pr-[20px]">
             <div className="flex flex-col gap-y-[8px]">
-              <span className="text-lg text-black_333236">담당자</span>
+              <span className="text-lg text-black_333236">담당자 *</span>
               <AssigneeDropdown
                 onSelect={(userId) =>
                   setValues({ ...values, assigneeUserId: userId })
