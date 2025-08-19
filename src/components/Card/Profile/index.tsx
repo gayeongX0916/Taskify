@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import plusIcon from "@/assets/plus_icon.svg";
 import { BaseInput } from "@/components/common/Input/BaseInput";
-import { ModalButton } from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { postProfileImg, putMyInfo } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { UserChangeType } from "@/types/users";
@@ -89,7 +89,7 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
           e.preventDefault();
         }}
       >
-        <div className="flex flex-col lg:items-center gap-y-[10px]">
+        <div className="flex flex-col items-center gap-y-[10px]">
           <button
             className="w-[100px] h-[100px] flex justify-center items-center bg-[#F5F5F5] rounded-[6px] md:w-[182px] md:h-[182px]"
             onClick={handleInputClick}
@@ -101,7 +101,7 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
                 alt="프로필 이미지"
                 width={100}
                 height={100}
-                className="md:w-[182px] md:h-[182px]"
+                className="w-[100px] h-[100px] md:w-[182px] md:h-[182px]"
               />
             ) : (
               <Image
@@ -113,17 +113,19 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
               />
             )}
           </button>
-          <button
-            className="flex"
-            type="button"
-            onClick={() => {
-              setLocalProfileImageUrl(null);
-              setIsTyping(true);
-            }}
-            disabled={isLoading}
-          >
-            프로필 삭제하기
-          </button>
+          {myInfo?.profileImageUrl && (
+            <button
+              className="flex"
+              type="button"
+              onClick={() => {
+                setLocalProfileImageUrl(null);
+                setIsTyping(true);
+              }}
+              disabled={isLoading}
+            >
+              프로필 삭제하기
+            </button>
+          )}
         </div>
 
         <input
