@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { setCookie, deleteCookie } from "@/lib/utils/cookie";
 
 interface AuthState {
   accessToken: string | null;
@@ -15,16 +16,17 @@ export const useAuthStore = create<AuthState>()(
       userId: null,
 
       setAuth: (token, userId) =>
-        set(() => ({
-          accessToken: token,
-          userId: userId,
-        })),
+        set(() => {
+          // localStorage 저장 + 쿠키 미러링
+          setCookie("accessToken", token);
+          return { accessToken: token, userId };
+        }),
 
       clearAuth: () =>
-        set(() => ({
-          accessToken: null,
-          userId: null,
-        })),
+        set(() => {
+          deleteCookie("accessToken");
+          return { accessToken: null, userId: null };
+        }),
     }),
     { name: "auth-storage" }
   )
