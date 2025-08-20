@@ -2,13 +2,13 @@
 
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
-import  ModalButton  from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { TextareaInput } from "@/components/common/Input/ModalInput/TextareaInput";
 import { DateInput } from "@/components/common/Input/ModalInput/DateInput";
 import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
-import  AssigneeDropdown  from "@/components/Dropdown/AssigneeDropdown";
+import AssigneeDropdown from "@/components/Dropdown/AssigneeDropdown";
 import { ModalProps } from "@/types/ModalProps";
 import { postCard } from "@/lib/api/cards";
 import { useToastStore } from "@/lib/stores/toast";
@@ -44,7 +44,7 @@ export function CreateTodoModal({
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const addCard = useCardStore((state) => state.addCard);
+  const addCard = useCardStore((s) => s.addCard);
   const initialValues: postCardFormValues = {
     assigneeUserId: 0,
     columnId: columnId,

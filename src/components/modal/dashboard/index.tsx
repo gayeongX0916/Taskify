@@ -99,12 +99,12 @@ function DashBoardModal({
     (state) => state.commentsByCard?.[cardId]
   );
   const commentArray = commentList ?? [];
-  const setCommentList = useCommentStore((state) => state.setCommentList);
+  const setCommentList = useCommentStore((s) => s.setCommentList);
   const cardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardId]?.[columnId] ?? []
   );
   const card = cardList.find((c) => c.id === cardId);
-  const removeCard = useCardStore((state) => state.removeCard);
+  const removeCard = useCardStore((s) => s.removeCard);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -146,9 +146,28 @@ function DashBoardModal({
     }
   }, [removeCard, dashboardId, columnId, cardId, addToast, onClose]);
 
+  useEffect(() => {
+    if (!card && isOpen && !isLoading) {
+      addToast("카드를 찾을 수 없습니다.");
+    }
+  }, [card, isOpen, isLoading]);
+
   if (!card) {
-    addToast("카드를 찾을 수 없습니다.");
-    return null;
+    return (
+      <Dialog open={isOpen} onClose={onClose}>
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
+          <section className="bg-white_FFFFFF w-full md:w-[480px] p-[20px] rounded-[8px]">
+            <header className="flex justify-between items-center mb-[8px]">
+              <h2 className="text-lg font-bold">카드를 찾을 수 없습니다</h2>
+              <CloseIcon onClose={onClose} />
+            </header>
+            <p className="text-sm text-gray-600">
+              카드가 삭제되었거나 이동되었을 수 있어요.
+            </p>
+          </section>
+        </div>
+      </Dialog>
+    );
   }
 
   return (

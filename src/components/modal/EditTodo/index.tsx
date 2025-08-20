@@ -1,10 +1,10 @@
 "use client";
 
-import  AssigneeDropdown  from "@/components/Dropdown/AssigneeDropdown";
+import AssigneeDropdown from "@/components/Dropdown/AssigneeDropdown";
 import { ProgressDropdown } from "@/components/Dropdown/ProgressDropdown";
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
-import ModalButton  from "@/components/common/Button/ModalButton";
+import ModalButton from "@/components/common/Button/ModalButton";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import { TextareaInput } from "@/components/common/Input/ModalInput/TextareaInput";
 import { DateInput } from "@/components/common/Input/ModalInput/DateInput";
@@ -57,7 +57,7 @@ export function EditTodoModal({
     (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId] ?? []
   );
   const card = cardList.find((c) => c.id === cardId);
-  const updateCard = useCardStore((state) => state.updateCard);
+  const updateCard = useCardStore((s) => s.updateCard);
   const [values, setValues] = useState<EditCardFormValues>({
     columnId,
     title: "",
@@ -97,10 +97,10 @@ export function EditTodoModal({
       const payload = {
         ...data,
         dueDate: data.dueDate ? formatDateTime(data.dueDate) : "",
-        imageUrl: data.imageUrl?.trim() ? data.imageUrl : null, 
+        imageUrl: data.imageUrl?.trim() ? data.imageUrl : null,
       };
       const res = await putCard({ id: cardId, ...payload });
-      updateCard(dashboardIdNum, payload.columnId, res.data);
+      updateCard(dashboardIdNum, columnId, res.data);
       onClose();
       addToast("컬럼 수정에 성공했습니다.", "success");
       setValues({

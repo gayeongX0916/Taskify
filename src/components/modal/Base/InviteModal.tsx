@@ -20,7 +20,7 @@ function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addSentInvite = useInviteStore((state) => state.addSentInvite);
+  const addSentInvite = useInviteStore((s) => s.addSentInvite);
   const [value, setValue] = useState("");
 
   const handleInviteDashboard = useCallback(

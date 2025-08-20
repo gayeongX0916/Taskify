@@ -53,8 +53,8 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const removeDashboardMember = useDashboardStore(
     (state) => state.removeDashboardMember
   );
-  const setSentInvites = useInviteStore((state) => state.setSentInvites);
-  const removeSentInvite = useInviteStore((state) => state.removeSentInvite);
+  const setSentInvites = useInviteStore((s) => s.setSentInvites);
+  const removeSentInvite = useInviteStore((s) => s.removeSentInvite);
   const addToast = useToastStore.getState().addToast;
   const [sentInvitesList, setSentInvitesList] = useState<InviteUser[]>([]);
   const [memberList, setMemberList] = useState<getDashboardMemberListType[]>(

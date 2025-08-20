@@ -8,8 +8,8 @@ import { useAuthStore } from "@/lib/stores/auth";
 
 export default function DefaultHeader() {
   const router = useRouter();
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
 
   const handleGotoHome = () => router.push("/");
 

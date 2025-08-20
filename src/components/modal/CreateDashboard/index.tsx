@@ -20,7 +20,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const addDashboard = useDashboardStore((state) => state.addDashboard);
+  const addDashboard = useDashboardStore((s) => s.addDashboard);
   const [color, setColor] = useState("");
   const [title, setTitle] = useState("");
 
@@ -29,7 +29,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
       start(key);
       const res = await postDashboard(data);
       addDashboard(res.data);
-      
+
       onClose();
       setTitle("");
       setColor("");

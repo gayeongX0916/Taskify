@@ -16,8 +16,8 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
   const key = "profile";
   const addToast = useToastStore.getState().addToast;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const myInfo = useUserStore((state) => state.myInfo);
-  const updateMyInfo = useUserStore((state) => state.updateMyInfo);
+  const myInfo = useUserStore((s) => s.myInfo);
+  const updateMyInfo = useUserStore((s) => s.updateMyInfo);
   const [isTyping, setIsTyping] = useState(false);
   const [localNickname, setLocalNickname] = useState(myInfo?.nickname ?? "");
   const [localProfileImageUrl, setLocalProfileImageUrl] = useState(
