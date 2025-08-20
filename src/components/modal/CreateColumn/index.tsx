@@ -20,7 +20,7 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
-  const addColumn = useColumnStore((state) => state.addColumn);
+  const addColumn = useColumnStore((s) => s.addColumn);
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
   );

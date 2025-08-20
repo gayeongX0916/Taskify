@@ -24,7 +24,7 @@ export function DeleteColumnModal({
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const addToast = useToastStore.getState().addToast;
-  const removeColumn = useColumnStore((state) => state.removeColumn);
+  const removeColumn = useColumnStore((s) => s.removeColumn);
 
   const handleDeleteColumn = useCallback(async () => {
     try {

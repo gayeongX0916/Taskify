@@ -6,7 +6,6 @@ import { BackButton } from "@/components/common/Button/BackButton";
 import { useLoadingStore } from "@/lib/stores/loading";
 
 const myPage = () => {
-  const key = "mypage";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore(

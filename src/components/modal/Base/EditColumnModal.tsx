@@ -23,7 +23,7 @@ export function EditColumnModal({
   dashboardId,
 }: EditColumnModalProps) {
   const addToast = useToastStore.getState().addToast;
-  const updateColumn = useColumnStore((state) => state.updateColumn);
+  const updateColumn = useColumnStore((s) => s.updateColumn);
   const key = "EditColumnModal";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);

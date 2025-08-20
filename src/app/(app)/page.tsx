@@ -13,7 +13,7 @@ import { useAuthStore } from "@/lib/stores/auth";
 
 const HomePage = () => {
   const router = useRouter();
-  const accessToken = useAuthStore((state) => state.accessToken);
+  const accessToken = useAuthStore((s) => s.accessToken);
 
   const featureList = [
     {

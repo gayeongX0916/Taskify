@@ -24,7 +24,7 @@ export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addComment = useCommentStore((state) => state.addComment);
+  const addComment = useCommentStore((s) => s.addComment);
   const [value, setValue] = useState("");
 
   const handleAddComment = async (data: postCommentType) => {

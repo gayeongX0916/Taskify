@@ -21,9 +21,9 @@ const DashboardPage = () => {
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const key = "dashboard";
-  const start = useLoadingStore((state) => state.startLoading);
-  const stop = useLoadingStore((state) => state.stopLoading);
-  const isLoading = useLoadingStore((state) => state.loadingMap[key] ?? true);
+  const start = useLoadingStore((s) => s.startLoading);
+  const stop = useLoadingStore((s) => s.stopLoading);
+  const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? true);
   const [isOpen, setIsOpen] = useState(false);
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
@@ -31,11 +31,11 @@ const DashboardPage = () => {
   const columnArray = columnsByDashboard
     ? Object.values(columnsByDashboard)
     : [];
-  const setColumnList = useColumnStore((state) => state.setColumnList);
+  const setColumnList = useColumnStore((s) => s.setColumnList);
 
   const cardsByDashboard =
-    useCardStore((state) => state.cardsByDashboard?.[dashboardIdNum]) ?? {};
-  const setCardList = useCardStore((state) => state.setCardList);
+    useCardStore((s) => s.cardsByDashboard?.[dashboardIdNum]) ?? {};
+  const setCardList = useCardStore((s) => s.setCardList);
   console.log(cardsByDashboard);
   const handleOpen = useCallback(() => setIsOpen(true), []);
 

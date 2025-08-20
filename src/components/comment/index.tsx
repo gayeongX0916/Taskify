@@ -1,5 +1,5 @@
 import { formatDateTimeUTC } from "@/lib/utils/formatDate";
-import  Avatar  from "../common/Avatar";
+import Avatar from "../common/Avatar";
 import { useCommentStore } from "@/lib/stores/comment";
 import { useToastStore } from "@/lib/stores/toast";
 import { deleteComment, putComment } from "@/lib/api/comments";
@@ -22,8 +22,8 @@ function Comment({ name, date, content, cardId, commentId }: CommentProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const removeComment = useCommentStore((state) => state.removeComment);
-  const updateComment = useCommentStore((state) => state.updateComment);
+  const removeComment = useCommentStore((s) => s.removeComment);
+  const updateComment = useCommentStore((s) => s.updateComment);
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(content);
 

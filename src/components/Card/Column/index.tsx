@@ -47,7 +47,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
   const rawCardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId]
   );
-  const setCardList = useCardStore((state) => state.setCardList);
+  const setCardList = useCardStore((s) => s.setCardList);
   const count = useCardStore(
     (state) => state.countsByDashboard?.[dashboardIdNum]?.[columnId] ?? 0
   );
@@ -218,10 +218,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
                             "will-change-transform", // GPU 힌트
                             // 지금 이 카드가 드래그 중인지 여부
                             dragSnapshot.isDragging
-                              ? [
-                                  "shadow-2xl",
-                                  "scale-[1.02]",
-                                ].join(" ")
+                              ? ["shadow-2xl", "scale-[1.02]"].join(" ")
                               : "hover:shadow-md",
                           ].join(" ")}
                           onClick={() => {

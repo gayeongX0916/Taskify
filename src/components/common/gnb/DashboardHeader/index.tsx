@@ -2,9 +2,8 @@ import Image from "next/image";
 import settingIcon from "@/assets/setting_icon.svg";
 import addBoxIcon from "@/assets/add_box.svg";
 import Avatar from "../../Avatar";
-import InvitedUserList from "./InvitedUserList";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import  InviteModal  from "@/components/Modal/Base/InviteModal";
+import InviteModal from "@/components/Modal/Base/InviteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardDetail } from "@/lib/api/dashboards";
@@ -17,6 +16,7 @@ import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { useAuthStore } from "@/lib/stores/auth";
 import React from "react";
+import InvitedUserList from "./InvitedUserList";
 
 const SettingIcon = React.memo(() => (
   <Image
@@ -62,8 +62,8 @@ export default function DashboardHeader() {
   const isMyDashboardPage =
     pathname === "/mydashboard" || pathname === "/mypage";
 
-  const myInfo = useUserStore((state) => state.myInfo);
-  const setMyInfo = useUserStore((state) => state.setMyInfo);
+  const myInfo = useUserStore((s) => s.myInfo);
+  const setMyInfo = useUserStore((s) => s.setMyInfo);
 
   const dashboardMemberList = useDashboardStore(
     (state) => state.membersByDashboardId
@@ -74,10 +74,10 @@ export default function DashboardHeader() {
   const dashboard = useDashboardStore(
     (state) => state.dashboardsById[dashboardNum]
   );
-  const addDashboard = useDashboardStore((state) => state.addDashboard);
+  const addDashboard = useDashboardStore((s) => s.addDashboard);
   const member = dashboardMemberList[dashboardNum] || [];
-  const userId = useAuthStore((state) => state.userId);
-  const visibleMembers = useMemo(() => member.map(m => m.nickname), [member]);
+  const userId = useAuthStore((s) => s.userId);
+  const visibleMembers = useMemo(() => member.map((m) => m.nickname), [member]);
 
   useEffect(() => {
     if (!isMyDashboardPage && !dashboard && dashboardId) {

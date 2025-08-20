@@ -75,7 +75,7 @@ function ReceivedInviteTable() {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? true);
-  const receivedInvites = useInviteStore((state) => state.receivedInvites);
+  const receivedInvites = useInviteStore((s) => s.receivedInvites);
   const setReceivedInvites = useInviteStore(
     (state) => state.setReceivedInvites
   );
