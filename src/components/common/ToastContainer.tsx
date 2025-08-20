@@ -15,9 +15,9 @@ export function ToastContainer() {
 
   return (
     <div className="fixed top-[20px] left-1/2 -translate-x-1/2 flex flex-col gap-2 z-[9999]">
-      {toasts.map((toast) => (
+      {toasts.map((toast, idx) => (
         <button
-          key={toast.id}
+          key={idx}
           className={`px-[12px] py-[8px] text-sm md:text-lg md:px-[20px] md:py-[13px] rounded-[8px] text-white animate-fadeOut whitespace-nowrap
             ${
               toast.type === "error"
