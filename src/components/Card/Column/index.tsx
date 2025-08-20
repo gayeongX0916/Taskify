@@ -15,6 +15,7 @@ import { isAxiosError } from "axios";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { Skeleton } from "@/components/common/Skeleton";
 import React from "react";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
 
 type ColumnCardProps = {
   columnId: number;
@@ -34,10 +35,11 @@ const SettingIcon = React.memo(({ onClick }: { onClick: () => void }) => (
     />
   </button>
 ));
+
 function ColumnCard({ columnId, title }: ColumnCardProps) {
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-  const key = "columncard";
+  const key = `columncard-${columnId}`;
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
@@ -57,12 +59,11 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
     deleteColumn: false,
   });
   const [maxVisible, setMaxVisible] = useState(1);
-  const [visibleCount, setVisibleCount] = useState(maxVisible);
+  const [visibleCount, setVisibleCount] = useState(1);
 
   const handleClickOpen = (modalName: ModalName) => {
     setModalState((prev) => ({ ...prev, [modalName]: true }));
   };
-
   const handleClickClose = (modalName: ModalName) => {
     setModalState((prev) => ({ ...prev, [modalName]: false }));
   };
@@ -70,7 +71,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
   const handleOpenEditColumn = useCallback(() => {
     handleClickOpen("editColumn");
   }, []);
-
   const handleOpenCreateTodo = useCallback(() => {
     handleClickOpen("createTodo");
   }, []);
@@ -79,7 +79,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
     const fetchData = async () => {
       try {
         start(key);
-        const res = await getCardList({ size: 10, columnId });
+        const res = await getCardList({ size: 50, columnId });
         setCardList(
           dashboardIdNum,
           columnId,
@@ -99,7 +99,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
       }
     };
     fetchData();
-  }, [columnId, setCardList]);
+  }, [columnId, dashboardIdNum]);
 
   useEffect(() => {
     const updateMaxVisible = () => {
@@ -108,7 +108,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
       else if (width < 1200) setMaxVisible(2);
       else setMaxVisible(3);
     };
-
     updateMaxVisible();
     window.addEventListener("resize", updateMaxVisible);
     return () => window.removeEventListener("resize", updateMaxVisible);
@@ -119,13 +118,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
   }, [maxVisible]);
 
   const cardList = useMemo(() => rawCardList ?? [], [rawCardList]);
-  const sortedCardList = useMemo(() => {
-    return [...cardList].sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
-  }, [cardList]);
-  const visibleCards = sortedCardList.slice(0, visibleCount);
 
   return (
     <section className="py-[16px] px-[12px] md:py-[20px] md:px-[20px] flex flex-col border-b border-gray_EEEEEE lg:border-b-0 lg:border-r lg:min-w-[354px]">
@@ -162,6 +154,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
           onClose={() => handleClickClose("dashboard")}
         />
       )}
+
       <header className="flex items-center justify-between mb-[24px]">
         <div className="flex items-center gap-x-[8px]">
           <div className="w-[8px] h-[8px] bg-violet_5534DA rounded-full"></div>
@@ -172,7 +165,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
             </span>
           </div>
         </div>
-
         <SettingIcon onClick={handleOpenEditColumn} />
       </header>
 
@@ -183,40 +175,89 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
           onClick={handleOpenCreateTodo}
         />
       </div>
-      <div className="flex flex-col md:gap-y-[16px]">
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton
-                key={i}
-                className="w-full h-[250px] md:h-[90px] lg:h-[250px]"
-              />
-            ))
-          : visibleCards.map(({ id }, idx) => (
-              <div
-                role="button"
-                key={id}
-                className={`${idx > 0 ? "hidden md:block" : ""}`}
-                onClick={() => {
-                  setSelectedId(id);
-                  handleClickOpen("dashboard");
-                }}
-              >
-                <ColumnDetailCard
-                  dashboardId={dashboardIdNum}
-                  columnId={columnId}
-                  cardId={id}
-                />
-              </div>
-            ))}
-        {!isLoading && visibleCount < sortedCardList.length && (
-          <button
-            className="text-2lg text-violet_5534DA hidden lg:block"
-            onClick={() => setVisibleCount((prev) => prev + maxVisible)}
+
+      <Droppable
+        droppableId={`column-${columnId}`}
+        type="CARD"
+        ignoreContainerClipping
+      >
+        {(dropProvided, dropSnapshot) => (
+          <div
+            ref={dropProvided.innerRef}
+            {...dropProvided.droppableProps}
+            className={[
+              "flex flex-col md:gap-y-[16px]",
+              "rounded-xl transition-colors",
+              // 이 컬럼 위로 드래그 중인 카드가 올라와 있는지 여부
+              dropSnapshot.isDraggingOver &&
+                "bg-violet_5534DA/5 outline outline-2 outline-dashed outline-violet_5534DA/40 px-1 -mx-1 py-1 -my-1",
+            ].join(" ")}
           >
-            더보기
-          </button>
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-full h-[250px] md:h-[90px] lg:h-[250px]"
+                  />
+                ))
+              : cardList.map(({ id }, idx) => {
+                  const visuallyHidden = idx >= visibleCount;
+                  return (
+                    <Draggable draggableId={`card-${id}`} index={idx} key={id}>
+                      {(dragProvided, dragSnapshot) => (
+                        <div
+                          role="button"
+                          ref={dragProvided.innerRef}
+                          {...dragProvided.draggableProps}
+                          {...dragProvided.dragHandleProps}
+                          className={[
+                            idx > 0 ? "hidden md:block" : "",
+                            visuallyHidden &&
+                              "pointer-events-none h-0 overflow-hidden opacity-0",
+                            "rounded-2xl bg-white shadow-sm transition-all duration-150 select-none cursor-grab active:cursor-grabbing",
+                            "will-change-transform", // GPU 힌트
+                            // 지금 이 카드가 드래그 중인지 여부
+                            dragSnapshot.isDragging
+                              ? [
+                                  "shadow-2xl",
+                                  "scale-[1.02]",
+                                ].join(" ")
+                              : "hover:shadow-md",
+                          ].join(" ")}
+                          onClick={() => {
+                            if (dragSnapshot.isDragging) return;
+                            setSelectedId(id);
+                            handleClickOpen("dashboard");
+                          }}
+                        >
+                          <ColumnDetailCard
+                            dashboardId={dashboardIdNum}
+                            columnId={columnId}
+                            cardId={id}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+
+            {dropProvided.placeholder}
+
+            {!isLoading && visibleCount < cardList.length && (
+              <button
+                className="text-2lg text-violet_5534DA hidden lg:block"
+                onClick={() =>
+                  setVisibleCount((prev) =>
+                    Math.min(prev + maxVisible, cardList.length)
+                  )
+                }
+              >
+                더보기
+              </button>
+            )}
+          </div>
         )}
-      </div>
+      </Droppable>
     </section>
   );
 }
