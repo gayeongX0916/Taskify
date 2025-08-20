@@ -22,7 +22,7 @@ const mydashboardPage = () => {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const setDashboardList = useDashboardStore((state) => state.setDashboardList);
+  const setDashboardList = useDashboardStore((s) => s.setDashboardList);
   const [dashboards, setDashboards] = useState<getDashboardListType[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -66,10 +66,7 @@ const mydashboardPage = () => {
 
   return (
     <main className="bg-gray_FAFAFA min-h-screen">
-      <CreateDashboardModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
+      <CreateDashboardModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       <div className="max-w-[960px] px-[24px] py-[24px] flex flex-col gap-y-[32px] md:gap-y-[40px] md:px-[40px] md:py-[40px]">
         <div className="flex flex-col gap-y-[16px] lg:gap-y-[12px]">
           <div className="flex flex-col gap-y-[8px] md:grid md:grid-cols-2 md:gap-[10px] lg:grid-cols-3 lg:gap-[12px]">

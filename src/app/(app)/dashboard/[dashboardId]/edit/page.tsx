@@ -21,7 +21,7 @@ const editDashboardPage = () => {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const removeDashboard = useDashboardStore((state) => state.removeDashboard);
+  const removeDashboard = useDashboardStore((s) => s.removeDashboard);
 
   const handleDeleteDashboard = async (dashboardId: number) => {
     try {
