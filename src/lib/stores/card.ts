@@ -93,13 +93,18 @@ export const useCardStore = create<CardState>((set) => ({
       const dbCards = { ...(state.cardsByDashboard[dashboardId] || {}) };
       const dbCounts = { ...(state.countsByDashboard[dashboardId] || {}) };
 
-      const oldCards = dbCards[oldColumnId] || [];
-      dbCards[oldColumnId] = oldCards.filter((c) => c.id !== card.id);
-      dbCounts[oldColumnId] = Math.max((dbCounts[oldColumnId] || 1) - 1, 0);
+      if (oldColumnId === newColumnId) {
+        const list = dbCards[newColumnId] || [];
+        dbCards[newColumnId] = list.map((c) => (c.id === card.id ? card : c));
+      } else {
+        const oldList = dbCards[oldColumnId] || [];
+        dbCards[oldColumnId] = oldList.filter((c) => c.id !== card.id);
+        dbCounts[oldColumnId] = Math.max((dbCounts[oldColumnId] || 1) - 1, 0);
 
-      const newCards = dbCards[newColumnId] || [];
-      dbCards[newColumnId] = [card, ...newCards];
-      dbCounts[newColumnId] = (dbCounts[newColumnId] || 0) + 1;
+        const newList = dbCards[newColumnId] || [];
+        dbCards[newColumnId] = [card, ...newList];
+        dbCounts[newColumnId] = (dbCounts[newColumnId] || 0) + 1;
+      }
 
       return {
         cardsByDashboard: { ...state.cardsByDashboard, [dashboardId]: dbCards },
