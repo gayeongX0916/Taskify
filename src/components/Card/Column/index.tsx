@@ -195,10 +195,12 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
           >
             {isLoading
               ? Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton
+                  <div
                     key={i}
-                    className="w-full h-[250px] md:h-[90px] lg:h-[250px]"
-                  />
+                    className="relative w-full h-[250px] md:h-[90px] lg:h-[250px] rounded-md overflow-hidden"
+                  >
+                    <Skeleton />
+                  </div>
                 ))
               : cardList.map(({ id }, idx) => {
                   const visuallyHidden = idx >= visibleCount;
