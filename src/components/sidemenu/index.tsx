@@ -16,6 +16,7 @@ import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardListType } from "@/types/dashboards";
 import { Skeleton } from "../common/Skeleton";
 import PaginationButton from "../common/Button/PaginationButton";
+import { useAuthStore } from "@/lib/stores/auth";
 
 const LogoTitle = (
   <Image src={logoTitlePurple} alt="로고" className="hidden md:flex" />
@@ -34,6 +35,7 @@ export function SideMenu() {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -44,28 +46,37 @@ export function SideMenu() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        start(key);
-        const res = await getDashboardList({ page, size: PAGE_SIZE });
-        setDashboards(res.data.dashboards);
-        setTotalCount(res.data.totalCount);
-      } catch (error) {
-        if (isAxiosError(error))
-          addToast(
-            error.response?.data.message ||
-              "대시보드 목록 불러오기에 실패했습니다."
-          );
-        else addToast("알 수 없는 오류 발생");
-      } finally {
-        stop(key);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      start(key);
+      const res = await getDashboardList({ page, size: PAGE_SIZE });
+      setDashboards(res.data.dashboards);
+      setTotalCount(res.data.totalCount);
+    } catch (error) {
+      if (isAxiosError(error))
+        addToast(
+          error.response?.data.message ||
+            "대시보드 목록 불러오기에 실패했습니다."
+        );
+      else addToast("알 수 없는 오류 발생");
+    } finally {
+      stop(key);
+    }
   }, [page, isOpen]);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   useEffect(() => setSelectedId(dashboardIdNum || null), [dashboardIdNum]);
+
+  useEffect(() => {
+    setDashboards([]);
+    setTotalCount(0);
+    setPage(1);
+    setSelectedId(null);
+    fetchData();
+  }, [accessToken]);
 
   const handleSelect = useCallback(
     (id: number) => {
@@ -110,9 +121,9 @@ export function SideMenu() {
         <ul className="flex flex-col items-center md:gap-y-[8px] md:items-start gap-y-[6px] md:w-full">
           {filledArray.map(({ id, isEmpty }, i) => (
             <li key={id} className="md:w-full relative">
-              {!isEmpty ? (
+              {!isEmpty && (
                 <button
-                  className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] ${
+                  className={`flex w-[40px] h-[40px] justify-center items-center md:w-full md:gap-x-[16px] md:hover:bg-violet_8P md:hover:rounded-[4px] md:px-[10px] md:py-[7px] md:justify-start lg:px-[12px] lg:py-[12px] md:min-w-0 md:flex-1 ${
                     id === selectedId ? "bg-violet_8P rounded-[4px]" : ""
                   }`}
                   onClick={() => handleSelect(Number(id))}
@@ -121,17 +132,15 @@ export function SideMenu() {
                   <div
                     className={`${
                       dashboardColoMap[dashboards[i].color]
-                    } rounded-full min-w-[8px] min-h-[8px]`}
+                    } rounded-full min-w-[8px] min-h-[8px] shrink-0`}
                   />
-                  <div className="hidden md:flex md:gap-x-[6px]">
-                    <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg">
+                  <div className="hidden md:flex md:gap-x-[6px] md:min-w-0 md:flex-1">
+                    <span className="text-lg text-gray_787486 whitespace-nowrap lg:text-2lg truncate">
                       {dashboards[i].title}
                     </span>
                     {dashboards[i].createdByMe && CrownIcon}
                   </div>
                 </button>
-              ) : (
-                <div className="w-full h-[40px]" />
               )}
               {isLoading && <Skeleton className="absolute inset-0" />}
             </li>
