@@ -15,6 +15,7 @@ interface DashboardState {
   removeDashboard: (id: number) => void;
   updateDashboard: (id: number, title: string, color: string) => void;
   removeDashboardMember: (dashboardId: number, memberId: number) => void;
+  reset: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -78,4 +79,6 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         },
       };
     }),
+
+  reset: () => set({ dashboardsById: {}, membersByDashboardId: {} }),
 }));
