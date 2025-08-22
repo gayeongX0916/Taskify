@@ -14,10 +14,7 @@ type AssigneeDropdownProps = {
   onSelect?: (userId: number) => void;
 };
 
-function AssigneeDropdown({
-  initialUserId,
-  onSelect,
-}: AssigneeDropdownProps) {
+function AssigneeDropdown({ initialUserId, onSelect }: AssigneeDropdownProps) {
   const { dashboardId } = useParams();
   const dashboardNum = Number(dashboardId);
   const dashboardMemberList = useDashboardStore(
@@ -94,9 +91,9 @@ function AssigneeDropdown({
 
       {isOpen && filteredList(value).length > 0 && (
         <div className="absolute bg-white_FFFFFF w-full px-[16px] py-[14px] flex flex-col gap-y-[11px] border border-gray_D9D9D9 rounded-[6px] mt-[2px] overflow-y-auto max-h-[300px]">
-          {filteredList(value).map(({ userId, nickname }) => (
+          {filteredList(value).map(({ userId, nickname }, idx) => (
             <button
-              key={userId}
+              key={idx}
               className="flex gap-x-[8px]"
               onClick={() => handleSelectClick(userId, nickname)}
             >
@@ -117,4 +114,4 @@ function AssigneeDropdown({
   );
 }
 
-export default React.memo(AssigneeDropdown)
+export default React.memo(AssigneeDropdown);
