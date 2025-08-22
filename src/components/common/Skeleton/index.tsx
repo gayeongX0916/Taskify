@@ -1,7 +1,7 @@
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`relative overflow-hidden bg-gray-200 rounded-md ${className}`}
+      className={`absolute inset-0 overflow-hidden bg-gray-200 rounded-md ${className}`}
     >
       <div
         className="absolute top-0 left-0 h-full w-full"
