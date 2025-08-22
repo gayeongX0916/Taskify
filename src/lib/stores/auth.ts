@@ -17,7 +17,6 @@ export const useAuthStore = create<AuthState>()(
 
       setAuth: (token, userId) =>
         set(() => {
-          // localStorage 저장 + 쿠키 미러링
           setCookie("accessToken", token);
           return { accessToken: token, userId };
         }),

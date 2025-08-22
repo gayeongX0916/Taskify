@@ -5,6 +5,7 @@ interface UserState {
   myInfo: getUserType | null;
   setMyInfo: (info: getUserType) => void;
   updateMyInfo: (partial: Partial<getUserType>) => void;
+  reset: () => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -14,4 +15,5 @@ export const useUserStore = create<UserState>((set) => ({
     set((state) => ({
       myInfo: state.myInfo ? { ...state.myInfo, ...partial } : null,
     })),
+  reset: () => set({ myInfo: null }),
 }));

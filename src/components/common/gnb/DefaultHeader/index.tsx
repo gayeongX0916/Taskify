@@ -5,17 +5,22 @@ import logoWhite from "@/assets/logo_white.svg";
 import logoTitleWhite from "@/assets/logo_title_white.svg";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/auth";
+import { useDashboardStore } from "@/lib/stores/dashboard";
+import { useUserStore } from "@/lib/stores/user";
 
 export default function DefaultHeader() {
   const router = useRouter();
   const accessToken = useAuthStore((s) => s.accessToken);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const resetDashboard = useDashboardStore((s) => s.reset);
+  const resetUser = useUserStore((s) => s.reset);
 
   const handleGotoHome = () => router.push("/");
 
   const handleLogout = () => {
     clearAuth();
-    router.push("/");
+    resetDashboard();
+    resetUser();
   };
 
   return (

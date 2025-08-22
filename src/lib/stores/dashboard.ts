@@ -1,62 +1,81 @@
+import { create } from "zustand";
 import { getDashboardListType } from "@/types/dashboards";
 import { getDashboardMemberListType } from "@/types/members";
-import { create } from "zustand";
 
 interface DashboardState {
   dashboardsById: Record<number, getDashboardListType>;
+  orderedIds: number[];
+  totalCount: number;
+
   membersByDashboardId: Record<number, getDashboardMemberListType[]>;
 
-  setDashboardList: (list: getDashboardListType[]) => void;
+  mergeListPage: (list: getDashboardListType[], totalCount: number) => void;
+
+  addDashboard: (dashboard: getDashboardListType) => void;
+  removeDashboard: (id: number) => void;
+  updateDashboard: (id: number, title: string, color: string) => void;
+
   setDashboardMembers: (
     dashboardId: number,
     members: getDashboardMemberListType[]
   ) => void;
-  addDashboard: (dashboard: getDashboardListType) => void;
-  removeDashboard: (id: number) => void;
-  updateDashboard: (id: number, title: string, color: string) => void;
   removeDashboardMember: (dashboardId: number, memberId: number) => void;
+
+  reset: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
   dashboardsById: {},
+  orderedIds: [],
+  totalCount: 0,
+
   membersByDashboardId: {},
 
-  setDashboardList: (list) =>
-    set((state) => ({
-      dashboardsById: {
-        ...state.dashboardsById,
-        ...list.reduce((acc, d) => {
-          acc[d.id] = d;
-          return acc;
-        }, {} as Record<number, getDashboardListType>),
-      },
-    })),
+  mergeListPage: (list, totalCount) =>
+    set((state) => {
+      const dashboardsById = { ...state.dashboardsById };
+      // 새 데이터 덮어쓰기
+      list.forEach((d) => (dashboardsById[d.id] = d));
 
-  setDashboardMembers: (dashboardId, members) =>
-    set((state) => ({
-      membersByDashboardId: {
-        ...state.membersByDashboardId,
-        [dashboardId]: members,
-      },
-    })),
+      const seen = new Set<number>();
+      const nextOrdered = [
+        ...state.orderedIds,
+        ...list.map((d) => d.id),
+      ].filter((id) => {
+        // 중복 제거 때문에
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+
+      return { dashboardsById, orderedIds: nextOrdered, totalCount };
+    }),
 
   addDashboard: (dashboard) =>
-    set((state) => ({
-      dashboardsById: {
+    set((state) => {
+      const dashboardsById = {
         ...state.dashboardsById,
         [dashboard.id]: dashboard,
-      },
-    })),
+      };
+      const next = [
+        dashboard.id,
+        ...state.orderedIds.filter((id) => id !== dashboard.id),
+      ];
+      return {
+        dashboardsById,
+        orderedIds: next,
+        totalCount: state.totalCount + 1,
+      };
+    }),
 
   removeDashboard: (id) =>
     set((state) => {
-      const newDashboards = { ...state.dashboardsById };
-      delete newDashboards[id];
-      const newMembers = { ...state.membersByDashboardId };
-      delete newMembers[id];
+      const dashboardsById = { ...state.dashboardsById };
+      delete dashboardsById[id];
       return {
-        dashboardsById: newDashboards,
-        membersByDashboardId: newMembers,
+        dashboardsById,
+        orderedIds: state.orderedIds.filter((x) => x !== id),
+        totalCount: Math.max(0, state.totalCount - 1),
       };
     }),
 
@@ -68,14 +87,30 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       },
     })),
 
+  setDashboardMembers: (dashboardId, members) =>
+    set((state) => ({
+      membersByDashboardId: {
+        ...state.membersByDashboardId,
+        [dashboardId]: members,
+      },
+    })),
+
   removeDashboardMember: (dashboardId, memberId) =>
     set((state) => {
-      const currentMembers = state.membersByDashboardId[dashboardId] || [];
+      const cur = state.membersByDashboardId[dashboardId] || [];
       return {
         membersByDashboardId: {
           ...state.membersByDashboardId,
-          [dashboardId]: currentMembers.filter((m) => m.id !== memberId),
+          [dashboardId]: cur.filter((m) => m.id !== memberId),
         },
       };
+    }),
+
+  reset: () =>
+    set({
+      dashboardsById: {},
+      orderedIds: [],
+      totalCount: 0,
+      membersByDashboardId: {},
     }),
 }));

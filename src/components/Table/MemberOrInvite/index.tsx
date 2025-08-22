@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ActionButton } from "@/components/common/Button/ActionButton";
 import PaginationButton from "@/components/common/Button/PaginationButton";
 import Avatar from "@/components/common/Avatar";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   deleteInviteDashboard,
   getInviteDashboard,
@@ -50,16 +50,15 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const removeDashboardMember = useDashboardStore(
-    (state) => state.removeDashboardMember
+  const membersByDashboardId = useDashboardStore((s) => s.membersByDashboardId);
+  const setDashboardMembers = useDashboardStore((s) => s.setDashboardMembers);
+  const removeDashboardMemberStore = useDashboardStore(
+    (s) => s.removeDashboardMember
   );
+  const sentInvites = useInviteStore((s) => s.sentInvites);
   const setSentInvites = useInviteStore((s) => s.setSentInvites);
   const removeSentInvite = useInviteStore((s) => s.removeSentInvite);
   const addToast = useToastStore.getState().addToast;
-  const [sentInvitesList, setSentInvitesList] = useState<InviteUser[]>([]);
-  const [memberList, setMemberList] = useState<getDashboardMemberListType[]>(
-    []
-  );
   const [isOpen, setIsOpen] = useState(false);
   const [inviteTotalCount, setInviteTotalCount] = useState(0);
   const [memberTotalCount, setMemberTotalCount] = useState(0);
@@ -68,29 +67,51 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const [invitePage, setInvitePage] = useState(1);
   const [memberPage, setMemberPage] = useState(1);
 
-  const filledMemberList = Array.from({ length: 4 }).map(
-    (_, i) => memberList[i] ?? { id: `empty-${i}`, nickname: "", isEmpty: true }
+
+  const rawMembers: getDashboardMemberListType[] =
+    membersByDashboardId[dashboardId] ?? [];
+
+  const membersWithoutOwner = useMemo(
+    () => rawMembers.filter((m) => !m.isOwner),
+    [rawMembers]
   );
 
-  const filledInviteList = Array.from({ length: 5 }).map(
-    (_, i) =>
-      sentInvitesList[i] ?? {
-        invitationId: `empty-${i}`,
-        email: "",
-        isEmpty: true,
-      }
+  const filledMemberList = useMemo(
+    () =>
+      Array.from({ length: 4 }).map(
+        (_, i) =>
+          membersWithoutOwner[i] ?? {
+            id: `empty-${i}`,
+            nickname: "",
+            isEmpty: true,
+          }
+      ),
+    [membersWithoutOwner]
+  );
+
+  const filledInviteList = useMemo(
+    () =>
+      Array.from({ length: 5 }).map(
+        (_, i) =>
+          sentInvites[i] ?? {
+            invitationId: `empty-${i}`,
+            email: "",
+            isEmpty: true,
+          }
+      ),
+    [sentInvites]
   );
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMembers = async () => {
       try {
         start(key);
         const res = await getDashboardMemberList({
           size: 4,
-          dashboardId: dashboardId,
+          dashboardId,
           page: memberPage,
         });
-        setMemberList(res.data.members);
+        setDashboardMembers(dashboardId, res.data.members);
         setMemberTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error)) {
@@ -104,26 +125,25 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
         stop(key);
       }
     };
-    fetchData();
-  }, [memberPage]);
+    fetchMembers();
+  }, [dashboardId, memberPage]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInvites = async () => {
       try {
         start(key);
         const res = await getInviteDashboard({
-          dashboardId: dashboardId,
+          dashboardId,
           size: 5,
           page: invitePage,
         });
-        const users = res.data.invitations.map(
+        const users: InviteUser[] = res.data.invitations.map(
           (invitation: getInvitationType) => ({
             email: invitation.invitee.email,
             invitationId: invitation.id,
           })
         );
         setSentInvites(users);
-        setSentInvitesList(users);
         setInviteTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error)) {
@@ -138,16 +158,13 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
         stop(key);
       }
     };
-    fetchData();
+    fetchInvites();
   }, [dashboardId, isOpen, invitePage]);
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
       start(key);
-      await deleteInviteDashboard({
-        dashboardId,
-        invitationId,
-      });
+      await deleteInviteDashboard({ dashboardId, invitationId });
       removeSentInvite(invitationId);
       addToast("초대 취소에 성공했습니다.", "success");
     } catch (error) {
@@ -165,7 +182,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
     try {
       start(key);
       await deleteDashboardMember({ memberId });
-      removeDashboardMember(dashboardId, memberId);
+      removeDashboardMemberStore(dashboardId, memberId);
       addToast("대시보드 멤버 삭제에 성공했습니다.", "success");
     } catch (error) {
       if (isAxiosError(error)) {
@@ -253,13 +270,13 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
                     </ActionButton>
                   </>
                 ) : (
-                  <div className="w-full h-[35px] " />
+                  <div className="w-full h-[35px]" />
                 )}
               </div>
             ))
-          : filledInviteList.map((user) => (
+          : filledInviteList.map((user, idx: number) => (
               <div
-                key={user.invitationId}
+                key={user.invitationId ?? `empty-${idx}`}
                 className="flex justify-between items-center py-[12px] border-b border-gray_EEEEEE"
               >
                 {!user.isEmpty ? (
