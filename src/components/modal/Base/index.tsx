@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import Image from "next/image";
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode } from "react";
 import closeIcon from "@/assets/close_icon_gray.svg";
 import React from "react";
 

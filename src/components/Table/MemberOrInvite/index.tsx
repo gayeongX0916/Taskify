@@ -67,7 +67,6 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const [invitePage, setInvitePage] = useState(1);
   const [memberPage, setMemberPage] = useState(1);
 
-
   const rawMembers: getDashboardMemberListType[] =
     membersByDashboardId[dashboardId] ?? [];
 
@@ -210,15 +209,26 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
         </h1>
 
         <div className="flex items-center gap-x-[12px] md:gap-x-[16px]">
-          <span className="text-xs text-black_333236 md:text-md">
-            {mode === "member" ? memberTotalPages : inviteTotalPages} 페이지 중
-            {mode === "member" ? memberPage : invitePage}
-          </span>
-          <PaginationButton
-            currentPage={mode === "member" ? memberPage : invitePage}
-            totalPages={mode === "member" ? memberTotalPages : inviteTotalPages}
-            onPageChange={mode === "member" ? setMemberPage : setInvitePage}
-          />
+          {(() => {
+            const totalPages =
+              mode === "member" ? memberTotalPages : inviteTotalPages;
+            const currentPage = mode === "member" ? memberPage : invitePage;
+
+            return totalPages > 1 ? (
+              <>
+                <span className="text-xs text-black_333236 md:text-md">
+                  {totalPages} 페이지 중 {currentPage}
+                </span>
+                <PaginationButton
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={
+                    mode === "member" ? setMemberPage : setInvitePage
+                  }
+                />
+              </>
+            ) : null;
+          })()}
           {mode === "invite" && (
             <InviteButton
               className="hidden md:flex md:h-full md:w-[105px]"
