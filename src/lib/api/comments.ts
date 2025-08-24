@@ -1,5 +1,4 @@
 import {
-  getCommentType,
   postCommentType,
   putCommentType,
 } from "@/types/comments";
