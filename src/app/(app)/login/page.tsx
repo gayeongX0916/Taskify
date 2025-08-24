@@ -28,13 +28,15 @@ type FormField = {
   mode: "text" | "password";
 };
 
-export const AuthLogo = React.memo(() => (
+const AuthLogoComponent = () => (
   <Link href="/">
     <Image src={authLogo} alt="로고" />
   </Link>
-));
+);
 
-const loginPage = () => {
+export const AuthLogo = React.memo(AuthLogoComponent);
+
+const LoginPage = () => {
   const setAuth = useAuthStore.getState().setAuth;
   const addToast = useToastStore.getState().addToast;
   const key = "login";
@@ -202,4 +204,4 @@ const loginPage = () => {
   );
 };
 
-export default loginPage;
+export default LoginPage;

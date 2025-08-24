@@ -48,7 +48,7 @@ const MyDashboardPage = () => {
     } finally {
       stop(key);
     }
-  }, [page]);
+  }, [page, mergeListPage, start, stop, addToast]);
 
   useEffect(() => {
     fetchData();

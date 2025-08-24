@@ -11,7 +11,7 @@ import { useLoadingStore } from "@/lib/stores/loading";
 import { BackButton } from "@/components/common/Button/BackButton";
 import { isAxiosError } from "axios";
 
-const editDashboardPage = () => {
+const EditDashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const { dashboardId } = useParams();
@@ -65,4 +65,4 @@ const editDashboardPage = () => {
   );
 };
 
-export default editDashboardPage;
+export default EditDashboardPage;

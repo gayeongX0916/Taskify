@@ -28,13 +28,19 @@ const DashboardPage = () => {
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
   );
-  const columnArray = columnsByDashboard
-    ? Object.values(columnsByDashboard)
-    : [];
+  const columnArray = useMemo(
+    () => (columnsByDashboard ? Object.values(columnsByDashboard) : []),
+    [columnsByDashboard]
+  );
   const setColumnList = useColumnStore((s) => s.setColumnList);
 
-  const cardsByDashboard =
-    useCardStore((s) => s.cardsByDashboard?.[dashboardIdNum]) ?? {};
+  const rawCardsByDashboard = useCardStore(
+    (s) => s.cardsByDashboard?.[dashboardIdNum]
+  );
+  const cardsByDashboard = useMemo(
+    () => rawCardsByDashboard ?? {},
+    [rawCardsByDashboard]
+  );
   const setCardList = useCardStore((s) => s.setCardList);
   const handleOpen = useCallback(() => setIsOpen(true), []);
 
@@ -57,7 +63,7 @@ const DashboardPage = () => {
       }
     };
     fetchData();
-  }, [dashboardIdNum, setColumnList, addToast]);
+  }, [dashboardIdNum, setColumnList, addToast, start, stop]);
 
   const parseDroppableId = (droppableId: string) =>
     Number(droppableId.replace("column-", ""));

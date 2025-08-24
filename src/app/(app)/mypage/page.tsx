@@ -5,7 +5,7 @@ import { ProfileCard } from "@/components/Card/Profile";
 import { BackButton } from "@/components/common/Button/BackButton";
 import { useLoadingStore } from "@/lib/stores/loading";
 
-const myPage = () => {
+const MyPage = () => {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore(
@@ -25,4 +25,4 @@ const myPage = () => {
   );
 };
 
-export default myPage;
+export default MyPage;
