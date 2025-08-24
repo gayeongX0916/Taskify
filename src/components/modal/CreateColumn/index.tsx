@@ -52,7 +52,7 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   useEffect(() => {
     const isExisted = columnArray.some((col) => col.title === value);
     setExisted(isExisted);
-  }, [value, columnsByDashboard]);
+  }, [value, columnsByDashboard, columnArray]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>

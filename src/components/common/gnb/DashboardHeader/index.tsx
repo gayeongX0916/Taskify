@@ -18,7 +18,7 @@ import { useAuthStore } from "@/lib/stores/auth";
 import React from "react";
 import InvitedUserList from "./InvitedUserList";
 
-const SettingIcon = React.memo(() => (
+const SettingIconComponent = () => (
   <Image
     src={settingIcon}
     alt="관리"
@@ -26,9 +26,10 @@ const SettingIcon = React.memo(() => (
     height={20}
     className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
   />
-));
+);
+const SettingIcon = React.memo(SettingIconComponent);
 
-const AddBoxIcon = React.memo(() => (
+const AddBoxIconComponent = () => (
   <Image
     src={addBoxIcon}
     alt="초대하기"
@@ -36,9 +37,10 @@ const AddBoxIcon = React.memo(() => (
     height={20}
     className="hidden md:flex md:w-[18px] md:h-[18px] lg:w-[20px] lg:h-[20px]"
   />
-));
+);
+const AddBoxIcon = React.memo(AddBoxIconComponent);
 
-const CronwIcon = React.memo(() => (
+const CronwIconComponent = () => (
   <Image
     src={crownIcon}
     alt="주인"
@@ -46,7 +48,8 @@ const CronwIcon = React.memo(() => (
     height={20}
     className="hidden lg:block"
   />
-));
+);
+const CronwIcon = React.memo(CronwIconComponent);
 
 export default function DashboardHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,7 +78,10 @@ export default function DashboardHeader() {
     (state) => state.dashboardsById[dashboardNum]
   );
   const addDashboard = useDashboardStore((s) => s.addDashboard);
-  const member = dashboardMemberList[dashboardNum] || [];
+  const member = useMemo(
+    () => dashboardMemberList[dashboardNum] || [],
+    [dashboardMemberList, dashboardNum]
+  );
   const userId = useAuthStore((s) => s.userId);
   const visibleMembers = useMemo(() => member.map((m) => m.nickname), [member]);
 
@@ -104,7 +110,15 @@ export default function DashboardHeader() {
 
       fetchDashboard();
     }
-  }, [dashboardId, dashboard, isMyDashboardPage]);
+  }, [
+    dashboardId,
+    dashboard,
+    isMyDashboardPage,
+    addDashboard,
+    addToast,
+    start,
+    stop,
+  ]);
 
   useEffect(() => {
     if (!myInfo) {
@@ -128,7 +142,7 @@ export default function DashboardHeader() {
       };
       fetchData();
     }
-  }, []);
+  }, [addToast, myInfo, setMyInfo, start, stop]);
 
   useEffect(() => {
     if (!isMyDashboardPage) {
@@ -154,7 +168,13 @@ export default function DashboardHeader() {
       };
       fetchData();
     }
-  }, [dashboardId, isMyDashboardPage]);
+  }, [
+    dashboardId,
+    isMyDashboardPage,
+    addToast,
+    dashboardNum,
+    setDashboardMemberList,
+  ]);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
 

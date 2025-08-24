@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 type ActionDropdownProps = {
   setShowDropdown: (showDropdown: boolean) => void;
@@ -19,21 +19,22 @@ export function ActionDropdown({
     { label: "삭제하기", onClick: onDelete },
   ];
 
-  const handleClickOutSide = (e: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(e.target as Node)
-    ) {
-      setShowDropdown(false);
-    }
-  };
+  const handleClickOutSide = useCallback(
+    (e: MouseEvent) => {
+      const el = dropdownRef.current;
+      if (el && !el.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    },
+    [setShowDropdown]
+  );
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutSide);
     return () => {
       document.removeEventListener("click", handleClickOutSide);
     };
-  }, []);
+  }, [handleClickOutSide]);
 
   return (
     <div

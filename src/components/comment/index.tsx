@@ -47,7 +47,7 @@ function Comment({ name, date, content, cardId, commentId }: CommentProps) {
     } finally {
       stop(key);
     }
-  }, [commentId, value, updateComment, cardId, addToast]);
+  }, [commentId, value, updateComment, cardId, addToast, start, stop]);
 
   const handleonDelete = useCallback(async () => {
     try {
@@ -64,7 +64,7 @@ function Comment({ name, date, content, cardId, commentId }: CommentProps) {
     } finally {
       stop(key);
     }
-  }, [commentId, removeComment, cardId, addToast]);
+  }, [commentId, removeComment, cardId, addToast, start, stop]);
 
   const buttonList = useMemo(
     () => [

@@ -22,13 +22,14 @@ type MobileInviteListProps = {
   isLoading: boolean;
 };
 
-const SearchIcon = React.memo(() => (
+const SearchIconComponent = () => (
   <Image
     src={searchIcon}
     alt="검색"
     className="absolute left-[12px] top-1/2 -translate-y-1/2"
   />
-));
+);
+const SearchIcon = React.memo(SearchIconComponent);
 
 function MobileInviteList({
   name,
@@ -106,7 +107,7 @@ function ReceivedInviteTable() {
       }
     };
     fetchData();
-  }, []);
+  }, [addToast, setReceivedInvites, start, stop]);
 
   const filteredList = receivedInvites.filter((item) =>
     item.inviter.nickname.includes(value)

@@ -67,12 +67,9 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const [invitePage, setInvitePage] = useState(1);
   const [memberPage, setMemberPage] = useState(1);
 
-  const rawMembers: getDashboardMemberListType[] =
-    membersByDashboardId[dashboardId] ?? [];
-
   const membersWithoutOwner = useMemo(
-    () => rawMembers.filter((m) => !m.isOwner),
-    [rawMembers]
+    () => (membersByDashboardId[dashboardId] ?? []).filter((m) => !m.isOwner),
+    [membersByDashboardId, dashboardId]
   );
 
   const filledMemberList = useMemo(
@@ -125,7 +122,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
       }
     };
     fetchMembers();
-  }, [dashboardId, memberPage]);
+  }, [dashboardId, memberPage, addToast, setDashboardMembers, start, stop]);
 
   useEffect(() => {
     const fetchInvites = async () => {
@@ -158,7 +155,7 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
       }
     };
     fetchInvites();
-  }, [dashboardId, isOpen, invitePage]);
+  }, [dashboardId, isOpen, invitePage, addToast, setSentInvites, start, stop]);
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {

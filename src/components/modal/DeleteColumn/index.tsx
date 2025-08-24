@@ -42,7 +42,7 @@ export function DeleteColumnModal({
     } finally {
       stop(key);
     }
-  }, [removeColumn, addToast, onClose]);
+  }, [removeColumn, addToast, onClose, columnId, dashboardId, start, stop]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
