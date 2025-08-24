@@ -13,8 +13,10 @@ import { useToastStore } from "@/lib/stores/toast";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
+  const router = useRouter();
   const key = "CreateDashboardModal";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -34,6 +36,7 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
       setTitle("");
       setColor("");
       addToast("대시보드 생성에 성공했습니다.", "success");
+      router.push(`/dashboard/${res.data.id}`);
     } catch (error) {
       if (isAxiosError(error)) {
         addToast(
