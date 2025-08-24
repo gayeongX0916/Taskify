@@ -1,9 +1,7 @@
 import {
   BaseCardType,
   getCardListType,
-  getCardType,
   postCardType,
-  putCardType,
 } from "@/types/cards";
 import { api } from "./axios";
 

@@ -6,7 +6,6 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import moreIcon from "@/assets/more_icon.svg";

@@ -36,7 +36,6 @@ const DashboardPage = () => {
   const cardsByDashboard =
     useCardStore((s) => s.cardsByDashboard?.[dashboardIdNum]) ?? {};
   const setCardList = useCardStore((s) => s.setCardList);
-  console.log(cardsByDashboard);
   const handleOpen = useCallback(() => setIsOpen(true), []);
 
   useEffect(() => {
