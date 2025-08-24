@@ -10,7 +10,6 @@ import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { BackButton } from "@/components/common/Button/BackButton";
 import { isAxiosError } from "axios";
-import { useCallback } from "react";
 
 const editDashboardPage = () => {
   const addToast = useToastStore.getState().addToast;
