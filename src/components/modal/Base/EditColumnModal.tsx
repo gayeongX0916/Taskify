@@ -49,7 +49,7 @@ export function EditColumnModal({
         stop(key);
       }
     },
-    [updateColumn, onClose, addToast]
+    [updateColumn, onClose, dashboardId, addToast, start, stop]
   );
 
   const handleClose = useCallback(() => {

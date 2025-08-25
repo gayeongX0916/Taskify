@@ -68,7 +68,7 @@ export function SideMenu() {
     } finally {
       stop(key);
     }
-  }, [page]);
+  }, [page, addToast, mergeListPage, start, stop]);
 
   useEffect(() => {
     fetchData();
@@ -79,7 +79,7 @@ export function SideMenu() {
   useEffect(() => {
     setPage(1);
     fetchData();
-  }, [accessToken]);
+  }, [accessToken, fetchData]);
 
   const pageIds = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;

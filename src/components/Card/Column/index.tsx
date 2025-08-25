@@ -24,8 +24,8 @@ type ColumnCardProps = {
 
 type ModalName = "editColumn" | "createTodo" | "dashboard" | "deleteColumn";
 
-const SettingIcon = React.memo(({ onClick }: { onClick: () => void }) => (
-  <button onClick={onClick} aria-label="컬럼 관리">
+const SettingIconComponent = ({ onClick }: { onClick: () => void }) => (
+  <button onClick={onClick}>
     <Image
       src={settingIcon}
       alt="컬럼 관리"
@@ -34,7 +34,8 @@ const SettingIcon = React.memo(({ onClick }: { onClick: () => void }) => (
       className="md:w-[24px] md:h-[24px]"
     />
   </button>
-));
+);
+export const SettingIcon = React.memo(SettingIconComponent);
 
 function ColumnCard({ columnId, title }: ColumnCardProps) {
   const { dashboardId } = useParams();
@@ -99,7 +100,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
       }
     };
     fetchData();
-  }, [columnId, dashboardIdNum]);
+  }, [columnId, dashboardIdNum, start, stop, setCardList, addToast, key]);
 
   useEffect(() => {
     const updateMaxVisible = () => {

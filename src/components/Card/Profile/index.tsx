@@ -36,7 +36,7 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
     if (myInfo && localProfileImageUrl === null) {
       setLocalProfileImageUrl(myInfo.profileImageUrl ?? null);
     }
-  }, [myInfo]);
+  }, [myInfo, localNickname, localProfileImageUrl]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;

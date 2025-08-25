@@ -11,7 +11,8 @@ type BaseModalProps = {
   children: ReactNode;
 };
 
-const CloseIcon = React.memo(() => <Image src={closeIcon} alt="닫기" />);
+const CloseIconComponent = () => <Image src={closeIcon} alt="닫기" />;
+const CloseIcon = React.memo(CloseIconComponent);
 
 export function BaseModal({
   isOpen,

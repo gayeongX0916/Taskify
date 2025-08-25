@@ -36,30 +36,29 @@ interface DashBoardModalProps extends ModalProps {
   dashboardId: number;
 }
 
-const MoreIcon = React.memo(
-  ({
-    setShowDropdown,
-  }: {
-    setShowDropdown: Dispatch<SetStateAction<boolean>>;
-  }) => (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setShowDropdown((prev) => !prev);
-      }}
-    >
-      <Image
-        src={moreIcon}
-        alt="더보기"
-        width={24}
-        height={24}
-        className="md:w-[28px] md:h-[28px]"
-      />
-    </button>
-  )
+const MoreIconComponent = ({
+  setShowDropdown,
+}: {
+  setShowDropdown: Dispatch<SetStateAction<boolean>>;
+}) => (
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowDropdown((prev) => !prev);
+    }}
+  >
+    <Image
+      src={moreIcon}
+      alt="더보기"
+      width={24}
+      height={24}
+      className="md:w-[28px] md:h-[28px]"
+    />
+  </button>
 );
+export const MoreIcon = React.memo(MoreIconComponent);
 
-const CloseIcon = React.memo(({ onClose }: { onClose: () => void }) => (
+const CloseIconComponent = ({ onClose }: { onClose: () => void }) => (
   <button onClick={onClose}>
     <Image
       src={closeIcon}
@@ -69,9 +68,10 @@ const CloseIcon = React.memo(({ onClose }: { onClose: () => void }) => (
       className="md:w-[28px] md:h-[28px]"
     />
   </button>
-));
+);
+export const CloseIcon = React.memo(CloseIconComponent);
 
-const CardImage = React.memo(({ imageUrl }: { imageUrl: string }) => (
+const CardImageComponent = ({ imageUrl }: { imageUrl: string }) => (
   <Image
     src={imageUrl}
     alt="카드 이미지"
@@ -79,7 +79,8 @@ const CardImage = React.memo(({ imageUrl }: { imageUrl: string }) => (
     height={168}
     className="w-full h-full mt-[32px] md:mt-[16px] lg:mt-[8px] md:w-[420px] md:h-[246px] lg:w-[445px] lg:h-[260px]"
   />
-));
+);
+export const CardImage = React.memo(CardImageComponent);
 
 function DashBoardModal({
   isOpen,
@@ -89,7 +90,7 @@ function DashBoardModal({
   columnId,
   dashboardId,
 }: DashBoardModalProps) {
-  const key = `dashboard-modal-${cardId}`;
+  const key = `Dashboard-Modal-${cardId}`;
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
@@ -124,7 +125,7 @@ function DashBoardModal({
       }
     };
     fetchData();
-  }, [cardId, setCommentList, addToast]);
+  }, [cardId, setCommentList, addToast, start, stop, key]);
 
   const handleDeleteCard = useCallback(async () => {
     try {
@@ -143,13 +144,23 @@ function DashBoardModal({
     } finally {
       stop(key);
     }
-  }, [removeCard, dashboardId, columnId, cardId, addToast, onClose]);
+  }, [
+    removeCard,
+    dashboardId,
+    columnId,
+    cardId,
+    addToast,
+    onClose,
+    start,
+    stop,
+    key,
+  ]);
 
   useEffect(() => {
     if (!card && isOpen && !isLoading) {
       addToast("카드를 찾을 수 없습니다.");
     }
-  }, [card, isOpen, isLoading]);
+  }, [card, isOpen, isLoading, addToast]);
 
   if (!card) {
     return (

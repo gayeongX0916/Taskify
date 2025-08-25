@@ -47,7 +47,7 @@ function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
         stop(key);
       }
     },
-    [addToast, onClose, addSentInvite]
+    [addToast, onClose, addSentInvite, start, stop]
   );
 
   const handleClose = useCallback(() => {

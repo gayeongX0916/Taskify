@@ -30,20 +30,25 @@ type FormField = {
   mode: "text" | "password";
 };
 
-const AgreeCheckbox = React.memo(
-  ({ agree, toggleAgree }: { agree: boolean; toggleAgree: () => void }) => {
-    return (
-      <button type="button" onClick={toggleAgree}>
-        <Image
-          src={agree ? checkboxActive : checkboxDefault}
-          alt="체크박스"
-          width={20}
-          height={20}
-        />
-      </button>
-    );
-  }
-);
+const AgreeCheckboxComponent = ({
+  agree,
+  toggleAgree,
+}: {
+  agree: boolean;
+  toggleAgree: () => void;
+}) => {
+  return (
+    <button type="button" onClick={toggleAgree}>
+      <Image
+        src={agree ? checkboxActive : checkboxDefault}
+        alt="체크박스"
+        width={20}
+        height={20}
+      />
+    </button>
+  );
+};
+const AgreeCheckbox = React.memo(AgreeCheckboxComponent);
 
 const SignUpPage = () => {
   const addToast = useToastStore.getState().addToast;
