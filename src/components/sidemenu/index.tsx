@@ -30,6 +30,8 @@ const AddBoxIcon = <Image src={addBoxIcon} alt="추가" width={20} height={20} /
 const CrownIcon = <Image src={crownIcon} alt="주인" />;
 
 export function SideMenu() {
+  const pathname = usePathname();
+  if (["/login", "/signup", "/"].includes(pathname)) return null;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
@@ -38,7 +40,6 @@ export function SideMenu() {
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const pathname = usePathname();
   const router = useRouter();
 
   const dashboardsById = useDashboardStore((s) => s.dashboardsById);
@@ -52,6 +53,7 @@ export function SideMenu() {
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const fetchData = useCallback(async () => {
+    if (!accessToken) return;
     try {
       start(key);
       const res = await getDashboardList({ page, size: PAGE_SIZE });
@@ -95,8 +97,6 @@ export function SideMenu() {
       ),
     [pageIds, dashboardsById]
   );
-
-  if (["/login", "/signup", "/"].includes(pathname)) return null;
 
   return (
     <nav className="fixed top-0 left-0 w-[67px] md:w-[160px] lg:w-[300px] pt-[20px] px-[13px] lg:pl-[8px] lg:pr-[12px] border-r border-gray_D9D9D9 h-screen">
