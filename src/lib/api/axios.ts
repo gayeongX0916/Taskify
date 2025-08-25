@@ -16,6 +16,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      console.warn("로그인이 필요합니다.");
+    }
     return Promise.reject(error);
   }
 );
