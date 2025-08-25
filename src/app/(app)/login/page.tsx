@@ -33,8 +33,7 @@ const AuthLogoComponent = () => (
     <Image src={authLogo} alt="로고" />
   </Link>
 );
-
-export const AuthLogo = React.memo(AuthLogoComponent);
+const AuthLogo = React.memo(AuthLogoComponent);
 
 const LoginPage = () => {
   const setAuth = useAuthStore.getState().setAuth;

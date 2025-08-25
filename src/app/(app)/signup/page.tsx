@@ -13,13 +13,14 @@ import React, {
   useRef,
   useState,
 } from "react";
+import authLogo from "@/assets/auth_logo.svg";
 import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
 import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
-import { AuthLogo } from "../login/page";
+import Link from "next/link";
 
 type FieldKey = "email" | "nickname" | "password" | "checkPassword";
 
@@ -49,6 +50,13 @@ const AgreeCheckboxComponent = ({
   );
 };
 const AgreeCheckbox = React.memo(AgreeCheckboxComponent);
+
+const AuthLogoComponent = () => (
+  <Link href="/">
+    <Image src={authLogo} alt="로고" />
+  </Link>
+);
+const AuthLogo = React.memo(AuthLogoComponent);
 
 const SignUpPage = () => {
   const addToast = useToastStore.getState().addToast;
