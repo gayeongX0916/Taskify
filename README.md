@@ -58,4 +58,4 @@ Taskify는 **커뮤니티 기반으로 일정과 할 일을 공유·관리할 �
 ## 🎨 디자인 & 문서
 - [Figma 디자인](https://www.figma.com/design/bNTFuJECTJFzpx84Vi4HzR/Taskify?node-id=0-1&p=f&t=NgAbrZsHWIAic3mt-0)
 - [Swagger API 문서](https://sp-taskify-api.vercel.app/docs/#/) 
-- [프로젝트 컨벤션](https://chivalrous-barberry-9bb.notion.site/Taskify-255a83bcc88680c39082e037d37efd1c?source=copy_link)
+- [프로젝트 컨벤션](https://chivalrous-barberry-9bb.notion.site/254a83bcc886808b878ef679236ee7c5?source=copy_link)
