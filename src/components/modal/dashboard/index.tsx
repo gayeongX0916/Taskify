@@ -125,7 +125,7 @@ function DashBoardModal({
       }
     };
     fetchData();
-  }, [cardId, setCommentList, addToast, start, stop]);
+  }, [cardId, setCommentList, addToast, start, stop, key]);
 
   const handleDeleteCard = useCallback(async () => {
     try {
@@ -153,6 +153,7 @@ function DashBoardModal({
     onClose,
     start,
     stop,
+    key,
   ]);
 
   useEffect(() => {

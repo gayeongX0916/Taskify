@@ -10,7 +10,7 @@ import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const key = "CreateColumnModal";
@@ -24,9 +24,10 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
   );
-  const columnArray = columnsByDashboard
-    ? Object.values(columnsByDashboard)
-    : [];
+  const columnArray = useMemo(
+    () => (columnsByDashboard ? Object.values(columnsByDashboard) : []),
+    [columnsByDashboard]
+  );
   const [existed, setExisted] = useState(false);
   const [value, setValue] = useState("");
 
