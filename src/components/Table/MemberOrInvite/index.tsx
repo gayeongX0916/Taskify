@@ -19,7 +19,6 @@ import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useInviteStore } from "@/lib/stores/invite";
-import { getDashboardMemberListType } from "@/types/members";
 
 type MemberTableProps = {
   mode: "member" | "invite";
