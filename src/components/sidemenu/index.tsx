@@ -31,7 +31,8 @@ const CrownIcon = <Image src={crownIcon} alt="주인" />;
 
 export function SideMenu() {
   const pathname = usePathname();
-  if (["/login", "/signup", "/"].includes(pathname)) return null;
+  const skip =
+    pathname === "/" || pathname === "/login" || pathname === "/signup";
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const addToast = useToastStore.getState().addToast;
@@ -53,6 +54,7 @@ export function SideMenu() {
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const fetchData = useCallback(async () => {
+    if (skip) return;
     if (!accessToken) return;
     try {
       start(key);
