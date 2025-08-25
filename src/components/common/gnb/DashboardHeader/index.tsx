@@ -174,6 +174,8 @@ export default function DashboardHeader() {
     addToast,
     dashboardNum,
     setDashboardMemberList,
+    start,
+    stop,
   ]);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);

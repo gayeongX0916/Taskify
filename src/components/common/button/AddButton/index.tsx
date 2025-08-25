@@ -9,9 +9,10 @@ type AddButtonProps = {
   disabled?: boolean;
 };
 
-const AddBoxIcon = React.memo(() => (
+const AddBoxIconComponent = () => (
   <Image src={addBoxIcon} alt="추가하기" width={22} height={22} />
-));
+);
+const AddBoxIcon = React.memo(AddBoxIconComponent);
 
 function AddButton({ mode, className, onClick, disabled }: AddButtonProps) {
   const getText = () => {
