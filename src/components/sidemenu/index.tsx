@@ -72,7 +72,7 @@ export function SideMenu() {
     } finally {
       stop(key);
     }
-  }, [page, addToast, mergeListPage, start, stop]);
+  }, [page, addToast, mergeListPage, start, stop, accessToken, skip]);
 
   useEffect(() => {
     fetchData();
