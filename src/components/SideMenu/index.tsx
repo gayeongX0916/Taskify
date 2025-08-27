@@ -73,17 +73,18 @@ export function SideMenu() {
       stop(key);
     }
   }, [page, addToast, mergeListPage, start, stop, accessToken, skip]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  
+useEffect(() => {
+    if (!skip && accessToken) {
+      fetchData();
+    }
+  }, [accessToken, skip, fetchData]);
 
   useEffect(() => setSelectedId(dashboardIdNum || null), [dashboardIdNum]);
 
   useEffect(() => {
     setPage(1);
-    fetchData();
-  }, [accessToken, fetchData]);
+  }, [accessToken]);
 
   const pageIds = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;

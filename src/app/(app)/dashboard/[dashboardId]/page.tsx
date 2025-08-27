@@ -134,6 +134,7 @@ const DashboardPage = () => {
           imageUrl: movedCard.imageUrl ?? null,
         };
         await putCard({ id: cardId, ...payload });
+        addToast("카드가 새 컬럼으로 옮겨졌습니다.", "success");
       } catch {
         addToast("이동 저장 중 오류가 발생했습니다.");
         setCardList(
