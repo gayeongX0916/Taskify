@@ -30,13 +30,12 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
   };
 
   useEffect(() => {
-    if (myInfo && !localNickname) {
-      setLocalNickname(myInfo.nickname);
-    }
-    if (myInfo && localProfileImageUrl === null) {
-      setLocalProfileImageUrl(myInfo.profileImageUrl ?? null);
-    }
-  }, [myInfo, localNickname, localProfileImageUrl]);
+    if (!myInfo) return;
+    if (isTyping) return;
+
+    setLocalNickname(myInfo.nickname ?? "");
+    setLocalProfileImageUrl(myInfo.profileImageUrl ?? null);
+  }, [myInfo, isTyping, localNickname, localProfileImageUrl]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -113,7 +112,7 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
               />
             )}
           </button>
-          {myInfo?.profileImageUrl && (
+          {localProfileImageUrl && (
             <button
               className="flex"
               type="button"
