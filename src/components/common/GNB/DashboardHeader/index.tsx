@@ -247,7 +247,6 @@ export default function DashboardHeader() {
               <>
                 <Avatar
                   username={myInfo.nickname}
-                  profileImageUrl={myInfo.profileImageUrl || null}
                 />
                 <span className="hidden md:flex md:text-lg md:text-black_333236">
                   {myInfo.nickname}

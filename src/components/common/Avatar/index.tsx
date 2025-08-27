@@ -1,3 +1,4 @@
+import { useUserStore } from "@/lib/stores/user";
 import {
   getInitialFromUserName,
   getRandomColor,
@@ -8,12 +9,12 @@ import React from "react";
 type AvatarProps = {
   username: string;
   className?: string;
-  profileImageUrl?: string | null;
 };
 
-function Avatar({ username, className, profileImageUrl }: AvatarProps) {
+function Avatar({ username, className }: AvatarProps) {
   const initial = getInitialFromUserName(username);
   const bgColor = getRandomColor(initial);
+  const profileImageUrl = useUserStore((s) => s.myInfo?.profileImageUrl);
 
   return (
     <>
