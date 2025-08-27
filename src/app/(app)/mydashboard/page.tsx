@@ -98,7 +98,7 @@ const MyDashboardPage = () => {
             ))}
           </div>
 
-          {totalCount > 0 && (
+          {totalPages > 1 && (
             <div className="flex items-center justify-end gap-x-[16px]">
               <span className="text-xs text-black_333236 md:text-md">
                 {totalPages} 페이지 중 {page}
