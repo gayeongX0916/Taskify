@@ -28,7 +28,7 @@ Taskify는 **커뮤니티 기반으로 일정과 할 일을 공유·관리할 �
 
 ## ✨ 주요 기능
 - **인증/권한**
-	- 로그인 → accessToken 저장 (Zustand persist로 LocalStorage 유지)
+	- **로그인 → accessToken 저장** (Zustand persist로 LocalStorage 유지)
 	- Axios 인터셉터로 `Authorization: Bearer <token>` 자동 주입 
 	- 401 응답 처리 및 자동 로그아웃/리다이렉트
 	- Next.js Middleware로 보호 라우트/게스트 라우트 분기
@@ -44,13 +44,12 @@ Taskify는 **커뮤니티 기반으로 일정과 할 일을 공유·관리할 �
 	- 스켈레톤 UI & 스피너 (로딩 경험 개선)
 	- Toast 알림(Zustand store와 연동)
 	- DatePicker로 기간/날짜 선택
-	- Drag & Drop으로 컬럼/카드 순서 변경
-	- not-fount 페이지 제공
+	- **Drag & Drop으로 컬럼/카드 순서 변경**
+	- not-found 페이지 제공
 
 - **성능 최적화**
-	- useMemo, useCallback, React.memo 적극 활용
+	- **useMemo, useCallback, React.memo 적극 활용**
 	- Zustand 리렌더 최소화
-	- 컴포넌트 단위 분리 및 key 최적화
 
 ## 🚀 배포 링크
 [Taskify 바로가기](https://taskify-six-sooty.vercel.app/)
