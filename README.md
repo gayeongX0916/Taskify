@@ -53,7 +53,7 @@ Taskify는 **커뮤니티 기반으로 일정과 할 일을 공유·관리할 �
 	- 컴포넌트 단위 분리 및 key 최적화
 
 ## 🚀 배포 링크
-[OpenMind 바로가기](https://taskify-six-sooty.vercel.app/)
+[Taskify 바로가기](https://taskify-six-sooty.vercel.app/)
 
 ## 🎨 디자인 & 문서
 - [Figma 디자인](https://www.figma.com/design/bNTFuJECTJFzpx84Vi4HzR/Taskify?node-id=0-1&p=f&t=NgAbrZsHWIAic3mt-0)
