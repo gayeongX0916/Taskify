@@ -15,7 +15,7 @@ Taskify는 **커뮤니티 기반으로 일정과 할 일을 공유·관리할 �
 </p>
 
 - **상태 관리** : Zustand (전역 상태 관리)
-- **API 연동** : Axios + Swagger 기반 API 명세 활용
+- **API 통신** : Axios 기반 커스텀 API 클라이언트 (Swagger 문서 참고)
 
 ## 📂 폴더 구조
 - **app/** – Next.js App Router 기반의 페이지 라우팅
