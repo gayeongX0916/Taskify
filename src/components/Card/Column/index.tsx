@@ -191,7 +191,7 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
               "rounded-xl transition-colors",
               // 이 컬럼 위로 드래그 중인 카드가 올라와 있는지 여부
               dropSnapshot.isDraggingOver &&
-                "bg-violet_5534DA/5 outline outline-2 outline-dashed outline-violet_5534DA/40 px-1 -mx-1 py-1 -my-1",
+                "bg-violet_5534DA/5 outline-2 outline-dashed outline-violet_5534DA/40 px-1 -mx-1 py-1 -my-1",
             ].join(" ")}
           >
             {isLoading
