@@ -4,18 +4,17 @@ import ModalButton from "@/components/common/Button/ModalButton";
 import { useCallback, useState } from "react";
 import { postInviteDashboard } from "@/lib/api/dashboards";
 import { postInviteDashboardType } from "@/types/dashboards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useInviteStore } from "@/lib/stores/invite";
 import React from "react";
+import { toast } from "react-toastify";
 
 interface InviteMoalProps extends ModalProps {
   dashboardId: number;
 }
 
 function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
-  const addToast = useToastStore.getState().addToast;
   const key = "InviteModal";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -33,21 +32,21 @@ function InviteModal({ isOpen, onClose, dashboardId }: InviteMoalProps) {
           invitationId: res.data.id,
         });
         setValue("");
-        addToast("대시보드 초대에 성공했습니다.", "success");
+        toast.success("대시보드 초대에 성공했습니다.");
         onClose();
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message || "대시보드 초대에 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     },
-    [addToast, onClose, addSentInvite, start, stop]
+    [ onClose, addSentInvite, start, stop]
   );
 
   const handleClose = useCallback(() => {

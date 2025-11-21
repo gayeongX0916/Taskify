@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { ActionButton } from "../../Button/ActionButton";
 import { useCommentStore } from "@/lib/stores/comment";
-import { useToastStore } from "@/lib/stores/toast";
 import { postComment } from "@/lib/api/comments";
 import { postCommentType } from "@/types/comments";
 import { useParams } from "next/navigation";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import React from "react";
+import { toast } from "react-toastify";
 
 type CommentTextareaProps = {
   cardId: number;
@@ -17,7 +17,6 @@ type CommentTextareaProps = {
 };
 
 export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
-  const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const key = "commentTextarea";
@@ -35,9 +34,9 @@ export function CommentTextarea({ cardId, columnId }: CommentTextareaProps) {
       setValue("");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "댓글 생성에 실패했습니다.");
+        toast.error(error.response?.data.message || "댓글 생성에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

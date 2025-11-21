@@ -2,10 +2,10 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import plusIcon from "@/assets/plus_icon.svg";
 import { postCardImg } from "@/lib/api/columns";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import React from "react";
+import { toast } from "react-toastify";
 
 type ImageInputProps = {
   label: string;
@@ -21,7 +21,6 @@ export function ImageInput({
   initialUrl,
 }: ImageInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addToast = useToastStore.getState().addToast;
   const key = "ImageInput";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -44,9 +43,9 @@ export function ImageInput({
       onChange(res.data.imageUrl);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "이미지 생성에 실패했습니다.");
+        toast.error(error.response?.data.message || "이미지 생성에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

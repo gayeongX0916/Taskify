@@ -4,10 +4,10 @@ import ModalButton from "@/components/common/Button/ModalButton";
 import { useColumnStore } from "@/lib/stores/column";
 import { putColumnType } from "@/types/columns";
 import { putColumn } from "@/lib/api/columns";
-import { useToastStore } from "@/lib/stores/toast";
 import { useCallback, useState } from "react";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 interface EditColumnModalProps extends ModalProps {
   onDelete: () => void;
@@ -22,7 +22,6 @@ export function EditColumnModal({
   columnId,
   dashboardId,
 }: EditColumnModalProps) {
-  const addToast = useToastStore.getState().addToast;
   const updateColumn = useColumnStore((s) => s.updateColumn);
   const key = "EditColumnModal";
   const start = useLoadingStore((s) => s.startLoading);
@@ -38,18 +37,18 @@ export function EditColumnModal({
         updateColumn(dashboardId, res.data.id, res.data.title);
         onClose();
         setValue("");
-        addToast("컬럼 수정에 성공했습니다.", "success");
+        toast.success("컬럼 수정에 성공했습니다.");
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
+          toast.error(error.response?.data.message || "컬럼 수정에 실패했습니다.");
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     },
-    [updateColumn, onClose, dashboardId, addToast, start, stop]
+    [updateColumn, onClose, dashboardId, start, stop]
   );
 
   const handleClose = useCallback(() => {
