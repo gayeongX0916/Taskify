@@ -1,12 +1,12 @@
 import { formatDateTimeUTC } from "@/lib/utils/formatDate";
 import Avatar from "../common/Avatar";
 import { useCommentStore } from "@/lib/stores/comment";
-import { useToastStore } from "@/lib/stores/toast";
 import { deleteComment, putComment } from "@/lib/api/comments";
 import { useCallback, useMemo, useState } from "react";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import React from "react";
+import { toast } from "react-toastify";
 
 type CommentProps = {
   name: string;
@@ -17,7 +17,6 @@ type CommentProps = {
 };
 
 function Comment({ name, date, content, cardId, commentId }: CommentProps) {
-  const addToast = useToastStore.getState().addToast;
   const key = "comment";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -37,34 +36,34 @@ function Comment({ name, date, content, cardId, commentId }: CommentProps) {
       await putComment({ commentId, content: value });
       updateComment(cardId, commentId, value);
       setIsEditing(false);
-      addToast("댓글 수정에 성공했습니다.", "success");
+      toast.success("댓글 수정에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "댓글 수정에 실패했습니다");
+        toast.error(error.response?.data.message || "댓글 수정에 실패했습니다");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [commentId, value, updateComment, cardId, addToast, start, stop]);
+  }, [commentId, value, updateComment, cardId, start, stop]);
 
   const handleonDelete = useCallback(async () => {
     try {
       start(key);
       await deleteComment({ commentId });
       removeComment(cardId, commentId);
-      addToast("댓글 삭제에 성공했습니다.", "success");
+      toast.success("댓글 삭제에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "댓글 삭제에 실패했습니다");
+        toast.error(error.response?.data.message || "댓글 삭제에 실패했습니다");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [commentId, removeComment, cardId, addToast, start, stop]);
+  }, [commentId, removeComment, cardId, start, stop]);
 
   const buttonList = useMemo(
     () => [

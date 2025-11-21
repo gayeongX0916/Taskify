@@ -9,7 +9,6 @@ import { useDashboardStore } from "@/lib/stores/dashboard";
 import { getDashboardDetail } from "@/lib/api/dashboards";
 import crownIcon from "@/assets/crown.svg";
 import { getMyInfo } from "@/lib/api/users";
-import { useToastStore } from "@/lib/stores/toast";
 import { getDashboardMemberList } from "@/lib/api/members";
 import { useUserStore } from "@/lib/stores/user";
 import { isAxiosError } from "axios";
@@ -17,6 +16,7 @@ import { useLoadingStore } from "@/lib/stores/loading";
 import { useAuthStore } from "@/lib/stores/auth";
 import React from "react";
 import InvitedUserList from "./InvitedUserList";
+import { toast } from "react-toastify";
 
 const SettingIconComponent = () => (
   <Image
@@ -59,7 +59,6 @@ export default function DashboardHeader() {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const pathname = usePathname();
   const isMyDashboardPage =
@@ -96,12 +95,12 @@ export default function DashboardHeader() {
           addDashboard(res.data);
         } catch (error) {
           if (isAxiosError(error)) {
-            addToast(
+            toast.error(
               error.response?.data.message ||
                 "대시보드를 불러오는데 실패했습니다."
             );
           } else {
-            addToast("알 수 없는 오류가 발생했습니다.");
+            toast.error("알 수 없는 오류가 발생했습니다.");
           }
         } finally {
           stop(key);
@@ -115,7 +114,6 @@ export default function DashboardHeader() {
     dashboard,
     isMyDashboardPage,
     addDashboard,
-    addToast,
     start,
     stop,
   ]);
@@ -129,12 +127,12 @@ export default function DashboardHeader() {
           setMyInfo(res.data);
         } catch (error) {
           if (isAxiosError(error)) {
-            addToast(
+            toast.error(
               error.response?.data.message ||
                 "내 정보를 가져오는데 실패했습니다."
             );
           } else {
-            addToast("알 수 없는 오류가 발생했습니다.");
+            toast.error("알 수 없는 오류가 발생했습니다.");
           }
         } finally {
           stop(key);
@@ -142,7 +140,7 @@ export default function DashboardHeader() {
       };
       fetchData();
     }
-  }, [addToast, myInfo, setMyInfo, start, stop]);
+  }, [ myInfo, setMyInfo, start, stop]);
 
   useEffect(() => {
     if (!isMyDashboardPage) {
@@ -156,11 +154,11 @@ export default function DashboardHeader() {
           setDashboardMemberList(dashboardNum, res.data.members);
         } catch (error) {
           if (isAxiosError(error)) {
-            addToast(
+            toast.error(
               error.response?.data.message || "멤버 목록 조회에 실패했습니다."
             );
           } else {
-            addToast("알 수 없는 오류가 발생했습니다.");
+            toast.error("알 수 없는 오류가 발생했습니다.");
           }
         } finally {
           stop(key);
@@ -171,7 +169,6 @@ export default function DashboardHeader() {
   }, [
     dashboardId,
     isMyDashboardPage,
-    addToast,
     dashboardNum,
     setDashboardMemberList,
     start,

@@ -12,13 +12,12 @@ import ReceivedInviteTable from "@/components/Table/ReceivedInvite";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
-import { useToastStore } from "@/lib/stores/toast";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 5;
 
 const MyDashboardPage = () => {
   const router = useRouter();
-  const addToast = useToastStore.getState().addToast;
   const key = "MyDashboardPage";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -38,17 +37,17 @@ const MyDashboardPage = () => {
       mergeListPage(res.data.dashboards, res.data.totalCount);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message ||
             "대시보드 목록 불러오기에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [page, mergeListPage, start, stop, addToast]);
+  }, [page, mergeListPage, start, stop]);
 
   useEffect(() => {
     fetchData();

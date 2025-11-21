@@ -2,11 +2,11 @@ import ModalButton from "@/components/common/Button/ModalButton";
 import { deleteColumn } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
-import { useToastStore } from "@/lib/stores/toast";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 import { isAxiosError } from "axios";
 import { useCallback } from "react";
+import { toast } from "react-toastify";
 
 interface DeleteColumnModalProps extends ModalProps {
   columnId: number;
@@ -23,7 +23,6 @@ export function DeleteColumnModal({
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const removeColumn = useColumnStore((s) => s.removeColumn);
 
   const handleDeleteColumn = useCallback(async () => {
@@ -32,17 +31,17 @@ export function DeleteColumnModal({
       await deleteColumn({ columnId });
       removeColumn(dashboardId, columnId);
       onClose();
-      addToast("컬럼 삭제에 성공했습니다.", "success");
+      toast.success("컬럼 삭제에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "컬럼 삭제에 실패했습니다.");
+        toast.error(error.response?.data.message || "컬럼 삭제에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [removeColumn, addToast, onClose, columnId, dashboardId, start, stop]);
+  }, [removeColumn, onClose, columnId, dashboardId, start, stop]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>

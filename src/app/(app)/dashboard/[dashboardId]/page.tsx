@@ -7,7 +7,6 @@ import { CreateColumnModal } from "@/components/Modal/CreateColumn";
 import { getColumnList } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
-import { useToastStore } from "@/lib/stores/toast";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,9 +14,9 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { useCardStore } from "@/lib/stores/card";
 import { putCard } from "@/lib/api/cards";
 import { BaseCardType } from "@/types/cards";
+import { toast } from "react-toastify";
 
 const DashboardPage = () => {
-  const addToast = useToastStore.getState().addToast;
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
   const key = "dashboard";
@@ -52,18 +51,18 @@ const DashboardPage = () => {
         setColumnList(dashboardIdNum, res.data.data);
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message || "컬럼 목록 조회에 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [dashboardIdNum, setColumnList, addToast, start, stop]);
+  }, [dashboardIdNum, setColumnList, start, stop]);
 
   const parseDroppableId = (droppableId: string) =>
     Number(droppableId.replace("column-", ""));
@@ -134,9 +133,9 @@ const DashboardPage = () => {
           imageUrl: movedCard.imageUrl ?? null,
         };
         await putCard({ id: cardId, ...payload });
-        addToast("카드가 새 컬럼으로 옮겨졌습니다.", "success");
+        toast.success("카드가 새 컬럼으로 옮겨졌습니다.");
       } catch {
-        addToast("이동 저장 중 오류가 발생했습니다.");
+        toast.error("이동 저장 중 오류가 발생했습니다.");
         setCardList(
           dashboardIdNum,
           sourceColumnId,
@@ -146,7 +145,7 @@ const DashboardPage = () => {
         setCardList(dashboardIdNum, destColumnId, prevDest, prevDest.length);
       }
     },
-    [cardsByDashboard, dashboardIdNum, setCardList, addToast]
+    [cardsByDashboard, dashboardIdNum, setCardList]
   );
 
   const orderedColumns = useMemo(() => columnArray, [columnArray]);

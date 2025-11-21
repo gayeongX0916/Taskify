@@ -6,13 +6,13 @@ import Image from "next/image";
 import { DashboardButton } from "@/components/common/Button/DashboardButton";
 import { useEffect, useState } from "react";
 import { getInvitationList, putInvitationAnswer } from "@/lib/api/invitations";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useInviteStore } from "@/lib/stores/invite";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/common/Spinner";
 import React from "react";
+import { toast } from "react-toastify";
 
 type MobileInviteListProps = {
   name: string;
@@ -83,7 +83,6 @@ function ReceivedInviteTable() {
   const removeReceivedInvite = useInviteStore(
     (state) => state.removeReceivedInvite
   );
-  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const [value, setValue] = useState("");
 
@@ -95,19 +94,19 @@ function ReceivedInviteTable() {
         setReceivedInvites(res.data.invitations);
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message ||
               "초대받은 목록을 불러오는데 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [addToast, setReceivedInvites, start, stop]);
+  }, [setReceivedInvites, start, stop]);
 
   const filteredList = receivedInvites.filter((item) =>
     item.inviter.nickname.includes(value)
@@ -127,12 +126,14 @@ function ReceivedInviteTable() {
           router.push(`/dashboard/${dashboardId}`);
         }
       }
-      addToast("초대 응답에 성공했습니다.", "success");
+      toast.success("초대 응답에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "초대 응답에 실패했습니다.");
+        toast.error(
+          error.response?.data.message || "초대 응답에 실패했습니다."
+        );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
@@ -144,7 +145,7 @@ function ReceivedInviteTable() {
       className={`flex flex-col bg-white_FFFFFF rounded-[16px] ${
         receivedInvites.length === 0
           ? "gap-y-[100px] md:gap-y-[60px] px-[20px] pt-[24px] pb-[80px] md:px-[40px]"
-          : "px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] md:px-[28px] gap-y-[13px] md:gap-y-[24px]"
+          : "px-[24px] py-[16px] md:px-[28px] md:py-[18px] lg:py-[32px] gap-y-[13px] md:gap-y-[24px]"
       }`}
     >
       <header className="flex flex-col gap-y-[16px] lg:gap-y-[32px]">

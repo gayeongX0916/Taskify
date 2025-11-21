@@ -6,10 +6,10 @@ import ModalButton from "@/components/common/Button/ModalButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { putDashboard } from "@/lib/api/dashboards";
 import { putDashboardType } from "@/types/dashboards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useRouter } from "next/navigation";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 type EditDashboardCardProps = {
   dashboardId: number;
@@ -17,7 +17,6 @@ type EditDashboardCardProps = {
 
 export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
   const router = useRouter();
-  const addToast = useToastStore.getState().addToast;
   const key = "editDashboard";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -35,15 +34,15 @@ export function EditDashboardCard({ dashboardId }: EditDashboardCardProps) {
       start(key);
       const res = await putDashboard(data);
       updateDashboard(res.data.id, res.data.title, res.data.color);
-      addToast("대시보드 수정에 성공했습니다.", "success");
+      toast.success("대시보드 수정에 성공했습니다.");
       router.push(`/dashboard/${dashboardId}`);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message || "대시보드 수정에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

@@ -12,7 +12,6 @@ import { TagInput } from "@/components/common/Input/ModalInput/TagInput";
 import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import { ModalProps } from "@/types/ModalProps";
 import { putCard } from "@/lib/api/cards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useParams } from "next/navigation";
 import { formatDateTime } from "@/lib/utils/formatDate";
 import { useCardStore } from "@/lib/stores/card";
@@ -20,6 +19,7 @@ import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { Spinner } from "@/components/common/Spinner";
+import { toast } from "react-toastify";
 
 interface EditCardFormValues {
   columnId: number;
@@ -48,7 +48,6 @@ export function EditTodoModal({
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const columnList = useColumnStore(
     (state) => state.columnsByDashboard[dashboardIdNum]
   );
@@ -102,7 +101,7 @@ export function EditTodoModal({
       const res = await putCard({ id: cardId, ...payload });
       updateCard(dashboardIdNum, columnId, res.data);
       onClose();
-      addToast("컬럼 수정에 성공했습니다.", "success");
+      toast.success("컬럼 수정에 성공했습니다.");
       setValues({
         columnId,
         title: "",
@@ -114,9 +113,11 @@ export function EditTodoModal({
       });
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "컬럼 수정에 실패했습니다.");
+        toast.error(
+          error.response?.data.message || "컬럼 수정에 실패했습니다."
+        );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

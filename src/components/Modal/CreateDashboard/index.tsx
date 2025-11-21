@@ -9,11 +9,11 @@ import { colorList } from "@/lib/utils/dashboardColor";
 import { ModalProps } from "@/types/ModalProps";
 import { postDashboard } from "@/lib/api/dashboards";
 import { postDashboardType } from "@/types/dashboards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const router = useRouter();
@@ -21,7 +21,6 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const addDashboard = useDashboardStore((s) => s.addDashboard);
   const [color, setColor] = useState("");
   const [title, setTitle] = useState("");
@@ -35,15 +34,15 @@ export function CreateDashboardModal({ isOpen, onClose }: ModalProps) {
       onClose();
       setTitle("");
       setColor("");
-      addToast("대시보드 생성에 성공했습니다.", "success");
+      toast.success("대시보드 생성에 성공했습니다.");
       router.push(`/dashboard/${res.data.id}`);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message || "대시보드 생성에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

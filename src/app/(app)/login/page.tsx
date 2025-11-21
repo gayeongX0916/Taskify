@@ -17,9 +17,9 @@ import { postLogin } from "@/lib/api/auth";
 import { useAuthStore } from "@/lib/stores/auth";
 import { LoginType } from "@/types/auth";
 import { useRouter } from "next/navigation";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 type FormField = {
   key: "email" | "password";
@@ -37,7 +37,6 @@ const AuthLogo = React.memo(AuthLogoComponent);
 
 const LoginPage = () => {
   const setAuth = useAuthStore.getState().setAuth;
-  const addToast = useToastStore.getState().addToast;
   const key = "login";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -103,13 +102,13 @@ const LoginPage = () => {
       const token = response.data.accessToken;
       const userId = response.data.user.id;
       setAuth(token, userId);
-      addToast("로그인에 성공했습니다.", "success");
+      toast.success("로그인에 성공했습니다.");
       router.push("/mydashboard");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "로그인에 실패했습니다.");
+        toast.error(error.response?.data.message || "로그인에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
@@ -123,15 +122,15 @@ const LoginPage = () => {
       const password = "1234567890";
       const res = await postLogin({ email, password });
       setAuth(res.data.accessToken, res.data.user.id);
-      addToast("게스트 로그인에 성공했습니다.", "success");
+      toast.success("게스트 로그인에 성공했습니다.");
       router.push("/mydashboard");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message || "게스트 로그인에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

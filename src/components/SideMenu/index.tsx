@@ -11,12 +11,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getDashboardList } from "@/lib/api/dashboards";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
-import { useToastStore } from "@/lib/stores/toast";
 import { Skeleton } from "../common/Skeleton";
 import PaginationButton from "../common/Button/PaginationButton";
 import { useAuthStore } from "@/lib/stores/auth";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { dashboardColoMap } from "@/lib/utils/dashboardColor";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE = 10;
 
@@ -35,7 +35,6 @@ export function SideMenu() {
     pathname === "/" || pathname === "/login" || pathname === "/signup";
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-  const addToast = useToastStore.getState().addToast;
   const key = "SideMenu";
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
@@ -62,17 +61,17 @@ export function SideMenu() {
       mergeListPage(res.data.dashboards, res.data.totalCount);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message ||
             "대시보드 목록 불러오기에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [page, addToast, mergeListPage, start, stop, accessToken, skip]);
+  }, [page, mergeListPage, start, stop, accessToken, skip]);
   
 useEffect(() => {
     if (!skip && accessToken) {

@@ -4,13 +4,13 @@ import ModalButton from "@/components/common/Button/ModalButton";
 import { postColumn } from "@/lib/api/columns";
 import { useColumnStore } from "@/lib/stores/column";
 import { useLoadingStore } from "@/lib/stores/loading";
-import { useToastStore } from "@/lib/stores/toast";
 import { postColumnType } from "@/types/columns";
 import { ModalProps } from "@/types/ModalProps";
 import { Dialog } from "@headlessui/react";
 import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const key = "CreateColumnModal";
@@ -19,7 +19,6 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
-  const addToast = useToastStore.getState().addToast;
   const addColumn = useColumnStore((s) => s.addColumn);
   const columnsByDashboard = useColumnStore(
     (state) => state.columnsByDashboard?.[dashboardIdNum]
@@ -38,12 +37,12 @@ export function CreateColumnModal({ isOpen, onClose }: ModalProps) {
       addColumn(Number(dashboardId), res.data);
       onClose();
       setValue("");
-      addToast("컬럼 생성에 성공했습니다.", "success");
+      toast.success("컬럼 생성에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "컬럼 생성에 실패했습니다.");
+        toast.error(error.response?.data.message || "컬럼 생성에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

@@ -8,7 +8,6 @@ import {
   deleteInviteDashboard,
   getInviteDashboard,
 } from "@/lib/api/dashboards";
-import { useToastStore } from "@/lib/stores/toast";
 import { getInvitationType, InviteUser } from "@/types/invite";
 import InviteModal from "@/components/Modal/Base/InviteModal";
 import {
@@ -19,6 +18,7 @@ import { useDashboardStore } from "@/lib/stores/dashboard";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { useInviteStore } from "@/lib/stores/invite";
+import { toast } from "react-toastify";
 
 type MemberTableProps = {
   mode: "member" | "invite";
@@ -57,7 +57,6 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
   const sentInvites = useInviteStore((s) => s.sentInvites);
   const setSentInvites = useInviteStore((s) => s.setSentInvites);
   const removeSentInvite = useInviteStore((s) => s.removeSentInvite);
-  const addToast = useToastStore.getState().addToast;
   const [isOpen, setIsOpen] = useState(false);
   const [inviteTotalCount, setInviteTotalCount] = useState(0);
   const [memberTotalCount, setMemberTotalCount] = useState(0);
@@ -110,18 +109,18 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
         setMemberTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message || "담당자 목록 조회에 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchMembers();
-  }, [dashboardId, memberPage, addToast, setDashboardMembers, start, stop]);
+  }, [dashboardId, memberPage, setDashboardMembers, start, stop]);
 
   useEffect(() => {
     const fetchInvites = async () => {
@@ -142,31 +141,33 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
         setInviteTotalCount(res.data.totalCount);
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message ||
               "대시보드 초대 목록 불러오는데 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchInvites();
-  }, [dashboardId, isOpen, invitePage, addToast, setSentInvites, start, stop]);
+  }, [dashboardId, isOpen, invitePage, setSentInvites, start, stop]);
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
       start(key);
       await deleteInviteDashboard({ dashboardId, invitationId });
       removeSentInvite(invitationId);
-      addToast("초대 취소에 성공했습니다.", "success");
+      toast.success("초대 취소에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "초대 취소에 실패했습니다.");
+        toast.error(
+          error.response?.data.message || "초대 취소에 실패했습니다."
+        );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
@@ -178,14 +179,14 @@ export function MemberOrInviteTable({ mode, dashboardId }: MemberTableProps) {
       start(key);
       await deleteDashboardMember({ memberId });
       removeDashboardMemberStore(dashboardId, memberId);
-      addToast("대시보드 멤버 삭제에 성공했습니다.", "success");
+      toast.success("대시보드 멤버 삭제에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message || "대시보드 멤버 삭제에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
