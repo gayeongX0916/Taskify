@@ -17,10 +17,10 @@ import authLogo from "@/assets/auth_logo.svg";
 import { useRouter } from "next/navigation";
 import { SignupType } from "@/types/users";
 import { postSignUp } from "@/lib/api/users";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 type FieldKey = "email" | "nickname" | "password" | "checkPassword";
 
@@ -59,7 +59,6 @@ const AuthLogoComponent = () => (
 const AuthLogo = React.memo(AuthLogoComponent);
 
 const SignUpPage = () => {
-  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const key = "signup";
   const start = useLoadingStore((s) => s.startLoading);
@@ -169,13 +168,13 @@ const SignUpPage = () => {
       start(key);
       const { email: e, nickname: n, password: p } = data;
       await postSignUp({ email: e, nickname: n, password: p });
-      addToast("회원가입에 성공했습니다.", "success");
+      toast.success("회원가입에 성공했습니다.");
       router.push("/login");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "회원 가입에 실패했습니다.");
+        toast.error(error.response?.data.message || "회원 가입에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
