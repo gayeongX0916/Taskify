@@ -7,7 +7,6 @@ import { CreateTodoModal } from "@/components/Modal/CreateTodo";
 import DashBoardModal from "@/components/Modal/Dashboard";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCardList } from "@/lib/api/cards";
-import { useToastStore } from "@/lib/stores/toast";
 import { DeleteColumnModal } from "@/components/Modal/DeleteColumn";
 import { useCardStore } from "@/lib/stores/card";
 import { useParams } from "next/navigation";
@@ -16,6 +15,7 @@ import { useLoadingStore } from "@/lib/stores/loading";
 import { Skeleton } from "@/components/common/Skeleton";
 import React from "react";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
+import { toast } from "react-toastify";
 
 type ColumnCardProps = {
   columnId: number;
@@ -44,7 +44,6 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const rawCardList = useCardStore(
     (state) => state.cardsByDashboard?.[dashboardIdNum]?.[columnId]
   );
@@ -89,18 +88,18 @@ function ColumnCard({ columnId, title }: ColumnCardProps) {
         );
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(
+          toast.error(
             error.response?.data.message || "카드 목록 조회에 실패했습니다."
           );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [columnId, dashboardIdNum, start, stop, setCardList, addToast, key]);
+  }, [columnId, dashboardIdNum, start, stop, setCardList, key]);
 
   useEffect(() => {
     const updateMaxVisible = () => {

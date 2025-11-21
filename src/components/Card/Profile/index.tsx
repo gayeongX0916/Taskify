@@ -6,15 +6,14 @@ import plusIcon from "@/assets/plus_icon.svg";
 import { BaseInput } from "@/components/common/Input/BaseInput";
 import ModalButton from "@/components/common/Button/ModalButton";
 import { postProfileImg, putMyInfo } from "@/lib/api/users";
-import { useToastStore } from "@/lib/stores/toast";
 import { UserChangeType } from "@/types/users";
 import { useUserStore } from "@/lib/stores/user";
 import { isAxiosError } from "axios";
 import { LoadingProps } from "@/types/loading";
+import { toast } from "react-toastify";
 
 export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
   const key = "profile";
-  const addToast = useToastStore.getState().addToast;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const myInfo = useUserStore((s) => s.myInfo);
   const updateMyInfo = useUserStore((s) => s.updateMyInfo);
@@ -47,12 +46,12 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
       const res = await postProfileImg(selectedFile);
       setLocalProfileImageUrl(res.data.profileImageUrl);
       setIsTyping(true);
-      addToast("이미지 생성에 성공했습니다.", "success");
+      toast.success("이미지 생성에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "이미지 생성에 실패했습니다.");
+        toast.error(error.response?.data.message || "이미지 생성에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
@@ -64,12 +63,12 @@ export function ProfileCard({ isLoading, start, stop }: LoadingProps) {
       start(key);
       await putMyInfo(data);
       setIsTyping(false);
-      addToast("프로필 수정에 성공했습니다.", "success");
+      toast.success("프로필 수정에 성공했습니다.");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "프로필 수정에 실패했습니다.");
+        toast.error(error.response?.data.message || "프로필 수정에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
