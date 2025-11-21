@@ -6,13 +6,12 @@ import { MemberOrInviteTable } from "@/components/Table/MemberOrInvite";
 import AddButton from "@/components/common/Button/AddButton";
 import { useDashboardStore } from "@/lib/stores/dashboard";
 import { deleteDashboard } from "@/lib/api/dashboards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { BackButton } from "@/components/common/Button/BackButton";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const EditDashboardPage = () => {
-  const addToast = useToastStore.getState().addToast;
   const router = useRouter();
   const { dashboardId } = useParams();
   const dashboardIdNum = Number(dashboardId);
@@ -27,15 +26,15 @@ const EditDashboardPage = () => {
       start(key);
       await deleteDashboard({ dashboardId });
       removeDashboard(dashboardId);
-      addToast("대시보드를 성공적으로 삭제했습니다.", "success");
+      toast.success("대시보드를 성공적으로 삭제했습니다.");
       router.push("/mydashboard");
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(
+        toast.error(
           error.response?.data.message || "대시보드 삭제에 실패했습니다."
         );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
