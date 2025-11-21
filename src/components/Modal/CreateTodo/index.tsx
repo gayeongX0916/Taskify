@@ -11,11 +11,11 @@ import { ImageInput } from "@/components/common/Input/ModalInput/ImageInput";
 import AssigneeDropdown from "@/components/Dropdown/AssigneeDropdown";
 import { ModalProps } from "@/types/ModalProps";
 import { postCard } from "@/lib/api/cards";
-import { useToastStore } from "@/lib/stores/toast";
 import { useCardStore } from "@/lib/stores/card";
 import { formatDateTime } from "@/lib/utils/formatDate";
 import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 interface postCardFormValues {
   assigneeUserId: number;
@@ -43,7 +43,6 @@ export function CreateTodoModal({
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const addCard = useCardStore((s) => s.addCard);
   const initialValues: postCardFormValues = {
     assigneeUserId: 0,
@@ -71,13 +70,13 @@ export function CreateTodoModal({
       const res = await postCard({ ...payload });
       addCard(dashboardId, columnId, res.data);
       onClose();
-      addToast("카드 생성에 성공했습니다.", "success");
+      toast.success("카드 생성에 성공했습니다.");
       setValues(initialValues);
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "카드 생성에 실패했습니다.");
+        toast.error(error.response?.data.message || "카드 생성에 실패했습니다.");
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);

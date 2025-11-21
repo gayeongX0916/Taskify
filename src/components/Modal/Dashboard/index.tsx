@@ -18,7 +18,6 @@ import AssigneeCard from "@/components/Card/Assignee";
 import { ActionDropdown } from "@/components/Dropdown/ActionDropdown";
 import { ModalProps } from "@/types/ModalProps";
 import TagList from "@/components/common/TagList";
-import { useToastStore } from "@/lib/stores/toast";
 import { deleteCardDetail } from "@/lib/api/cards";
 import { EditTodoModal } from "../EditTodo";
 import { useCardStore } from "@/lib/stores/card";
@@ -28,6 +27,7 @@ import { useLoadingStore } from "@/lib/stores/loading";
 import { isAxiosError } from "axios";
 import { Spinner } from "@/components/common/Spinner";
 import React from "react";
+import { toast } from "react-toastify";
 
 interface DashBoardModalProps extends ModalProps {
   cardId: number;
@@ -94,7 +94,6 @@ function DashBoardModal({
   const start = useLoadingStore((s) => s.startLoading);
   const stop = useLoadingStore((s) => s.stopLoading);
   const isLoading = useLoadingStore((s) => s.loadingMap[key] ?? false);
-  const addToast = useToastStore.getState().addToast;
   const commentList = useCommentStore(
     (state) => state.commentsByCard?.[cardId]
   );
@@ -116,16 +115,18 @@ function DashBoardModal({
         setCommentList(cardId, res.data.comments);
       } catch (error) {
         if (isAxiosError(error)) {
-          addToast(error.response?.data.message || "댓글 조회에 실패했습니다.");
+          toast.error(
+            error.response?.data.message || "댓글 조회에 실패했습니다."
+          );
         } else {
-          addToast("알 수 없는 오류가 발생했습니다.");
+          toast.error("알 수 없는 오류가 발생했습니다.");
         }
       } finally {
         stop(key);
       }
     };
     fetchData();
-  }, [cardId, setCommentList, addToast, start, stop, key]);
+  }, [cardId, setCommentList, start, stop, key]);
 
   const handleDeleteCard = useCallback(async () => {
     try {
@@ -133,34 +134,26 @@ function DashBoardModal({
       await deleteCardDetail({ cardId });
       removeCard(dashboardId, columnId, cardId);
       setShowDropdown(false);
-      addToast("카드 삭제에 성공했습니다.", "success");
+      toast.success("카드 삭제에 성공했습니다.");
       onClose();
     } catch (error) {
       if (isAxiosError(error)) {
-        addToast(error.response?.data.message || "카드 삭제에 실패했습니다.");
+        toast.error(
+          error.response?.data.message || "카드 삭제에 실패했습니다."
+        );
       } else {
-        addToast("알 수 없는 오류가 발생했습니다.");
+        toast.error("알 수 없는 오류가 발생했습니다.");
       }
     } finally {
       stop(key);
     }
-  }, [
-    removeCard,
-    dashboardId,
-    columnId,
-    cardId,
-    addToast,
-    onClose,
-    start,
-    stop,
-    key,
-  ]);
+  }, [removeCard, dashboardId, columnId, cardId, onClose, start, stop, key]);
 
   useEffect(() => {
     if (!card && isOpen && !isLoading) {
-      addToast("카드를 찾을 수 없습니다.");
+      toast.error("카드를 찾을 수 없습니다.");
     }
-  }, [card, isOpen, isLoading, addToast]);
+  }, [card, isOpen, isLoading]);
 
   if (!card) {
     return (
